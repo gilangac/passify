@@ -1,0 +1,82 @@
+{
+    "categories": [
+        {
+            "id": "0",
+            "name": "Sepakbola",
+            "path": "sepakbola",
+            "icon": "sepakbola_icon.png"
+        },
+        {
+            "id": "1",
+            "name": "Renang",
+            "path": "renang",
+            "icon": "renang_icon.png"
+        },
+        {
+            "id": "2",
+            "name": "Badminton",
+            "path": "badminton",
+            "icon": "bulutangkis_icon.png"
+        },
+        {
+            "id": "3",
+            "name": "Musik",
+            "path": "musik",
+            "icon": "music_icon.png"
+        },
+        {
+            "id": "4",
+            "name": "Coding",
+            "path": "coding",
+            "icon": "coding_icon.png"
+        },
+        {
+            "id": "5",
+            "name": "Futsal",
+            "path": "futsal",
+            "icon": "futsal_icon.png"
+        },
+        {
+            "id": "6",
+            "name": "Bersepeda",
+            "path": "bersepeda",
+            "icon": "cycle_icon.png"
+        },
+        {
+            "id": "7",
+            "name": "Panahan",
+            "path": "panahan",
+            "icon": "panah_icon.png"
+        },
+        {
+            "id": "8",
+            "name": "Basket",
+            "path": "Basket",
+            "icon": "basket_icon.png"
+        },
+        {
+            "id": "9",
+            "name": "Tenis Meja",
+            "path": "tenis-meja",
+            "icon": "table_tenis_icon.png"
+        },
+        {
+            "id": "10",
+            "name": "Tari",
+            "path": "tari",
+            "icon": "dance_icon.png"
+        },
+        {
+            "id": "11",
+            "name": "Bola Voli",
+            "path": "bola-voli",
+            "icon": "voli_icon.png"
+        },
+        {
+            "id": "12",
+            "name": "Lainnya",
+            "path": "lainnya",
+            "icon": "other_icon.png"
+        }
+    ]
+}
