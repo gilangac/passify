@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, must_be_immutable, unrelated_type_equality_checks
+// ignore_for_file: prefer_const_constructors, must_be_immutable, unrelated_type_equality_checks, sized_box_for_whitespace
 
 import 'dart:io';
 
@@ -10,9 +10,9 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/auth/register_controller.dart';
-import 'package:passify/models/provinsi.dart';
 import 'package:passify/routes/pages.dart';
 import 'package:passify/widgets/general/app_bar.dart';
+import 'package:passify/widgets/general/bottomsheet_widget.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:passify/widgets/general/form_input.dart';
 
@@ -31,58 +31,59 @@ class RegisterPage extends StatelessWidget {
   }
 
   Widget _body() {
-    return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
-      child: Container(
-        margin: EdgeInsets.all(35),
-        width: Get.width,
-        child: Form(
-          key: registerC.formKeReg,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            // ignore: prefer_const_literals_to_create_immutables
-            children: [
-              SizedBox(
-                height: 10,
+    return Obx(
+      () => SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Container(
+            margin: EdgeInsets.all(35),
+            width: Get.width,
+            child: Form(
+              key: registerC.formKeReg,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                // ignore: prefer_const_literals_to_create_immutables
+                children: [
+                  SizedBox(
+                    height: 10,
+                  ),
+                  _photoProfile(),
+                  SizedBox(
+                    height: 40,
+                  ),
+                  _usernameInput(),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  _nameInput(),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  _provinceInput(),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  _cityInput(),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  _hobbyInput(),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  _accountIgInput(),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  _accountTwitterInput(),
+                  SizedBox(
+                    height: 70,
+                  ),
+                  _btnNext()
+                ],
               ),
-              _photoProfile(),
-              SizedBox(
-                height: 40,
-              ),
-              _usernameInput(),
-              SizedBox(
-                height: 30,
-              ),
-              _nameInput(),
-              SizedBox(
-                height: 30,
-              ),
-              _provinceInput(),
-              SizedBox(
-                height: 30,
-              ),
-              _cityInput(),
-              SizedBox(
-                height: 30,
-              ),
-              _hobbyInput(),
-              SizedBox(
-                height: 30,
-              ),
-              _accountIgInput(),
-              SizedBox(
-                height: 30,
-              ),
-              _accountTwitterInput(),
-              SizedBox(
-                height: 70,
-              ),
-              _btnNext()
-            ],
-          ),
-        ),
-      ),
+            ),
+          )),
     );
   }
 
@@ -181,7 +182,7 @@ class RegisterPage extends StatelessWidget {
       ),
       onTap: () {
         registerC.dataProvinsi.isNotEmpty
-            ? _bottomSheetReg(
+            ? BottomSheetList(
                 ListView.builder(
                     physics: BouncingScrollPhysics(),
                     itemCount: registerC.dataProvinsi.length,
@@ -250,7 +251,7 @@ class RegisterPage extends StatelessWidget {
       ),
       onTap: () {
         registerC.dataCity.isNotEmpty
-            ? _bottomSheetReg(
+            ? BottomSheetList(
                 ListView.builder(
                     physics: BouncingScrollPhysics(),
                     itemCount: registerC.dataCity.length,
@@ -304,11 +305,13 @@ class RegisterPage extends StatelessWidget {
             enabled: false,
             suffix: true,
             title: 'Hobi',
-            placeholder: 'Pilih Hobi',
+            placeholder: registerC.selectedHoby.isNotEmpty
+                ? 'Tambah Hobi (maksimal 3)'
+                : 'Pilih Hobi',
             inputType: TextInputType.name,
             inputAction: TextInputAction.next,
             validator: (value) {
-              if (value == null || value.isEmpty) {
+              if (registerC.selectedHoby.isEmpty) {
                 return 'Masukkan hobi terlebih dahulu';
               }
               return null;
@@ -317,45 +320,49 @@ class RegisterPage extends StatelessWidget {
           ),
           onTap: () {
             registerC.dataHobies.isNotEmpty
-                ? _bottomSheetReg(
-                    ListView.builder(
-                        physics: BouncingScrollPhysics(),
-                        itemCount: registerC.dataHobies.length,
-                        padding: EdgeInsets.all(15),
-                        itemBuilder: (context, index) {
-                          return GestureDetector(
-                            onTap: () {
-                              Get.back();
-                            },
-                            child: Container(
-                              margin: EdgeInsets.only(bottom: 15),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    registerC.dataHobies[index]['name']
-                                        .toString(),
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 12,
-                                      color: AppColors.textColor,
-                                      fontWeight: FontWeight.w400,
+                ? registerC.selectedHoby.length < 3
+                    ? BottomSheetList(
+                        ListView.builder(
+                            physics: BouncingScrollPhysics(),
+                            itemCount: registerC.dataHobies.length,
+                            padding: EdgeInsets.symmetric(vertical: 15),
+                            itemBuilder: (context, index) {
+                              return InkWell(
+                                borderRadius: BorderRadius.circular(15),
+                                highlightColor: Colors.grey.shade200,
+                                splashColor: Colors.grey.shade200,
+                                onTap: () => registerC.onSelectHoby(index),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(15.0),
+                                      child: Text(
+                                        registerC.dataHobies[index]['name']
+                                            .toString(),
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          color: AppColors.textColor,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: 15,
-                                  ),
-                                  Container(
-                                    height: 1,
-                                    width: Get.width,
-                                    color: Colors.grey.shade200,
-                                  )
-                                ],
-                              ),
-                            ),
-                          );
-                        }),
-                    "Hobi")
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15),
+                                      child: Container(
+                                        height: 1,
+                                        width: Get.width,
+                                        color: Colors.grey.shade200,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              );
+                            }),
+                        "Hobi")
+                    : null
                 : registerC.onReadJson();
           },
         ),
@@ -363,46 +370,49 @@ class RegisterPage extends StatelessWidget {
           height: 10,
         ),
         Wrap(
-          direction: Axis.horizontal,
-          alignment: WrapAlignment.start,
-          children: [
-            Container(
-              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-              decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(5),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.grey.shade200,
-                        blurRadius: 4,
-                        spreadRadius: 2)
-                  ]),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    // member.detail.fullName ?? '',
-                    "sepakbola",
-                    style: GoogleFonts.poppins(color: Colors.white),
-                  ),
-                  SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Icon(
-                      Feather.x,
-                      color: Colors.white54,
-                      size: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        )
+            direction: Axis.horizontal,
+            alignment: WrapAlignment.start,
+            children: _selectedHoby())
       ],
     );
   }
+
+  List<Widget> _selectedHoby() => registerC.selectedHoby
+      .map(
+        (element) => Container(
+          margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+          padding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+          decoration: BoxDecoration(
+              color: AppColors.primaryColor,
+              borderRadius: BorderRadius.circular(5),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.grey.shade200, blurRadius: 4, spreadRadius: 2)
+              ]),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                // member.detail.fullName ?? '',
+                element,
+                style: GoogleFonts.poppins(color: Colors.white),
+              ),
+              SizedBox(width: 8),
+              GestureDetector(
+                onTap: () {
+                  registerC.selectedHoby.removeWhere((hoby) => hoby == element);
+                },
+                child: Icon(
+                  Feather.x,
+                  color: Colors.white54,
+                  size: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+      )
+      .toList();
 
   Widget _accountIgInput() {
     return formInput(
@@ -577,72 +587,6 @@ class RegisterPage extends StatelessWidget {
       onTap: () {
         Get.back();
       },
-    );
-  }
-
-  Widget _actionBar(String type) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-      alignment: Alignment.center,
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () {
-              // eventC.onClearFC();
-              Get.back();
-            },
-            child: Container(
-                width: 35,
-                padding: EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.grey.shade100,
-                        blurRadius: 4,
-                        spreadRadius: 2)
-                  ],
-                ),
-                child: Icon(Feather.x, size: 24)),
-          ),
-          Spacer(),
-          Text(
-            "Pilih " + type,
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          Spacer(),
-          Container(
-            width: 35,
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _bottomSheetReg(Widget content, String type) {
-    Get.bottomSheet(
-      SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(10),
-          child: Container(
-            height: Get.height * 0.92,
-            child: Column(
-              children: [
-                _actionBar(type),
-                Expanded(child: content),
-              ],
-            ),
-          ),
-        ),
-      ),
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-      isDismissible: true,
-      enableDrag: false,
-      isScrollControlled: true,
     );
   }
 }

@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable, prefer_const_constructors
+// ignore_for_file: must_be_immutable, prefer_const_constructors, prefer_const_constructors_in_immutables, file_names, unused_local_variable
 
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -10,7 +10,8 @@ import 'package:passify/controllers/profile/profile_controller.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/routes/pages.dart';
 
-FirebaseAuthController firebaseAuthController = Get.find();
+FirebaseAuthController firebaseAuthController =
+    Get.put(FirebaseAuthController());
 
 class ProfileActionMenuWidget extends StatelessWidget {
   ProfileActionMenuWidget({Key? key}) : super(key: key);
@@ -46,6 +47,7 @@ void _bottomSheetContent() {
               _listAction(
                   icon: Feather.info,
                   title: "Tentang Aplikasi",
+                  type: "about",
                   path: AppPages.HOME),
               SizedBox(height: 10),
               Container(
@@ -73,7 +75,10 @@ void _bottomSheetContent() {
 }
 
 Widget _listAction(
-    {IconData? icon, required String title, required String path}) {
+    {IconData? icon,
+    required String title,
+    String? type,
+    required String path}) {
   return InkWell(
     child: Container(
       decoration: BoxDecoration(
@@ -88,7 +93,7 @@ Widget _listAction(
     ),
     onTap: () {
       Get.back();
-      Get.toNamed(path);
+      type == "about" ? DialogHelper.showInfo() : Get.toNamed(path);
     },
   );
 }

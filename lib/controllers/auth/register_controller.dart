@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_this, unrelated_type_equality_checks, avoid_print, unused_field
+// ignore_for_file: unnecessary_this, unrelated_type_equality_checks, avoid_print, unused_field, unused_import
 
 import 'dart:convert';
 import 'dart:io';
@@ -9,7 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:images_picker/images_picker.dart';
+import 'package:passify/controllers/base/service_controller.dart';
 import 'package:passify/helpers/dialog_helper.dart';
+import 'package:passify/helpers/snackbar_helper.dart';
 import 'package:passify/models/provinsi.dart';
 import 'package:passify/routes/pages.dart';
 import 'package:passify/services/service_exception.dart';
@@ -18,7 +20,7 @@ import 'package:passify/services/service_preference.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
-class RegisterController extends GetxController {
+class RegisterController extends GetxController with ServiceController {
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference user = FirebaseFirestore.instance.collection('users');
@@ -26,8 +28,10 @@ class RegisterController extends GetxController {
   var selectedImagePath = ''.obs;
   var urlImage = ''.obs;
   var progress = 0.0.obs;
+  var isChecked = false.obs;
   final dataHobies = [].obs;
-  final dateNow = DateFormat("dd-MM-yyyy h:mma").format(DateTime.now());
+  final selectedHoby = [].obs;
+  final dateNow = DateTime.now();
   final formKeReg = GlobalKey<FormState>();
   File? imageFile;
   final provinsiData = [].obs;
@@ -53,9 +57,7 @@ class RegisterController extends GetxController {
   }
 
   onRegister() {
-    if (this.formKeReg.currentState!.validate()) {
-      DialogHelper.showLoading();
-
+    onSend() {
       try {
         selectedImagePath != ""
             ? user.doc(auth.currentUser?.uid).set({
@@ -65,7 +67,8 @@ class RegisterController extends GetxController {
                 "photoUser": urlImage.toString(),
                 "username": usernameFC.text.toLowerCase(),
                 "city": cityFC.text,
-                "hobby": hobbyFC.text,
+                "province": provinceFC.text,
+                "hobby": selectedHoby,
                 "instagram": instagramFC.text.toLowerCase(),
                 "twitter": twitterFC.text.toLowerCase(),
                 "date": dateNow
@@ -77,7 +80,8 @@ class RegisterController extends GetxController {
                 "photoUser": auth.currentUser?.photoURL,
                 "username": usernameFC.text.toLowerCase(),
                 "city": cityFC.text,
-                "hobby": hobbyFC.text,
+                "province": provinceFC.text,
+                "hobby": selectedHoby,
                 "instagram": instagramFC.text.toLowerCase(),
                 "twitter": twitterFC.text.toLowerCase(),
                 "date": dateNow
@@ -89,15 +93,33 @@ class RegisterController extends GetxController {
         Get.back();
       }
     }
+
+    if (this.formKeReg.currentState!.validate()) {
+      DialogHelper.showLoading();
+      user
+          .where('username', isEqualTo: usernameFC.text)
+          .get()
+          .then((QuerySnapshot snapshot) async {
+        print(snapshot.size);
+        if (snapshot.size == 0) {
+          onSend();
+        } else {
+          snapshot.docs.forEach((value) {
+            Get.back();
+            SnackBarHelper.showError(description: "Username sudah digunakan");
+          });
+        }
+      });
+    }
   }
 
   void pickImage(String source) async {
     source == 'camera'
         ? ImagesPicker.openCamera(
             language: Language.English,
-            maxSize: 50,
+            maxSize: 20,
             pickType: PickType.image,
-            quality: 0.5,
+            quality: 0.3,
             cropOpt: CropOption(
               aspectRatio: CropAspectRatio.custom,
               cropType: CropType.rect,
@@ -111,8 +133,8 @@ class RegisterController extends GetxController {
             count: 1,
             language: Language.English,
             pickType: PickType.image,
-            quality: 0.5,
-            maxSize: 50,
+            quality: 0.3,
+            maxSize: 20,
             cropOpt: CropOption(
               aspectRatio: CropAspectRatio.custom,
               cropType: CropType.rect,
@@ -202,7 +224,7 @@ class RegisterController extends GetxController {
   }
 
   onUpdateProvince() async {
-    if (dataProvinsi.length <= 0) {
+    if (dataProvinsi.isEmpty) {
       try {
         final result = await InternetAddress.lookup('google.com');
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
@@ -214,6 +236,26 @@ class RegisterController extends GetxController {
     }
   }
 
+  onSelectHoby(int index) {
+    var a = 0;
+    if (selectedHoby.isNotEmpty) {
+      for (int i = 0; i < selectedHoby.length; i++) {
+        if (dataHobies[index]['name'].toString() ==
+            selectedHoby[i].toString()) {
+          a = 1;
+        }
+      }
+      if (a != 1) {
+        if (selectedHoby.length < 3) {
+          selectedHoby.add(dataHobies[index]['name'].toString());
+        }
+      }
+    } else {
+      selectedHoby.add(dataHobies[index]['name'].toString());
+    }
+    Get.back();
+  }
+
   onReadJson() async {
     dataHobies.clear();
     final String response =
@@ -222,34 +264,4 @@ class RegisterController extends GetxController {
     dataHobies.value = data["categories"];
     print(dataHobies.length);
   }
-
-  void handleError(error) {
-    if (error is BadRequestException) {
-      Get.back();
-
-      var message = error.message;
-      var url = error.url;
-
-      if (url == '/provinsi') {
-        print(message);
-      } else {}
-    } else if (error is ApiNotRespondingException) {
-      var message = error.message;
-      print(message);
-    } else if (error is UnauthorizedException) {
-      var message = error.message;
-      print(message);
-    } else if (error is FetchDataException) {
-      var message = error.message;
-      DialogHelper.showError(description: message);
-    }
-  }
-
-  static final _errorMessages = {
-    '/provinsi': {
-      'title': 'Gagal',
-      'description':
-          'Waduh sepertinya ada masalah saat melakukan load Provinsi. Pastikan koneksi anda stabil dan silahkan coba lagi.',
-    },
-  };
 }

@@ -1,16 +1,19 @@
 // ignore_for_file: prefer_const_constructors, sized_box_for_whitespace
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/forum/detail_event_controller.dart';
-import 'package:passify/controllers/forum/event_controller.dart';
+import 'package:intl/intl.dart';
+import 'package:passify/routes/pages.dart';
 import 'package:passify/widgets/general/app_bar.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:passify/widgets/general/comment_widget.dart';
 import 'package:passify/widgets/general/dotted_separator.dart';
+import 'package:passify/widgets/post/form_edit_post.dart';
 
 class EventPage extends StatelessWidget {
   EventPage({Key? key}) : super(key: key);
@@ -29,7 +32,17 @@ class EventPage extends StatelessWidget {
   }
 
   PreferredSizeWidget _appBar() {
-    return appBar(title: "Detail Event");
+    return appBar(title: "Detail Event", actions: [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(0, 0, 14, 0),
+        child: Container(
+            alignment: Alignment.center,
+            child: GestureDetector(
+                onTap: () => _bottomSheetContent(
+                    detailEventController.detailEvent[0].idUser),
+                child: Icon(Feather.more_horizontal))),
+      )
+    ]);
   }
 
   Widget _body() {
@@ -40,32 +53,42 @@ class EventPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: SingleChildScrollView(
-                  physics: BouncingScrollPhysics(),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _profile(),
-                      Divider(
-                        height: 5,
-                        thickness: 5,
-                        color: Colors.grey.shade200,
-                      ),
-                      _aboutEvent(),
-                      Divider(
-                        height: 5,
-                        thickness: 5,
-                        color: Colors.grey.shade200,
-                      ),
-                      _description(),
-                      Divider(
-                        height: 5,
-                        thickness: 5,
-                        color: Colors.grey.shade200,
-                      ),
-                      _comment()
-                    ],
+                child: RefreshIndicator(
+                  onRefresh: () => detailEventController.OnRefresh(),
+                  child: SingleChildScrollView(
+                    physics: BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics()),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _profile(),
+                        Divider(
+                          height: 5,
+                          thickness: 5,
+                          color: Colors.grey.shade200,
+                        ),
+                        _aboutEvent(),
+                        Divider(
+                          height: 5,
+                          thickness: 5,
+                          color: Colors.grey.shade200,
+                        ),
+                        _description(),
+                        Divider(
+                          height: 5,
+                          thickness: 5,
+                          color: Colors.grey.shade200,
+                        ),
+                        _buttonFollow(),
+                        Divider(
+                          height: 5,
+                          thickness: 5,
+                          color: Colors.grey.shade200,
+                        ),
+                        _comment()
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -133,6 +156,59 @@ class EventPage extends StatelessWidget {
     );
   }
 
+  Widget _buttonFollow() {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Center(
+        child: Container(
+          width: Get.width * 0.8,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: detailEventController.isFollow.value
+                  ? Colors.transparent
+                  : AppColors.primaryColor,
+              border: Border.all(color: AppColors.primaryColor, width: 1)),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(10),
+              splashColor: detailEventController.isFollow.value
+                  ? AppColors.primaryColor.withOpacity(0.5)
+                  : Colors.grey.shade200.withOpacity(0.5),
+              highlightColor: detailEventController.isFollow.value
+                  ? AppColors.primaryColor.withOpacity(0.5)
+                  : Colors.grey.shade200.withOpacity(0.5),
+              onTap: () {
+                if (detailEventController.isFollow.value) {
+                  detailEventController.onUnfollowEvent();
+                } else {
+                  detailEventController.onFollowEvent();
+                }
+              },
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                child: Center(
+                  child: Text(
+                    detailEventController.isFollow.value
+                        ? 'Mengikuti Event'
+                        : 'Ikuti Event',
+                    style: GoogleFonts.poppins(
+                        color: detailEventController.isFollow.value
+                            ? AppColors.primaryColor
+                            : Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _aboutEvent() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -187,7 +263,10 @@ class EventPage extends StatelessWidget {
                     width: 10,
                   ),
                   Text(
-                    detailEventController.detailEvent[0].dateEvent.toString(),
+                    DateFormat("EEEE, dd MMMM yyyy", "id")
+                        .format(detailEventController.detailEvent[0].dateEvent!
+                            .toDate())
+                        .toString(),
                     style: GoogleFonts.poppins(
                         color: AppColors.tittleColor,
                         fontSize: 12,
@@ -237,7 +316,7 @@ class EventPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          detailEventController.detailEvent[0].member!.length
+                          detailEventController.detailEvent[0].member!
                                   .toString() +
                               " Partisipan",
                           style: GoogleFonts.poppins(
@@ -340,6 +419,7 @@ class EventPage extends StatelessWidget {
                       ),
                       Text(
                         "Belum ada komentar",
+                        textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
                             color: AppColors.tittleColor,
                             fontSize: 16,
@@ -347,11 +427,13 @@ class EventPage extends StatelessWidget {
                       ),
                       Text(
                         "Jadilah yang pertama mengomentari event ini",
+                        textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
                             color: Colors.grey.shade400,
                             fontSize: 12,
                             fontWeight: FontWeight.w500),
                       ),
+                      Container(height: 400)
                     ],
                   ),
                 ),
@@ -376,6 +458,10 @@ class EventPage extends StatelessWidget {
                       },
                       keyboardType: TextInputType.text,
                       textInputAction: TextInputAction.send,
+                      onFieldSubmitted: (value) {
+                        detailEventController.onPostComment();
+                        FocusManager.instance.primaryFocus?.unfocus();
+                      },
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.all(10),
                         fillColor: AppColors.lightGrey,
@@ -394,8 +480,6 @@ class EventPage extends StatelessWidget {
                       ? GestureDetector(
                           onTap: () {
                             detailEventController.onPostComment();
-                            detailEventController.commentFC.clear();
-                            detailEventController.commentText.value = '';
                             FocusManager.instance.primaryFocus?.unfocus();
                           },
                           child: Container(
@@ -428,8 +512,7 @@ class EventPage extends StatelessWidget {
                 Expanded(
                   child: ListView.builder(
                       physics: BouncingScrollPhysics(),
-                      itemCount:
-                          detailEventController.detailEvent[0].member!.length,
+                      itemCount: detailEventController.memberEvent.length,
                       padding: EdgeInsets.all(15),
                       itemBuilder: (context, index) {
                         return Container(
@@ -451,41 +534,45 @@ class EventPage extends StatelessWidget {
                                   SizedBox(
                                     width: 10,
                                   ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        detailEventController
-                                            .memberEvent[index].name
-                                            .toString(),
-                                        style: GoogleFonts.poppins(
-                                            color: AppColors.tittleColor,
-                                            height: 1.2,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                      Text(
-                                        detailEventController
-                                            .memberEvent[index].username
-                                            .toString(),
-                                        style: GoogleFonts.poppins(
-                                            height: 1.2,
-                                            color: Colors.grey.shade500,
-                                            fontStyle: FontStyle.normal,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w400),
-                                      ),
-                                    ],
+                                  Container(
+                                    width: Get.width * 0.55,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          detailEventController
+                                              .memberEvent[index].name
+                                              .toString(),
+                                          style: GoogleFonts.poppins(
+                                              color: AppColors.tittleColor,
+                                              height: 1.2,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                        Text(
+                                          detailEventController
+                                              .memberEvent[index].username
+                                              .toString(),
+                                          style: GoogleFonts.poppins(
+                                              height: 1.2,
+                                              color: Colors.grey.shade500,
+                                              fontStyle: FontStyle.normal,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   Spacer(),
                                   Obx(() => detailEventController
                                               .memberEvent[index].idUser ==
                                           detailEventController
-                                              .detailEvent[0].member![0]
+                                              .detailEvent[0].idUser
                                       ? Text(
-                                          "Pembuat Event",
+                                          "Pembuat",
                                           style: GoogleFonts.poppins(
                                               height: 1.2,
                                               color: Colors.grey.shade500,
@@ -493,7 +580,7 @@ class EventPage extends StatelessWidget {
                                               fontSize: 12,
                                               fontWeight: FontWeight.w400),
                                         )
-                                      : SizedBox()),
+                                      : SizedBox(height: 0)),
                                 ],
                               ),
                               SizedBox(
@@ -560,6 +647,148 @@ class EventPage extends StatelessWidget {
             width: 35,
           ),
         ],
+      ),
+    );
+  }
+
+  void _bottomSheetContent(var idUser) {
+    String myId = detailEventController.myAccountId.value;
+    Get.bottomSheet(
+        SafeArea(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(20, 10, 20, 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(color: AppColors.lightGrey, width: 35, height: 4),
+                SizedBox(height: 30),
+                Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey.shade100),
+                    child: Column(
+                      children: [
+                        _listAction(
+                            title: "Laporkan",
+                            path: AppPages.EDIT_PROFILE,
+                            type: "report"),
+                        myId == idUser
+                            ? Column(
+                                children: [
+                                  Divider(
+                                    height: 1,
+                                    color: Colors.grey.shade300,
+                                  ),
+                                  _listAction(
+                                      title: "Edit Event",
+                                      path: AppPages.HOME,
+                                      type: "edit"),
+                                  Divider(
+                                    height: 1,
+                                    color: Colors.grey.shade300,
+                                  ),
+                                  _deleteAction(),
+                                ],
+                              )
+                            : SizedBox(
+                                height: 0,
+                              ),
+                      ],
+                    )),
+                SizedBox(height: 13),
+                _cancelAction()
+              ],
+            ),
+          ),
+        ),
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+        isDismissible: true,
+        enableDrag: true,
+        isScrollControlled: true);
+  }
+
+  Widget _listAction({
+    required String title,
+    required String path,
+    String? type,
+  }) {
+    return Container(
+      width: Get.width,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: () {
+            Get.back();
+            type == "edit" ? formCreateEvent() : null;
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+            child: Text(
+              title,
+              style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textColor),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _deleteAction({String? title, String? path}) {
+    return Container(
+      width: Get.width,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: () {
+            // detailEventController.onConfirmDelete();
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+            child: Text(
+              "Hapus Event",
+              style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.red.shade500),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _cancelAction() {
+    return Container(
+      width: Get.width,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10), color: Colors.grey.shade100),
+      child: Material(
+        child: InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: () => Get.back(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+              child: Text(
+                'Batal',
+                style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.textColor),
+                textAlign: TextAlign.center,
+              ),
+            )),
+        color: Colors.transparent,
       ),
     );
   }

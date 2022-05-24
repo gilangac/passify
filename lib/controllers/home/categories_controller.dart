@@ -14,26 +14,54 @@ class CategoriesController extends GetxController {
   final HomeController homeController = Get.find();
   final _isChange = true.obs;
   final change = 0.obs;
+  final c1 = 0.obs;
+  final c2 = 0.obs;
+  final c3 = 0.obs;
+  final c4 = 0.obs;
   final changeC1 = 0.obs;
   final changeC2 = 0.obs;
   final changeC3 = 0.obs;
   final changeC4 = 0.obs;
-  final _isLoading = false.obs;
+  final _isLoading = true.obs;
 
   final itemsChange = [].obs;
   final otherItemsChange = [].obs;
 
   @override
   void onInit() async {
-    onGetData();
+    readJson();
     super.onInit();
   }
 
-  onGetData() {
-    itemsChange.addAll(homeController.items);
-    otherItemsChange.addAll(homeController.otherItems);
+  readJson() async {
+    itemsChange.isNotEmpty ? itemsChange.clear() : null;
+    otherItemsChange.isNotEmpty ? otherItemsChange.clear() : null;
+    final String response =
+        await rootBundle.loadString('assets/json/categories.json');
+    final data = await json.decode(response);
+    itemsChange.value = data["categories"];
+
+    c1.value = int.parse(PreferenceService.getC1().toString());
+    c2.value = int.parse(PreferenceService.getC2().toString());
+    c3.value = int.parse(PreferenceService.getC3().toString());
+    c4.value = int.parse(PreferenceService.getC4().toString());
+
+    otherItem();
   }
 
+  otherItem() {
+    for (int i = 0; i < itemsChange.length; i++) {
+      if (itemsChange[i]['id'] != PreferenceService.getC1().toString() &&
+          itemsChange[i]['id'] != PreferenceService.getC2().toString() &&
+          itemsChange[i]['id'] != PreferenceService.getC3().toString() &&
+          itemsChange[i]['id'] != PreferenceService.getC4().toString()) {
+        otherItemsChange.add(itemsChange[i]);
+        otherItemsChange.refresh();
+      }
+    }
+    _isLoading.value = false;
+  }
+  
   onMinFav(String id) {
     id == changeC1.value.toString()
         ? changeC1.value = 300

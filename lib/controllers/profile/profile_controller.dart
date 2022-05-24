@@ -1,28 +1,55 @@
 // ignore: unused_import
+// ignore_for_file: avoid_function_literals_in_foreach_calls, unnecessary_this
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:passify/models/community.dart';
+import 'package:passify/models/community_member.dart';
+import 'package:passify/models/event.dart';
 import 'package:passify/models/user.dart';
+import 'package:intl/intl.dart';
 
 class ProfileController extends GetxController {
   var dataUser = <UserModel>[].obs;
   final name = "".obs;
-
+  final hobby = "".obs;
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference user = FirebaseFirestore.instance.collection('users');
+  CollectionReference community =
+      FirebaseFirestore.instance.collection('communities');
+  CollectionReference event = FirebaseFirestore.instance.collection('events');
+  CollectionReference eventMember =
+      FirebaseFirestore.instance.collection('eventMembers');
+  CollectionReference communityMember =
+      FirebaseFirestore.instance.collection('communityMembers');
+  CollectionReference eventComment =
+      FirebaseFirestore.instance.collection('eventComments');
+  final _isLoading = true.obs;
+  var listMyIdEvent = [].obs;
+  var listMyIdCommunity = [].obs;
+  var dataEvent = <EventModel>[].obs;
+  var dataCommunity = <CommunityModel>[].obs;
+  var communityData = <CommunityModel>[].obs;
+  var dataMember = <CommunityMemberModel>[].obs;
 
   @override
   void onInit() async {
-    onGetDataUser();
     super.onInit();
+    onRefresh();
   }
 
-  onGetDataUser() {
+  onRefresh() async {
+    await onGetDataUser();
+    await onGetEventMember();
+    await onGetCommunityMember();
+  }
+
+  onGetDataUser() async {
     final User? users = auth.currentUser;
     final String? idUser = users!.uid;
-    user
+    await user
         .where("idUser", isEqualTo: idUser)
         // .orderBy("date", descending: true)
         .get()
@@ -41,7 +68,123 @@ class ProfileController extends GetxController {
             instagram: d["instagram"]));
 
         name.value = dataUser[0].name.toString();
+        for (int i = 0; i < d['hobby'].length; i++) {
+          hobby.value = d['hobby'][i];
+        }
       });
+      _isLoading.value = false;
     });
   }
+
+  onGetEventMember() async {
+    listMyIdEvent.isNotEmpty ? listMyIdEvent.clear() : null;
+    await eventMember
+        .where("idUser", isEqualTo: auth.currentUser!.uid)
+        .get()
+        .then((QuerySnapshot memberEvent) {
+      memberEvent.docs.forEach((element) {
+        listMyIdEvent.add(element['idEvent']);
+      });
+      onGetEvent();
+    });
+  }
+
+  onGetCommunityMember() async {
+    listMyIdCommunity.isNotEmpty ? listMyIdCommunity.clear() : null;
+    await communityMember
+        .where("idUser", isEqualTo: auth.currentUser!.uid)
+        .where("status", isEqualTo: "verified")
+        .get()
+        .then((QuerySnapshot memberCommunity) {
+      memberCommunity.docs.forEach((element) {
+        listMyIdCommunity.add(element['idCommunity']);
+      });
+      onGetCommunity();
+    });
+  }
+
+  onGetEvent() async {
+    dataEvent.isNotEmpty ? dataEvent.clear() : null;
+    for (int i = 0; i < listMyIdEvent.length; i++) {
+      await event
+          .where('idEvent', isEqualTo: listMyIdEvent[i])
+          .get()
+          .then((snapshot) {
+        snapshot.docs.forEach((d) async {
+          await eventMember
+              .where("idEvent", isEqualTo: listMyIdEvent[i])
+              .get()
+              .then((member) async {
+            await eventComment
+                .where('idEvent', isEqualTo: d['idEvent'])
+                .get()
+                .then((comment) {
+              dataEvent.add(EventModel(
+                  name: d["name"],
+                  category: d["category"],
+                  date: d["date"],
+                  idUser: d["idUser"],
+                  idEvent: d["idEvent"],
+                  description: d["description"],
+                  location: d["location"],
+                  time: d["time"],
+                  dateEvent: d["dateEvent"],
+                  comment: comment.size,
+                  member: member.size));
+            });
+          });
+        });
+      });
+    }
+  }
+
+  onGetCommunity() async {
+    dataCommunity.isNotEmpty ? dataCommunity.clear() : null;
+    communityData.isNotEmpty ? communityData.clear() : null;
+    dataMember.isNotEmpty ? dataMember.clear() : null;
+    for (int i = 0; i < listMyIdCommunity.length; i++) {
+      community
+          .where('idCommunity', isEqualTo: listMyIdCommunity[i].toString())
+          .get()
+          .then((snapshot) {
+        snapshot.docs.forEach((d) {
+          communityMember
+              .where("idCommunity", isEqualTo: d["idCommunity"])
+              .where("status", isEqualTo: "verified")
+              .get()
+              .then((QuerySnapshot snapshotMember) {
+            snapshotMember.docs.forEach((member) {
+              dataMember.add(CommunityMemberModel(
+                date: member["date"],
+                idCommunity: member["idCommunity"],
+                idUser: member["idUser"],
+                status: member["status"],
+              ));
+            });
+            DateTime a = d['date'].toDate();
+            String sort = DateFormat("yyyyMMddHHmmss").format(a);
+            communityData.add(CommunityModel(
+              name: d["name"],
+              category: d["category"],
+              date: d["date"],
+              idUser: d["idUser"],
+              idCommunity: d["idCommunity"],
+              description: d["description"],
+              city: d["city"],
+              province: d["province"],
+              photo: d["photo"],
+              member: dataMember
+                  .where((data) => data.idCommunity == d["idCommunity"])
+                  .toList(),
+              sort: int.parse(sort),
+            ));
+            dataCommunity.assignAll(communityData);
+            dataCommunity.sort((a, b) => b.sort!.compareTo(a.sort!));
+          });
+        });
+      });
+    }
+  }
+
+  get isLoading => this._isLoading.value;
 }

@@ -33,32 +33,32 @@ class CategoriesPage extends StatelessWidget {
   }
 
   Widget _body() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Obx(() => categoriesController.change.value == 0
-              ? Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _favCategories(),
-                    Expanded(child: _otherCategories())
-                  ],
-                )
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _favCategories2(),
-                    Expanded(child: _otherCategories2()),
-                    _btnSaveChange()
-                  ],
-                )),
-        ),
-      ],
-    );
+    return Obx(() => categoriesController.isLoading ? Center(child: CircularProgressIndicator(),) : Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Obx(() => categoriesController.change.value == 0
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _favCategories(),
+                        Expanded(child: _otherCategories())
+                      ],
+                    )
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _favCategories2(),
+                        Expanded(child: _otherCategories2()),
+                        _btnSaveChange()
+                      ],
+                    )),
+            ),
+          ],
+        ));
   }
 
   Widget _favCategories() {

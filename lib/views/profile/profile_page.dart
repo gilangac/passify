@@ -1,21 +1,21 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unused_local_variable, must_be_immutable
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:passify/constant/color_constant.dart';
-import 'package:passify/controllers/auth/firebase_auth_controller.dart';
-import 'package:passify/controllers/home/home_controller.dart';
 import 'package:passify/controllers/profile/profile_controller.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:passify/widgets/general/community_widget.dart';
 import 'package:passify/widgets/general/event_widget.dart';
 import 'package:passify/widgets/profile/Profile_action_widget.dart';
+import 'package:intl/intl.dart';
 
 class ProfilePage extends StatelessWidget {
   ProfilePage({Key? key}) : super(key: key);
-  FirebaseAuthController firebaseAuthController = Get.find();
   ProfileController profileC = Get.find();
 
   @override
@@ -28,77 +28,81 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _body() {
-    final dataUser = profileC.dataUser[0];
-    return DefaultTabController(
-      length: 2,
-      child: NestedScrollView(
-          physics: BouncingScrollPhysics(),
-          headerSliverBuilder: (context, index) {
-            return <Widget>[
-              SliverAppBar(
-                title: Text("Profile",
-                    style: GoogleFonts.poppins(
-                        color: AppColors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600)),
-                actions: _action(),
-                centerTitle: true,
-                backgroundColor: Colors.white,
-                pinned: true,
-                elevation: 1,
-                forceElevated: true,
-                primary: true,
-                expandedHeight: 325,
-                flexibleSpace: FlexibleSpaceBar(background: _profileInfo()),
-                bottom: TabBar(
-                  isScrollable: false,
-                  indicatorColor: AppColors.primaryColor,
-                  indicatorWeight: 2.0,
-                  indicatorPadding: EdgeInsets.symmetric(horizontal: 25),
-                  labelColor: AppColors.primaryColor,
-                  unselectedLabelColor: AppColors.textColor,
-                  tabs: [
-                    Tab(
-                      height: 50,
-                      child: Column(
-                        children: [
-                          Text("12",
-                              style: GoogleFonts.poppins(
-                                  color: AppColors.tittleColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600)),
-                          Text("Komunitas",
-                              style: GoogleFonts.poppins(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600)),
+    return profileC.isLoading
+        ? Center(
+            child: CircularProgressIndicator(),
+          )
+        : DefaultTabController(
+            length: 2,
+            child: NestedScrollView(
+                physics: BouncingScrollPhysics(),
+                headerSliverBuilder: (context, index) {
+                  return <Widget>[
+                    SliverAppBar(
+                      title: Text("Profile",
+                          style: GoogleFonts.poppins(
+                              color: AppColors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600)),
+                      actions: _action(),
+                      centerTitle: true,
+                      backgroundColor: Colors.white,
+                      pinned: true,
+                      elevation: 1,
+                      forceElevated: true,
+                      primary: true,
+                      expandedHeight: 325,
+                      flexibleSpace:
+                          FlexibleSpaceBar(background: _profileInfo()),
+                      bottom: TabBar(
+                        isScrollable: false,
+                        indicatorColor: AppColors.primaryColor,
+                        indicatorWeight: 2.0,
+                        indicatorPadding: EdgeInsets.symmetric(horizontal: 25),
+                        labelColor: AppColors.primaryColor,
+                        unselectedLabelColor: AppColors.textColor,
+                        tabs: [
+                          Tab(
+                            height: 50,
+                            child: Column(
+                              children: [
+                                Text(profileC.dataCommunity.length.toString(),
+                                    style: GoogleFonts.poppins(
+                                        color: AppColors.tittleColor,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600)),
+                                Text("Komunitas",
+                                    style: GoogleFonts.poppins(
+                                        color: Colors.grey,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600)),
+                              ],
+                            ),
+                          ),
+                          Tab(
+                            height: 50,
+                            child: Column(
+                              children: [
+                                Text(profileC.dataEvent.length.toString(),
+                                    style: GoogleFonts.poppins(
+                                        color: AppColors.tittleColor,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600)),
+                                Text("Event",
+                                    style: GoogleFonts.poppins(
+                                        color: Colors.grey,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600)),
+                              ],
+                            ),
+                          )
                         ],
                       ),
                     ),
-                    Tab(
-                      height: 50,
-                      child: Column(
-                        children: [
-                          Text("0",
-                              style: GoogleFonts.poppins(
-                                  color: AppColors.tittleColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600)),
-                          Text("Event",
-                              style: GoogleFonts.poppins(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600)),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ];
-          },
-          body: _content()),
-    );
+                  ];
+                },
+                body: _content()),
+          );
   }
 
   Widget _profileInfo() {
@@ -110,10 +114,13 @@ class ProfilePage extends StatelessWidget {
         SizedBox(
           height: 20,
         ),
-        circleAvatar(
-            imageData: dataUser.photo.toString(),
-            nameData: dataUser.name.toString(),
-            size: 45),
+        GestureDetector(
+          onTap: () => profileC.onRefresh(),
+          child: circleAvatar(
+              imageData: dataUser.photo.toString(),
+              nameData: dataUser.name.toString(),
+              size: 45),
+        ),
         SizedBox(
           height: 10,
         ),
@@ -125,9 +132,20 @@ class ProfilePage extends StatelessWidget {
               color: AppColors.tittleColor),
         ),
         Text(
-          dataUser.hobby.toString(),
+          dataUser.hobby!.length == 1
+              ? dataUser.hobby![0].toString()
+              : dataUser.hobby!.length == 2
+                  ? dataUser.hobby![0].toString() +
+                      " | " +
+                      dataUser.hobby![1].toString()
+                  : dataUser.hobby![0].toString() +
+                      " | " +
+                      dataUser.hobby![1].toString() +
+                      " | " +
+                      dataUser.hobby![2].toString(),
           style: GoogleFonts.poppins(
               fontSize: 12, fontWeight: FontWeight.w500, color: Colors.grey),
+          textAlign: TextAlign.center,
         ),
         SizedBox(
           height: 10,
@@ -170,26 +188,6 @@ class ProfilePage extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(
-              width: 10,
-            ),
-            Container(
-              height: 40,
-              width: 40,
-              decoration: BoxDecoration(
-                color: AppColors.primaryColor.withOpacity(0.8),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(0.0),
-                  child: Icon(
-                    Feather.instagram,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            )
           ],
         ),
         SizedBox(
@@ -200,31 +198,118 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _content() {
-    return Container(
-      height: 4,
-      width: Get.width,
-      color: Colors.white,
-      child: TabBarView(children: [_community(), _event()]),
+    return RefreshIndicator(
+      onRefresh: () {
+        HapticFeedback.lightImpact();
+        return profileC.onRefresh();
+      },
+      child: TabBarView(
+          physics:
+              BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+          children: [_community(), _event()]),
     );
   }
 
   Widget _event() {
-    return ListView.builder(
-        itemCount: 4,
-        physics: BouncingScrollPhysics(),
-        padding: EdgeInsets.all(25),
-        itemBuilder: (context, index) {
-          return eventCard();
-        });
+    return RefreshIndicator(
+      onRefresh: () {
+        HapticFeedback.lightImpact();
+        return profileC.onRefresh();
+      },
+      child: profileC.dataEvent.isEmpty
+          ? SingleChildScrollView(
+              physics: BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics()),
+              child: Center(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 50,
+                    ),
+                    LottieBuilder.asset("assets/json/empty_data.json",
+                        height: 180),
+                    Text(
+                      "Belum ada event yang diikuti",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                          color: AppColors.tittleColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600),
+                    ),
+                    Container(height: 100)
+                  ],
+                ),
+              ),
+            )
+          : ListView.builder(
+              itemCount: profileC.dataEvent.length,
+              physics: BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics()),
+              padding: EdgeInsets.all(25),
+              itemBuilder: (context, index) {
+                var data = profileC.dataEvent[index];
+                return eventCard(
+                    idEvent: data.idEvent,
+                    name: data.name,
+                    date: DateFormat("EEEE, dd MMMM yyyy", "id")
+                        .format(data.dateEvent!.toDate())
+                        .toString(),
+                    location: data.location,
+                    time: data.time,
+                    category: data.category,
+                    commentCount: data.comment.toString(),
+                    membersCount: data.member?.toString());
+              }),
+    );
   }
 
   Widget _community() {
-    return ListView.builder(
-        physics: BouncingScrollPhysics(),
-        itemCount: 4,
-        padding: EdgeInsets.all(25),
-        itemBuilder: (context, index) {
-          return communityCard();
-        });
+    return RefreshIndicator(
+      onRefresh: () {
+        HapticFeedback.lightImpact();
+        return profileC.onRefresh();
+      },
+      child: profileC.dataCommunity.isEmpty
+          ? SingleChildScrollView(
+              physics: BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics()),
+              child: Center(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 50,
+                    ),
+                    LottieBuilder.asset("assets/json/empty_data.json",
+                        height: 180),
+                    Text(
+                      "Belum ada komunitas yang diikuti",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                          color: AppColors.tittleColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600),
+                    ),
+                    Container(height: 100)
+                  ],
+                ),
+              ),
+            )
+          : ListView.builder(
+              itemCount: profileC.dataCommunity.length,
+              physics: BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics()),
+              shrinkWrap: true,
+              padding: EdgeInsets.all(25),
+              itemBuilder: (context, index) {
+                var data = profileC.dataCommunity[index];
+                return communityCard(
+                    idCommunity: data.idCommunity,
+                    category: data.category,
+                    city: data.city,
+                    name: data.name,
+                    photo: data.photo,
+                    membere: data.member);
+              }),
+    );
   }
 }

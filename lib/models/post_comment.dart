@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class EventCommentModel {
+class PostCommentModel {
   String? idUser;
-  String? idEvent;
+  String? idPost;
+  String? idCommunity;
   Timestamp? date;
   String? comment;
   String? name;
@@ -10,9 +11,10 @@ class EventCommentModel {
   String? photo;
   int? sort;
 
-  EventCommentModel(
+  PostCommentModel(
       {this.idUser,
-      this.idEvent,
+      this.idPost,
+      this.idCommunity,
       this.date,
       this.comment,
       this.name,

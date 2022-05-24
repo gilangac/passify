@@ -10,6 +10,7 @@ import 'package:passify/controllers/search/search_controller.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:passify/widgets/general/community_widget.dart';
 import 'package:passify/widgets/general/event_widget.dart';
+import 'package:passify/widgets/shimmer/search_person_shimmer.dart';
 
 class SearchPage extends StatelessWidget {
   SearchPage({Key? key}) : super(key: key);
@@ -221,42 +222,74 @@ class SearchPage extends StatelessWidget {
   }
 
   Widget _searchPerson() {
-    return ListView.builder(
-        physics: BouncingScrollPhysics(),
-        itemCount: 5,
-        padding: EdgeInsets.all(25),
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 15),
-            child: Row(
+    return searchController.searchText.value == ''
+        ? Center(
+            child: Column(
               children: [
-                circleAvatar(imageData: "", nameData: "T", size: 25),
                 SizedBox(
-                  width: 10,
+                  height: 80,
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Taesei Marukawa',
-                      style: GoogleFonts.poppins(
-                          fontSize: 14, fontWeight: FontWeight.w500),
-                    ),
-                    Text(
-                      'marukawa',
-                      style: GoogleFonts.poppins(
-                          color: Colors.grey.shade500,
-                          fontStyle: FontStyle.normal,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400),
-                    ),
-                  ],
+                Text(
+                  "Masukkan Kata Kunci",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                      color: AppColors.tittleColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  "Masukkan kata kunci untuk melakukan pencarian",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                      color: Colors.grey.shade400,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500),
                 ),
               ],
             ),
-          );
-        });
+          )
+        : searchController.isLoadingPerson
+            ? SearchPersonShimmer()
+            : ListView.builder(
+                physics: BouncingScrollPhysics(),
+                itemCount: searchController.personData.length,
+                padding: EdgeInsets.all(25),
+                itemBuilder: (context, index) {
+                  var data = searchController.personData[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 15),
+                    child: Row(
+                      children: [
+                        circleAvatar(
+                            imageData: data.photo,
+                            nameData: data.name,
+                            size: 25),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              data.name,
+                              style: GoogleFonts.poppins(
+                                  fontSize: 14, fontWeight: FontWeight.w500),
+                            ),
+                            Text(
+                              data.username,
+                              style: GoogleFonts.poppins(
+                                  color: Colors.grey.shade500,
+                                  fontStyle: FontStyle.normal,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                });
   }
 
   Widget _searchEvent() {

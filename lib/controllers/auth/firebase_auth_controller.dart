@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_final_fields
+// ignore_for_file: prefer_final_fields, avoid_print
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,6 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/routes/pages.dart';
 import 'package:passify/services/service_preference.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class FirebaseAuthController extends GetxController {
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -64,9 +65,11 @@ class FirebaseAuthController extends GetxController {
 
   onGetUser() async {
     final email = auth.currentUser?.email;
+    final userId = auth.currentUser?.uid;
     user.where("email", isEqualTo: email).get().then((QuerySnapshot snapshot) {
       print("jumlah : " + snapshot.size.toString());
       if (snapshot.size == 1) {
+        PreferenceService.setUserId(userId!);
         PreferenceService.setStatus("logged");
         Get.offNamed(AppPages.NAVIGATOR);
       } else {
@@ -78,6 +81,7 @@ class FirebaseAuthController extends GetxController {
   void logout() async {
     FirebaseMessaging.instance.deleteToken();
     await auth.signOut();
+    PreferenceService.clear();
     PreferenceService.setStatus("unlog");
     await _googleSignIn.signOut().then((value) {
       Get.offAllNamed(AppPages.LOGIN);

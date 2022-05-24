@@ -16,6 +16,9 @@ class AppRoutes {
     GetPage(name: _Paths.CATEGORIES, page: () => CategoriesPage()),
     GetPage(name: _Paths.HOBBY + ':hobby', page: () => HobbyPage()),
     GetPage(name: _Paths.DETAIL_EVENT + ':event', page: () => EventPage()),
+    GetPage(name: _Paths.DETAIL_POST + ':post', page: () => DetailPostPage()),
+    GetPage(name: _Paths.EDIT_POST + ':post', page: () => EditPostPage()),
+    GetPage(name: _Paths.COMMUNITY+ ':community', page: () => CommunityPage()),
     GetPage(name: _Paths.EDIT_PROFILE, page: () => EditProfilePage()),
     GetPage(
         name: _Paths.NAVIGATOR,
@@ -27,7 +30,6 @@ class AppRoutes {
           ForumBinding(),
           NotificationBinding(),
           ProfileBinding(),
-          FirebaseBinding()
         ],
         transition: Transition.downToUp),
   ];

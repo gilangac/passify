@@ -50,9 +50,10 @@ class DialogHelper {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                title ?? 'Error',
-                style: Get.textTheme.headline4,
+              Text(title ?? 'Terdapat Gangguan',
+                  style: Get.textTheme.headline6),
+              SizedBox(
+                height: 10,
               ),
               Text(
                 description ?? 'Sorry, something went wrong',
@@ -95,6 +96,44 @@ class DialogHelper {
               Text(
                 description ?? 'COOMING SOON',
                 style: Get.textTheme.headline5,
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.only(left: 30, right: 30),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100))),
+                  onPressed: () {
+                    if (Get.isDialogOpen ?? false) Get.back();
+                  },
+                  child: Text('Okay'))
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  static showInfo({String? title, String? description}) {
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title ?? 'Informasi Aplikasi',
+                style: Get.textTheme.headline6,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: Image.asset("assets/images/logo.png", height: 150),
+              ),
+              Text(
+                description ?? 'Versi Aplikasi : v1.0',
+                style: GoogleFonts.poppins(fontSize: 14),
               ),
               SizedBox(height: 20),
               ElevatedButton(

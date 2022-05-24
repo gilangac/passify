@@ -13,6 +13,7 @@ class AppColors {
 
   // multipurpose colors
   static const yellow = Color(0xFFFFC700);
+  static const green = Color(0xFF1BD741);
   static const blue = Color(0xFF5BBFFA);
   static const black = Color(0xFF18172B);
   static const grey = Color(0xFFCACED4);

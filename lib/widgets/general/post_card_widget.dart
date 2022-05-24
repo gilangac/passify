@@ -1,12 +1,37 @@
 // ignore_for_file: prefer_const_constructors, avoid_unnecessary_containers
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:passify/constant/color_constant.dart';
+import 'package:passify/controllers/forum/detail_community_controller.dart';
+import 'package:passify/routes/pages.dart';
 import 'circle_avatar.dart';
+import 'package:intl/intl.dart';
 
-Widget postCard(Map data) {
+DetailCommunityController controller = Get.find();
+
+Widget postCard(
+    {String? idPost,
+    String? title,
+    String? price,
+    String? status,
+    String? name,
+    String? idUser,
+    String? username,
+    String? caption,
+    String? photo,
+    String? photoUser,
+    String? category,
+    String? number,
+    int? comment}) {
+  NumberFormat currencyFormatter = NumberFormat.currency(
+    locale: 'id',
+    symbol: "Rp ",
+    decimalDigits: 0,
+  );
   return Container(
       margin: EdgeInsets.only(bottom: 20),
       width: Get.width,
@@ -32,49 +57,175 @@ Widget postCard(Map data) {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 circleAvatar(
-                    imageData: "", nameData: data['name'].toString(), size: 18),
+                    imageData: photoUser ?? "",
+                    nameData: name ?? "Gilang",
+                    size: 17),
                 SizedBox(
                   width: 10,
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      data['name'].toString(),
-                      style: GoogleFonts.poppins(
-                          height: 1, fontSize: 16, fontWeight: FontWeight.w600),
-                    ),
-                    Text(
-                      '@gilang.ac',
-                      style: GoogleFonts.poppins(
-                          color: Colors.grey.shade600,
-                          height: 1.5,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w400),
-                    ),
-                  ],
-                )
+                Container(
+                  width: Get.width * 0.55,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name ?? "",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                            height: 1,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      Text(
+                        username ?? "",
+                        overflow: TextOverflow.clip,
+                        style: GoogleFonts.poppins(
+                            color: Colors.grey.shade600,
+                            height: 1.5,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w400),
+                      ),
+                    ],
+                  ),
+                ),
+                Spacer(),
+                Container(
+                    alignment: Alignment.topRight,
+                    child: GestureDetector(
+                        onTap: () => _bottomSheetContent(idUser, idPost!),
+                        child: Icon(Feather.more_horizontal)))
               ],
             ),
+            category == 'fjb'
+                ? Row(
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 8,
+                          ),
+                          Row(
+                            // mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                title ?? "",
+                                style: GoogleFonts.poppins(
+                                    color: AppColors.tittleColor,
+                                    height: 1.5,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600),
+                                textAlign: TextAlign.justify,
+                                maxLines: photo == "" ? 5 : 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Container(
+                                margin: EdgeInsets.symmetric(horizontal: 5),
+                                alignment: Alignment.center,
+                                width: 3,
+                                height: 3,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(50),
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                              Text(
+                                status == "available" ? "Tersedia" : "Terjual",
+                                style: GoogleFonts.poppins(
+                                    color: Colors.grey.shade600,
+                                    height: 1.5,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400),
+                                textAlign: TextAlign.justify,
+                                maxLines: photo == "" ? 5 : 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                          Text(
+                            currencyFormatter.format(int.parse(price!)),
+                            style: GoogleFonts.poppins(
+                                color: Colors.grey.shade600,
+                                height: 1.5,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w400),
+                            textAlign: TextAlign.justify,
+                            maxLines: photo == "" ? 5 : 3,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                      Spacer(),
+                      number == ""
+                          ? Container()
+                          : GestureDetector(
+                              onTap: () => controller.onLaunchUrl(number!),
+                              child: Container(
+                                height: 27,
+                                width: 27,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(9),
+                                  color: AppColors.green,
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: Colors.green.shade100,
+                                        blurRadius: 4,
+                                        spreadRadius: 2)
+                                  ],
+                                ),
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(2.0),
+                                    child: Icon(FontAwesome.whatsapp,
+                                        color: Colors.white, size: 15),
+                                  ),
+                                ),
+                              ),
+                            )
+                    ],
+                  )
+                : Container(
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Text(
+                          title ?? "",
+                          style: GoogleFonts.poppins(
+                              color: AppColors.tittleColor,
+                              height: 1.5,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600),
+                          textAlign: TextAlign.justify,
+                          maxLines: photo == "" ? 5 : 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
             SizedBox(
-              height: 10,
+              height: 8,
             ),
             Text(
-              "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letra.",
+              caption ?? "",
               style: GoogleFonts.poppins(
                   color: Colors.grey.shade600,
                   height: 1.5,
                   fontSize: 11,
                   fontWeight: FontWeight.w400),
               textAlign: TextAlign.justify,
-              maxLines: data['foto'] == "" ? 5 : 3,
+              maxLines: photo == "" ? 5 : 3,
               overflow: TextOverflow.ellipsis,
             ),
             SizedBox(
               height: 10,
             ),
-            data['foto'] == ""
+            photo == ""
                 ? SizedBox(
                     height: 0,
                   )
@@ -88,10 +239,24 @@ Widget postCard(Map data) {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image(
-                              fit: BoxFit.cover,
-                              image: NetworkImage(
-                                  'https://firebasestorage.googleapis.com/v0/b/passify-app-347b7.appspot.com/o/UTSSport_Hero_TEST_Landscape-1536x1143.jpg?alt=media&token=dd016e59-98cd-41b5-8fd8-2182a2862573')),
+                          child: CachedNetworkImage(
+                            imageUrl: photo.toString(),
+                            width: Get.width,
+                            fit: BoxFit.cover,
+                            errorWidget: (context, url, error) =>
+                                Center(child: Icon(Icons.error)),
+                            progressIndicatorBuilder:
+                                (context, url, downloadProgress) => Container(
+                              color: Colors.white,
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  value: downloadProgress.progress,
+                                  color: AppColors.primaryColor,
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       SizedBox(
@@ -111,18 +276,24 @@ Widget postCard(Map data) {
                   width: 5,
                 ),
                 Text(
-                  '10 Komentar',
+                  '$comment Komentar',
                   style: GoogleFonts.poppins(
                       fontSize: 12, fontWeight: FontWeight.w400),
                 ),
                 Spacer(),
-                Container(
-                  child: Text(
-                    'Lihat Detail',
-                    style: GoogleFonts.poppins(
-                        fontStyle: FontStyle.italic,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400),
+                GestureDetector(
+                  onTap: () {
+                    Get.toNamed(AppPages.DETAIL_POST + idPost.toString(),
+                        arguments: idPost);
+                  },
+                  child: Container(
+                    child: Text(
+                      'Lihat Detail',
+                      style: GoogleFonts.poppins(
+                          fontStyle: FontStyle.italic,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400),
+                    ),
                   ),
                 )
               ],
@@ -130,4 +301,153 @@ Widget postCard(Map data) {
           ],
         ),
       ));
+}
+
+void _bottomSheetContent(var idUser, String idPost) {
+  String myId = controller.myAccountId.value;
+  Get.bottomSheet(
+      SafeArea(
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(20, 10, 20, 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(color: AppColors.lightGrey, width: 35, height: 4),
+              SizedBox(height: 30),
+              Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.grey.shade100),
+                  child: Column(
+                    children: [
+                      _listAction(
+                          title: "Laporkan",
+                          idPost: idPost,
+                          path: AppPages.EDIT_PROFILE),
+                      myId == idUser
+                          ? Column(
+                              children: [
+                                Divider(
+                                  height: 1,
+                                  color: Colors.grey.shade300,
+                                ),
+                                _listAction(
+                                    title: "Edit Postingan",
+                                    idPost: idPost,
+                                    path: AppPages.HOME,
+                                    type: "edit"),
+                                Divider(
+                                  height: 1,
+                                  color: Colors.grey.shade300,
+                                ),
+                                _deleteAction(
+                                    title: "Edit Postingan",
+                                    path: AppPages.HOME,
+                                    idPost: idPost),
+                              ],
+                            )
+                          : SizedBox(
+                              height: 0,
+                            ),
+                    ],
+                  )),
+              SizedBox(height: 13),
+              _cancelAction()
+            ],
+          ),
+        ),
+      ),
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+      isDismissible: true,
+      enableDrag: true,
+      isScrollControlled: true);
+}
+
+Widget _listAction(
+    {required String title,
+    required String path,
+    required String idPost,
+    String? type}) {
+  return Container(
+    width: Get.width,
+    child: Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: () {
+          Get.back();
+          type == "edit"
+              ? Get.toNamed(AppPages.EDIT_POST + idPost,
+                  arguments: [idPost, "community"])
+              : null;
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+          child: Text(
+            title,
+            style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textColor),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+Widget _deleteAction({String? title, String? path, required idPost}) {
+  return Container(
+    width: Get.width,
+    child: Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: () {
+          controller.onConfirmDelete(idPost);
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+          child: Text(
+            "Hapus Postingan",
+            style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Colors.red.shade500),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+Widget _cancelAction() {
+  return Container(
+    width: Get.width,
+    decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10), color: Colors.grey.shade100),
+    child: Material(
+      child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: () => Get.back(),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+            child: Text(
+              'Batal',
+              style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textColor),
+              textAlign: TextAlign.center,
+            ),
+          )),
+      color: Colors.transparent,
+    ),
+  );
 }

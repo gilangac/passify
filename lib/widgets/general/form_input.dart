@@ -14,6 +14,7 @@ Widget formInput(
     bool secureText = false,
     bool enabled = true,
     bool suffix = false,
+    ontap,
     required validator}) {
   return Column(
     children: [
@@ -30,8 +31,10 @@ Widget formInput(
         textInputAction: inputAction,
         obscureText: secureText,
         enabled: enabled,
+        onTap: ontap,
         decoration: InputDecoration(
             hintText: placeholder,
+            fillColor: Colors.grey.shade100,
             suffixIcon: suffix == true ? Icon(Feather.chevron_down) : null),
         autovalidateMode: AutovalidateMode.onUserInteraction,
         validator: validator,

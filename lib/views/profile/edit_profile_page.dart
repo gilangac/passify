@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/profile/edit_profile_controller.dart';
+import 'package:passify/widgets/general/bottomsheet_widget.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:passify/widgets/general/form_input.dart';
 
@@ -110,7 +111,11 @@ class EditProfilePage extends StatelessWidget {
                       SizedBox(
                         height: 30,
                       ),
-                      _addressInput(),
+                      _provinceInput(),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      _cityInput(),
                       SizedBox(
                         height: 30,
                       ),
@@ -213,39 +218,260 @@ class EditProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _addressInput() {
-    return formInput(
-      title: 'Kota Tempat Tinggal',
-      placeholder: 'Kota Tempat Tinggal',
-      inputType: TextInputType.name,
-      inputAction: TextInputAction.next,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Masukkan kota tempat tinggal terlebih dahulu';
-        }
-        return null;
+  Widget _provinceInput() {
+    return GestureDetector(
+      child: formInput(
+        suffix: true,
+        enabled: false,
+        title: 'Provinsi Tempat Tinggal',
+        placeholder: 'Provinsi Tempat Tinggal',
+        inputType: TextInputType.name,
+        inputAction: TextInputAction.next,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Masukkan provinsi tempat tinggal terlebih dahulu';
+          }
+          return null;
+        },
+        controller: editProfileC.provinsiFC
+          ..text = editProfileC.dataUser[0].provinsi.toString(),
+      ),
+      onTap: () {
+        editProfileC.dataProvinsi.isNotEmpty
+            ? BottomSheetList(
+                ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    itemCount: editProfileC.dataProvinsi.length,
+                    padding: EdgeInsets.all(15),
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          editProfileC.provinsiFC.text =
+                              editProfileC.dataProvinsi[index].nama.toString();
+                          editProfileC.cityFC.text = '';
+                          editProfileC.cityFC.clear();
+                          editProfileC.dataCity.clear();
+                          editProfileC.onGetCity(
+                              editProfileC.dataProvinsi[index].id.toString());
+                          Get.back();
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 15),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                editProfileC.dataProvinsi[index].nama
+                                    .toString(),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  color: AppColors.textColor,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 15,
+                              ),
+                              Container(
+                                height: 1,
+                                width: Get.width,
+                                color: Colors.grey.shade200,
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                "Provinsi")
+            : editProfileC.onGetProvince();
       },
-      controller: editProfileC.cityFC
-        ..text = editProfileC.dataUser[0].city.toString(),
+    );
+  }
+
+  Widget _cityInput() {
+    return GestureDetector(
+      child: formInput(
+        suffix: true,
+        enabled: false,
+        title: 'Kota Tempat Tinggal',
+        placeholder: 'Kota Tempat Tinggal',
+        inputType: TextInputType.name,
+        inputAction: TextInputAction.next,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Masukkan kota tempat tinggal terlebih dahulu';
+          }
+          return null;
+        },
+        controller: editProfileC.cityFC
+          ..text = editProfileC.dataUser[0].city.toString(),
+      ),
+      onTap: () {
+        editProfileC.dataCity.isNotEmpty
+            ? BottomSheetList(
+                ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    itemCount: editProfileC.dataCity.length,
+                    padding: EdgeInsets.all(15),
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          editProfileC.cityFC.text =
+                              editProfileC.dataCity[index].nama.toString();
+                          Get.back();
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 15),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                editProfileC.dataCity[index].nama.toString(),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  color: AppColors.textColor,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 15,
+                              ),
+                              Container(
+                                height: 1,
+                                width: Get.width,
+                                color: Colors.grey.shade200,
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                "Kota")
+            : null;
+      },
     );
   }
 
   Widget _hobbyInput() {
-    return formInput(
-      title: 'Hobi',
-      placeholder: 'Hobi',
-      inputType: TextInputType.name,
-      inputAction: TextInputAction.next,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Masukkan hobi terlebih dahulu';
-        }
-        return null;
-      },
-      controller: editProfileC.hobbyFC
-        ..text = editProfileC.dataUser[0].hobby.toString(),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          child: formInput(
+            enabled: false,
+            suffix: true,
+            title: 'Hobi',
+            placeholder: editProfileC.selectedHoby.isNotEmpty
+                ? 'Tambah Hobi (maksimal 3)'
+                : 'Pilih Hobi',
+            inputType: TextInputType.name,
+            inputAction: TextInputAction.next,
+            validator: (value) {
+              if (editProfileC.selectedHoby.isEmpty) {
+                return 'Masukkan hobi terlebih dahulu';
+              }
+              return null;
+            },
+            controller: editProfileC.hobbyFC,
+          ),
+          onTap: () {
+            editProfileC.dataHobies.isNotEmpty
+                ? editProfileC.selectedHoby.length < 3
+                    ? BottomSheetList(
+                        ListView.builder(
+                            physics: BouncingScrollPhysics(),
+                            itemCount: editProfileC.dataHobies.length,
+                            padding: EdgeInsets.symmetric(vertical: 15),
+                            itemBuilder: (context, index) {
+                              return InkWell(
+                                borderRadius: BorderRadius.circular(15),
+                                highlightColor: Colors.grey.shade200,
+                                splashColor: Colors.grey.shade200,
+                                onTap: () => editProfileC.onSelectHoby(index),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(15.0),
+                                      child: Text(
+                                        editProfileC.dataHobies[index]['name']
+                                            .toString(),
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          color: AppColors.textColor,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15),
+                                      child: Container(
+                                        height: 1,
+                                        width: Get.width,
+                                        color: Colors.grey.shade200,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              );
+                            }),
+                        "Hobi")
+                    : null
+                : editProfileC.onReadJson();
+          },
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Wrap(
+            direction: Axis.horizontal,
+            alignment: WrapAlignment.start,
+            children: _selectedHoby())
+      ],
     );
   }
+
+  List<Widget> _selectedHoby() => editProfileC.selectedHoby
+      .map(
+        (element) => Container(
+          margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+          padding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+          decoration: BoxDecoration(
+              color: AppColors.primaryColor,
+              borderRadius: BorderRadius.circular(5),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.grey.shade200, blurRadius: 4, spreadRadius: 2)
+              ]),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                // member.detail.fullName ?? '',
+                element,
+                style: GoogleFonts.poppins(color: Colors.white),
+              ),
+              SizedBox(width: 8),
+              GestureDetector(
+                onTap: () {
+                  editProfileC.selectedHoby
+                      .removeWhere((hoby) => hoby == element);
+                },
+                child: Icon(
+                  Feather.x,
+                  color: Colors.white54,
+                  size: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+      )
+      .toList();
 
   Widget _accountIgInput() {
     return formInput(

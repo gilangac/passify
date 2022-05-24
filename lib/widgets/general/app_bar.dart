@@ -29,9 +29,9 @@ PreferredSizeWidget appBar(
               child: GetPlatform.isAndroid
                   ? const Icon(
                       Feather.arrow_left,
-                      size: 30,
+                      size: 26,
                     )
-                  : const Icon(Feather.chevron_left, size: 30),
+                  : const Icon(Feather.chevron_left, size: 26),
             )
         : null,
     automaticallyImplyLeading: enableLeading ? true : false,

@@ -1,5 +1,5 @@
 // ignore: unused_import
-// ignore_for_file: non_constant_identifier_names, prefer_final_fields, unused_local_variable, unnecessary_this, avoid_print
+// ignore_for_file: non_constant_identifier_names, prefer_final_fields, unused_local_variable, unnecessary_this, avoid_print, unused_import, duplicate_ignore, avoid_function_literals_in_foreach_calls
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,14 +18,19 @@ class EventController extends GetxController {
   CollectionReference user = FirebaseFirestore.instance.collection('users');
   CollectionReference eventMember =
       FirebaseFirestore.instance.collection('eventMembers');
+  CollectionReference eventComment =
+      FirebaseFirestore.instance.collection('eventComments');
 
-  final dateNow = DateFormat("dd-MM-yyyy h:mma").format(DateTime.now());
   final formKeyEvent = GlobalKey<FormState>();
   var dataEvent = <EventModel>[].obs;
+  var eventData = <EventModel>[].obs;
   var userEvent = <UserModel>[].obs;
   var dataEventMembers = [].obs;
   final _isLoading = true.obs;
-  // var dataEvents = [].obs;
+  var selectedDropdown = 'WIB'.obs;
+  var selectedTime = '00.00 '.obs;
+  DateTime dateEvent = DateTime.now();
+  var category = Get.arguments;
 
   final nameFC = TextEditingController();
   final descriptionFC = TextEditingController();
@@ -35,17 +40,18 @@ class EventController extends GetxController {
 
   @override
   void onInit() async {
-    onGetDataEvent(Get.arguments);
+    onGetDataEvent();
     super.onInit();
   }
 
-  onCreateEvent(String category) {
+  onCreateEvent() async {
+    final dateNow = DateTime.now();
     if (this.formKeyEvent.currentState!.validate()) {
       DialogHelper.showLoading();
       String idEvent = "event-" + getRandomString(15).toString();
 
       try {
-        event.doc(idEvent).set({
+        await event.doc(idEvent).set({
           "idEvent": idEvent,
           "idUser": auth.currentUser?.uid,
           "name": nameFC.text,
@@ -53,18 +59,18 @@ class EventController extends GetxController {
           "description": descriptionFC.text,
           "location": locationFC.text,
           "date": dateNow,
-          "dateEvent": dateFC.text,
+          "dateEvent": dateEvent,
           "time": timeFC.text,
         });
 
-        eventMember.doc(idEvent).set({
+        var idMember = getRandomString(20);
+        await eventMember.doc(idMember).set({
           "idEvent": idEvent,
-          "members": [
-            auth.currentUser?.uid,
-          ],
+          "idUser": auth.currentUser?.uid,
+          "idMember": idMember,
           "date": dateNow,
         });
-        onGetDataEvent(category);
+        onGetDataEvent();
         Get.back();
         Get.back();
         onClearFC();
@@ -74,19 +80,25 @@ class EventController extends GetxController {
     }
   }
 
-  onGetDataEvent(String category) {
-    event
+  Future<void> onGetDataEvent() async {
+    await event
         .where("category", isEqualTo: category)
         .orderBy("date", descending: true)
         .get()
         .then((QuerySnapshot snapshot) {
-      dataEvent.clear();
+      eventData.clear();
       snapshot.docs.forEach((d) {
+        dataEvent.isNotEmpty ? dataEvent.clear() : null;
         eventMember
             .where("idEvent", isEqualTo: d["idEvent"])
             .get()
             .then((QuerySnapshot snapshotMember) {
-          snapshotMember.docs.forEach((member) {
+          eventComment
+              .where("idEvent", isEqualTo: d["idEvent"])
+              .get()
+              .then((QuerySnapshot snapshotComment) {
+            DateTime a = d['date'].toDate();
+            String sort = DateFormat("yyyyMMddHHmmss").format(a);
             dataEvent.add(EventModel(
                 name: d["name"],
                 category: d["category"],
@@ -97,9 +109,11 @@ class EventController extends GetxController {
                 location: d["location"],
                 time: d["time"],
                 dateEvent: d["dateEvent"],
-                member: member["members"]));
+                sort: int.parse(sort),
+                member: snapshotMember.size,
+                comment: snapshotComment.size));
+            dataEvent.sort((a, b) => b.sort!.compareTo(a.sort!));
           });
-          dataEvent.sort((a, b) => b.date!.compareTo(a.date!));
         });
       });
       _isLoading.value = false;

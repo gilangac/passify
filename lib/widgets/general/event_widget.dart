@@ -7,7 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/forum/event_controller.dart';
 import 'package:passify/routes/pages.dart';
-import 'package:passify/widgets/general/community_widget.dart';
 
 EventController eventC = Get.find();
 Widget eventCard(
@@ -17,7 +16,8 @@ Widget eventCard(
     String? date,
     String? time,
     String? category,
-    String? membersCount}) {
+    String? membersCount,
+    String? commentCount}) {
   return Container(
     margin: EdgeInsets.only(bottom: 20),
     width: Get.width,
@@ -91,7 +91,9 @@ Widget eventCard(
                                   child: Padding(
                                     padding: const EdgeInsets.all(3.0),
                                     child: Text(
-                                      'JAN',
+                                      ((date?.split(" ")[2]).toString())
+                                          .substring(0, 3)
+                                          .toUpperCase(),
                                       style: GoogleFonts.poppins(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w600,
@@ -112,15 +114,15 @@ Widget eventCard(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
-                                    '22',
+                                    (date?.split(" ")[1]).toString(),
                                     style: GoogleFonts.poppins(
-                                        fontSize: 36,
+                                        fontSize: 32,
                                         height: 1,
                                         fontWeight: FontWeight.w700,
                                         color: AppColors.primaryColor),
                                   ),
                                   Text(
-                                    '2022',
+                                    (date?.split(" ")[3]).toString(),
                                     style: GoogleFonts.poppins(
                                         fontSize: 13,
                                         height: 0.8,
@@ -135,98 +137,121 @@ Widget eventCard(
                     SizedBox(
                       width: 10,
                     ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Feather.map_pin,
-                              color: AppColors.primaryColor,
-                              size: 13,
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Text(
-                              location ?? "GOR Wilis Madiun",
-                              style: GoogleFonts.poppins(
-                                  fontSize: 12, fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Feather.calendar,
-                              color: AppColors.primaryColor,
-                              size: 13,
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Text(
-                              date ?? "18 Februari 2022",
-                              style: GoogleFonts.poppins(
-                                  fontSize: 12, fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Feather.clock,
-                              color: AppColors.primaryColor,
-                              size: 13,
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Text(
-                              time ?? " 12.00 WIB - 14.00 WIB",
-                              style: GoogleFonts.poppins(
-                                  fontSize: 12, fontWeight: FontWeight.w400),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Feather.users,
-                              color: AppColors.primaryColor,
-                              size: 13,
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                  membersCount ?? "0",
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Feather.map_pin,
+                                color: AppColors.primaryColor,
+                                size: 13,
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Container(
+                                width: Get.width * 0.5,
+                                child: Text(
+                                  location ?? "GOR Wilis Madiun",
+                                  overflow: TextOverflow.ellipsis,
                                   style: GoogleFonts.poppins(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w400),
                                 ),
-                                Text(
-                                  " Partisipan",
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Feather.calendar,
+                                color: AppColors.primaryColor,
+                                size: 13,
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Container(
+                                width: Get.width * 0.5,
+                                child: Text(
+                                  date ?? "18 Februari 2022",
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
                                   style: GoogleFonts.poppins(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w400),
                                 ),
-                              ],
-                            ),
-                          ],
-                        )
-                      ],
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Feather.clock,
+                                color: AppColors.primaryColor,
+                                size: 13,
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Container(
+                                width: Get.width * 0.5,
+                                child: Text(
+                                  time ?? " 12.00 WIB - 14.00 WIB",
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Feather.users,
+                                color: AppColors.primaryColor,
+                                size: 13,
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    membersCount ?? "0",
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                  Container(
+                                    width: Get.width * 0.4,
+                                    child: Text(
+                                      " Partisipan",
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
                     )
                   ],
                 ),
@@ -245,10 +270,19 @@ Widget eventCard(
                   SizedBox(
                     width: 5,
                   ),
-                  Text(
-                    '10 Komentar',
-                    style: GoogleFonts.poppins(
-                        fontSize: 12, fontWeight: FontWeight.w400),
+                  Row(
+                    children: [
+                      Text(
+                        commentCount ?? "0",
+                        style: GoogleFonts.poppins(
+                            fontSize: 12, fontWeight: FontWeight.w400),
+                      ),
+                      Text(
+                        " Komentar",
+                        style: GoogleFonts.poppins(
+                            fontSize: 12, fontWeight: FontWeight.w400),
+                      ),
+                    ],
                   ),
                   Spacer(),
                   Container(

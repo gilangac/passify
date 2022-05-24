@@ -24,8 +24,8 @@ class PreferenceService extends GetxService {
     _preferences.clear();
   }
 
-  static Future setIsFirstLog(bool userId) async {
-    await _preferences.setBool(_keyIsFirstLog, userId);
+  static Future setIsFirstLog(bool firstLog) async {
+    await _preferences.setBool(_keyIsFirstLog, firstLog);
   }
 
   static bool? getIsFirstLog() {
@@ -35,12 +35,23 @@ class PreferenceService extends GetxService {
     return null;
   }
 
-    static Future setIsLogged(bool userId) async {
-    await _preferences.setBool(_keyIsLogged, userId);
+    static Future setIsLogged(bool isLogged) async {
+    await _preferences.setBool(_keyIsLogged, isLogged);
   }
 
   static bool? getIsLogged() {
     final data = _preferences.getBool(_keyIsLogged);
+
+    if (data != null) return data;
+    return null;
+  }
+
+  static Future setUserId(String userId) async {
+    await _preferences.setString(_keyUserId, userId);
+  }
+
+  static String? getUserId() {
+    final data = _preferences.getString(_keyUserId);
 
     if (data != null) return data;
     return null;

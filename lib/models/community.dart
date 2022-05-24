@@ -1,30 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:passify/models/community_member.dart';
 
-class EventModel {
+class CommunityModel {
   String? category;
   String? description;
   String? name;
-  String? idEvent;
+  String? photo;
+  String? idCommunity;
   String? idUser;
   Timestamp? date;
-  String? location;
-  String? time;
-  Timestamp? dateEvent;
-  int? member;
-  int? comment;
+  String? province;
+  String? city;
+  List<CommunityMemberModel>? member;
   int? sort;
 
-  EventModel(
+  CommunityModel(
       {this.category,
       this.description,
       this.name,
-      this.idEvent,
+      this.photo,
+      this.idCommunity,
       this.idUser,
       this.date,
-      this.location,
-      this.time,
-      this.dateEvent,
+      this.province,
+      this.city,
       this.member,
-      this.comment,
       this.sort});
 }

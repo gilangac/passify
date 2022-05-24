@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print, unused_field
+
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/services/service_exception.dart';
 import 'package:get/get.dart';
@@ -10,7 +12,7 @@ class ServiceController {
       var message = error.message;
       var url = error.url;
 
-      if (url == '/jail') {
+      if (url == '/provinsi') {
         print(message);
       } else {}
     } else if (error is ApiNotRespondingException) {
@@ -26,10 +28,10 @@ class ServiceController {
   }
 
   static final _errorMessages = {
-    '/jail': {
+    '/provinsi': {
       'title': 'Gagal',
       'description':
-          'Waduh sepertinya ada masalah saat melakukan load Asal Permintaan. Pastikan koneksi anda stabil dan silahkan coba lagi.',
+          'Waduh sepertinya ada masalah saat melakukan load Provinsi. Pastikan koneksi anda stabil dan silahkan coba lagi.',
     },
   };
 }
