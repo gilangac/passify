@@ -48,6 +48,7 @@ class ForumController extends GetxController {
   }
 
   onGetPost() {
+    dataPost.isNotEmpty ? dataPost.clear() : null;
     for (int i = 0; i < listMyIdCommunity.length; i++)
       post
           .where('idCommunity', isEqualTo: listMyIdCommunity[i])
@@ -58,7 +59,6 @@ class ForumController extends GetxController {
               .where("idUser", isEqualTo: post["idUser"])
               .get()
               .then((QuerySnapshot userSnapshot) {
-            dataPost.isNotEmpty ? dataPost.clear() : null;
             userSnapshot.docs.forEach((user) {
               postComment
                   .where("idPost", isEqualTo: post["idPost"])

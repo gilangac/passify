@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:passify/constant/color_constant.dart';
 import 'package:passify/routes/pages.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
@@ -24,8 +25,8 @@ class NotificationService extends GetxService {
     await Firebase.initializeApp();
     _fcm = FirebaseMessaging.instance;
 
-    final token = await _fcm.getToken();
-    print(token);
+    // final token = await _fcm.getToken();
+    // print(token);
 
     if (GetPlatform.isIOS) {
       _fcm.requestPermission();
@@ -85,6 +86,7 @@ class NotificationService extends GetxService {
     // final notificationController = Get.put(NotificationController());
 
     // await _showNotification(message);
+    // _showNotification(message);
     print("Handling a background message: ${message.messageId}");
     // notificationController.onGetNotifications();
   }
@@ -94,7 +96,7 @@ class NotificationService extends GetxService {
     print(payload);
     if (payload != null) {
       final jsonPayload = json.decode(payload);
-      Get.toNamed(AppPages.DETAIL_EVENT, arguments: jsonPayload['code']);
+      Get.toNamed(AppPages.DETAIL_POST, arguments: jsonPayload['code']);
     }
   }
 }

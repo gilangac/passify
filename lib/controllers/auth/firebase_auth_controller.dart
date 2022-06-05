@@ -55,11 +55,11 @@ class FirebaseAuthController extends GetxController {
   }
 
   onSuccessLogin() async {
-    user.doc(auth.currentUser?.uid).set({
-      "name": auth.currentUser?.displayName,
-      "idUser": auth.currentUser?.uid,
-      "photoUser": auth.currentUser?.photoURL,
-    });
+    // user.doc(auth.currentUser?.uid).set({
+    //   "name": auth.currentUser?.displayName,
+    //   "idUser": auth.currentUser?.uid,
+    //   "photoUser": auth.currentUser?.photoURL,
+    // });
     FirebaseMessaging.instance.subscribeToTopic("all");
   }
 
@@ -71,8 +71,10 @@ class FirebaseAuthController extends GetxController {
       if (snapshot.size == 1) {
         PreferenceService.setUserId(userId!);
         PreferenceService.setStatus("logged");
+        onSuccessLogin();
         Get.offNamed(AppPages.NAVIGATOR);
       } else {
+        onSuccessLogin();
         Get.toNamed(AppPages.REGISTER);
       }
     });

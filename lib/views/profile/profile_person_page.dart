@@ -7,16 +7,16 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:passify/constant/color_constant.dart';
-import 'package:passify/controllers/profile/profile_controller.dart';
+import 'package:passify/controllers/profile/profile_person_controller.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:passify/widgets/general/community_widget.dart';
 import 'package:passify/widgets/general/event_widget.dart';
 import 'package:passify/widgets/profile/Profile_action_widget.dart';
 import 'package:intl/intl.dart';
 
-class ProfilePage extends StatelessWidget {
-  ProfilePage({Key? key}) : super(key: key);
-  ProfileController profileC = Get.find();
+class ProfilePersonPage extends StatelessWidget {
+  ProfilePersonPage({Key? key}) : super(key: key);
+  ProfilePersonController profileC = Get.put(ProfilePersonController());
 
   @override
   Widget build(BuildContext context) {
@@ -39,12 +39,12 @@ class ProfilePage extends StatelessWidget {
                 headerSliverBuilder: (context, index) {
                   return <Widget>[
                     SliverAppBar(
-                      title: Text("Profile",
+                      title: Text(
+                          '@${profileC.dataUser[0].username.toString()}',
                           style: GoogleFonts.poppins(
                               color: AppColors.black,
                               fontSize: 16,
                               fontWeight: FontWeight.w600)),
-                      actions: _action(),
                       centerTitle: true,
                       backgroundColor: Colors.white,
                       pinned: true,

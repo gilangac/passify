@@ -1028,7 +1028,7 @@ class CommunityPage extends StatelessWidget {
       child: TextFormField(
         onChanged: (text) => {},
         keyboardType: TextInputType.name,
-        textInputAction: TextInputAction.done,
+        textInputAction: TextInputAction.newline,
         enabled: true,
         maxLines: 6,
         minLines: 5,

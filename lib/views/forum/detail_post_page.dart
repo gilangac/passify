@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hashtagable/hashtagable.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/forum/detail_post_controller.dart';
 import 'package:passify/routes/pages.dart';
@@ -337,15 +338,34 @@ class DetailPostPage extends StatelessWidget {
           SizedBox(
             height: 12,
           ),
-          Text(
-            detailPostC.detailPost[0].caption.toString(),
-            style: GoogleFonts.poppins(
+          HashTagText(
+            text: detailPostC.detailPost[0].caption.toString(),
+            decoratedStyle: GoogleFonts.poppins(
+                color: Colors.blue.shade700,
+                height: 1.5,
+                fontSize: 11,
+                fontWeight: FontWeight.w400),
+            basicStyle: GoogleFonts.poppins(
                 color: Colors.grey.shade600,
                 height: 1.5,
                 fontSize: 11,
                 fontWeight: FontWeight.w400),
             textAlign: TextAlign.justify,
+            onTap: (text) {
+              print(text);
+            },
+            softWrap: true,
+            overflow: TextOverflow.ellipsis,
           ),
+          // Text(
+          //   detailPostC.detailPost[0].caption.toString(),
+          //   style: GoogleFonts.poppins(
+          //       color: Colors.grey.shade600,
+          //       height: 1.5,
+          //       fontSize: 11,
+          //       fontWeight: FontWeight.w400),
+          //   textAlign: TextAlign.justify,
+          // ),
           SizedBox(
             height: 12,
           ),

@@ -10,6 +10,7 @@ import 'package:passify/controllers/forum/detail_community_controller.dart';
 import 'package:passify/routes/pages.dart';
 import 'circle_avatar.dart';
 import 'package:intl/intl.dart';
+import 'package:hashtagable/hashtagable.dart';
 
 DetailCommunityController controller = Get.find();
 
@@ -211,17 +212,36 @@ Widget postCard(
             SizedBox(
               height: 8,
             ),
-            Text(
-              caption ?? "",
-              style: GoogleFonts.poppins(
+            HashTagText(
+              text: caption ?? "",
+              decoratedStyle: GoogleFonts.poppins(
+                  color: Colors.blue.shade700,
+                  height: 1.5,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w400),
+              basicStyle: GoogleFonts.poppins(
                   color: Colors.grey.shade600,
                   height: 1.5,
                   fontSize: 11,
                   fontWeight: FontWeight.w400),
-              textAlign: TextAlign.justify,
+              onTap: (text) {
+                print(text);
+              },
+              softWrap: true,
               maxLines: photo == "" ? 5 : 3,
               overflow: TextOverflow.ellipsis,
             ),
+            // Text(
+            //   caption ?? "",
+            //   style: GoogleFonts.poppins(
+            //       color: Colors.grey.shade600,
+            //       height: 1.5,
+            //       fontSize: 11,
+            //       fontWeight: FontWeight.w400),
+            //   textAlign: TextAlign.justify,
+            //   maxLines: photo == "" ? 5 : 3,
+            //   overflow: TextOverflow.ellipsis,
+            // ),
             SizedBox(
               height: 10,
             ),

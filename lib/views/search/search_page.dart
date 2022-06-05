@@ -7,10 +7,16 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/search/search_controller.dart';
+import 'package:passify/routes/pages.dart';
+import 'package:passify/views/forum/detail_trend.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:passify/widgets/general/community_widget.dart';
 import 'package:passify/widgets/general/event_widget.dart';
+import 'package:passify/widgets/shimmer/search_community_shimmer.dart';
+import 'package:passify/widgets/shimmer/search_event_shimmer.dart';
 import 'package:passify/widgets/shimmer/search_person_shimmer.dart';
+import 'package:intl/intl.dart';
+import 'package:passify/widgets/shimmer/search_shimmer.dart';
 
 class SearchPage extends StatelessWidget {
   SearchPage({Key? key}) : super(key: key);
@@ -23,7 +29,7 @@ class SearchPage extends StatelessWidget {
         statusBarBrightness: Brightness.dark,
         statusBarColor: Colors.white));
     return Obx(() => DefaultTabController(
-          length: searchController.searchView == true ? 4 : 1,
+          length: searchController.searchView == true ? 3 : 1,
           child: Scaffold(
             appBar: _appBar(),
             body: _body(),
@@ -52,7 +58,6 @@ class SearchPage extends StatelessWidget {
                     _tabBar("Orang"),
                     _tabBar("Event"),
                     _tabBar("Komunitas"),
-                    _tabBar("Tagar"),
                   ],
                 ),
               )
@@ -78,6 +83,7 @@ class SearchPage extends StatelessWidget {
                       child: TextFormField(
                         textAlign: TextAlign.start,
                         onTap: () {
+                          searchController.onRefresh();
                           searchController.searchView.value = true;
 
                           FocusManager.instance.primaryFocus;
@@ -145,77 +151,107 @@ class SearchPage extends StatelessWidget {
   }
 
   Widget _body() {
-    return searchController.searchView.value == true
-        ? TabBarView(
-            // ignore: prefer_const_literals_to_create_immutables
-            physics: BouncingScrollPhysics(),
-            children: [
-              _searchPerson(),
-              _searchEvent(),
-              _searchCommunity(),
-              _searchTag()
-            ],
-          )
-        : TabBarView(
-            // ignore: prefer_const_literals_to_create_immutables
-            physics: BouncingScrollPhysics(),
-            children: [_trendTag()]);
+    return searchController.isLoading
+        ? SearchShimmer()
+        : searchController.searchView.value == true
+            ? TabBarView(
+                // ignore: prefer_const_literals_to_create_immutables
+                physics: BouncingScrollPhysics(),
+                children: [
+                  _searchPerson(),
+                  _searchEvent(),
+                  _searchCommunity(),
+                ],
+              )
+            : TabBarView(
+                // ignore: prefer_const_literals_to_create_immutables
+                physics: BouncingScrollPhysics(),
+                children: [_trendTag()]);
   }
 
   Widget _trendTag() {
-    return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
-      child: Padding(
-        padding: const EdgeInsets.all(25.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Tren tagar untukmu',
-              style: GoogleFonts.poppins(
-                  fontSize: 18, fontWeight: FontWeight.w700),
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: 5,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    child: Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(25),
-                              bottomRight: Radius.circular(25),
-                              topRight: Radius.circular(10),
-                              bottomLeft: Radius.circular(10)),
-                          child: Container(
-                            height: 60,
-                            width: 60,
-                            color: Colors.grey.shade100,
-                            child: Center(
-                              child: Icon(Feather.hash),
+    return RefreshIndicator(
+      onRefresh: () {
+        HapticFeedback.lightImpact();
+        return searchController.onGetCommunityMember();
+      },
+      child: SingleChildScrollView(
+        physics: BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+        child: Padding(
+          padding: const EdgeInsets.all(25.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Tren tagar untukmu',
+                style: GoogleFonts.poppins(
+                    fontSize: 18, fontWeight: FontWeight.w700),
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              ListView.builder(
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: searchController.dataHashtag.length >= 5
+                      ? 5
+                      : searchController.dataHashtag.length,
+                  padding: EdgeInsets.only(bottom: 300),
+                  itemBuilder: (context, index) {
+                    var data = searchController.dataHashtag[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 15),
+                      child: GestureDetector(
+                        onTap: () {
+                          Get.to(() => DetailTrend(),
+                              arguments: data['hashtag'].toString());
+                        },
+                        child: Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(25),
+                                  bottomRight: Radius.circular(25),
+                                  topRight: Radius.circular(10),
+                                  bottomLeft: Radius.circular(10)),
+                              child: Container(
+                                height: 60,
+                                width: 60,
+                                color: Colors.grey.shade100,
+                                child: Center(
+                                  child: Icon(Feather.hash),
+                                ),
+                              ),
                             ),
-                          ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                  data['hashtag'],
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                                Text(
+                                  data['total'].toString() + " Postingan",
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          '#sparingfutsalmadiun',
-                          style: GoogleFonts.poppins(
-                              fontSize: 14, fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    ),
-                  );
-                })
-          ],
+                      ),
+                    );
+                  }),
+            ],
+          ),
         ),
       ),
     );
@@ -227,7 +263,7 @@ class SearchPage extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(
-                  height: 80,
+                  height: 120,
                 ),
                 Text(
                   "Masukkan Kata Kunci",
@@ -250,71 +286,232 @@ class SearchPage extends StatelessWidget {
           )
         : searchController.isLoadingPerson
             ? SearchPersonShimmer()
-            : ListView.builder(
-                physics: BouncingScrollPhysics(),
-                itemCount: searchController.personData.length,
-                padding: EdgeInsets.all(25),
-                itemBuilder: (context, index) {
-                  var data = searchController.personData[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    child: Row(
+            : searchController.personDataSearch.isEmpty
+                ? Center(
+                    child: Column(
                       children: [
-                        circleAvatar(
-                            imageData: data.photo,
-                            nameData: data.name,
-                            size: 25),
                         SizedBox(
-                          width: 10,
+                          height: 120,
                         ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              data.name,
-                              style: GoogleFonts.poppins(
-                                  fontSize: 14, fontWeight: FontWeight.w500),
-                            ),
-                            Text(
-                              data.username,
-                              style: GoogleFonts.poppins(
-                                  color: Colors.grey.shade500,
-                                  fontStyle: FontStyle.normal,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          ],
+                        Text(
+                          "Tidak Ada Hasil",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                              color: AppColors.tittleColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600),
+                        ),
+                        Text(
+                          "Tidak ada hasil untuk pencarian '${searchController.searchText.value}'",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                              color: Colors.grey.shade400,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
-                  );
-                });
+                  )
+                : ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    itemCount: searchController.personDataSearch.length,
+                    padding: EdgeInsets.all(25),
+                    itemBuilder: (context, index) {
+                      var data = searchController.personDataSearch[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 15),
+                        child: GestureDetector(
+                          onTap: () {
+                            Get.toNamed(
+                                AppPages.PROFILE_PERSON +
+                                    data.idUser.toString(),
+                                arguments: data.idUser.toString());
+                          },
+                          child: Row(
+                            children: [
+                              circleAvatar(
+                                  imageData: data.photo,
+                                  nameData: data.name.toString(),
+                                  size: 25),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    data.name.toString(),
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                  Text(
+                                    data.username.toString(),
+                                    style: GoogleFonts.poppins(
+                                        color: Colors.grey.shade500,
+                                        fontStyle: FontStyle.normal,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    });
   }
 
   Widget _searchEvent() {
-    return ListView.builder(
-        itemCount: 4,
-        physics: BouncingScrollPhysics(),
-        padding: EdgeInsets.all(25),
-        itemBuilder: (context, index) {
-          return eventCard();
-        });
+    return searchController.searchText.value == ''
+        ? Center(
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 120,
+                ),
+                Text(
+                  "Masukkan Kata Kunci",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                      color: AppColors.tittleColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  "Masukkan kata kunci untuk melakukan pencarian",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                      color: Colors.grey.shade400,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+          )
+        : searchController.isLoadingEvent
+            ? SearchEventShimmer()
+            : searchController.eventDataSearch.isEmpty
+                ? Center(
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 120,
+                        ),
+                        Text(
+                          "Tidak Ada Hasil",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                              color: AppColors.tittleColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600),
+                        ),
+                        Text(
+                          "Tidak ada hasil untuk pencarian event '${searchController.searchText.value}'",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                              color: Colors.grey.shade400,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: searchController.eventDataSearch.length,
+                    physics: BouncingScrollPhysics(),
+                    padding: EdgeInsets.all(25),
+                    itemBuilder: (context, index) {
+                      var data = searchController.eventDataSearch[index];
+                      return eventCard(
+                          idEvent: data.idEvent,
+                          name: data.name,
+                          date: DateFormat("EEEE, dd MMMM yyyy", "id")
+                              .format(data.dateEvent!.toDate())
+                              .toString(),
+                          location: data.location,
+                          time: data.time,
+                          category: data.category,
+                          commentCount: data.comment.toString(),
+                          membersCount: data.member?.toString());
+                    });
   }
 
   Widget _searchCommunity() {
-    return ListView.builder(
-        physics: BouncingScrollPhysics(),
-        itemCount: 4,
-        padding: EdgeInsets.all(25),
-        itemBuilder: (context, index) {
-          return communityCard();
-        });
+    return searchController.searchText.value == ''
+        ? Center(
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 120,
+                ),
+                Text(
+                  "Masukkan Kata Kunci",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                      color: AppColors.tittleColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  "Masukkan kata kunci untuk melakukan pencarian",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                      color: Colors.grey.shade400,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+          )
+        : searchController.isLoadingCommunity
+            ? SearchCommunityShimmer()
+            : searchController.communityDataSearch.isEmpty
+                ? Center(
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 120,
+                        ),
+                        Text(
+                          "Tidak Ada Hasil",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                              color: AppColors.tittleColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600),
+                        ),
+                        Text(
+                          "Tidak ada hasil untuk pencarian komunitas '${searchController.searchText.value}'",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                              color: Colors.grey.shade400,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    itemCount: searchController.communityDataSearch.length,
+                    padding: EdgeInsets.all(25),
+                    itemBuilder: (context, index) {
+                      var data = searchController.communityDataSearch[index];
+                      return communityCard(
+                          idCommunity: data.idCommunity,
+                          category: data.category,
+                          city: data.city,
+                          name: data.name,
+                          photo: data.photo,
+                          membere: data.member);
+                    });
   }
 
   Widget _searchTag() {
     return ListView.builder(
-        itemCount: 4,
+        itemCount: searchController.communityDataSearch.length,
         padding: EdgeInsets.all(25),
         itemBuilder: (context, index) {
           return Padding(

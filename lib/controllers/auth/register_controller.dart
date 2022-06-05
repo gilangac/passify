@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:passify/controllers/base/service_controller.dart';
+import 'package:passify/extension/title_case.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/helpers/snackbar_helper.dart';
 import 'package:passify/models/provinsi.dart';
@@ -62,7 +63,7 @@ class RegisterController extends GetxController with ServiceController {
         selectedImagePath != ""
             ? user.doc(auth.currentUser?.uid).set({
                 "email": auth.currentUser?.email,
-                "name": nameFC.text,
+                "name": nameFC.text.toTitleCase(),
                 "idUser": auth.currentUser?.uid,
                 "photoUser": urlImage.toString(),
                 "username": usernameFC.text.toLowerCase(),
@@ -75,7 +76,7 @@ class RegisterController extends GetxController with ServiceController {
               })
             : user.doc(auth.currentUser?.uid).set({
                 "email": auth.currentUser?.email,
-                "name": nameFC.text,
+                "name": nameFC.text.toTitleCase(),
                 "idUser": auth.currentUser?.uid,
                 "photoUser": auth.currentUser?.photoURL,
                 "username": usernameFC.text.toLowerCase(),

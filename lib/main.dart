@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:passify/routes/pages.dart';
+import 'package:passify/services/service_notification.dart';
 import 'package:passify/services/service_preference.dart';
 import 'package:passify/themes/light_theme.dart';
 import 'package:intl/intl.dart';
@@ -17,6 +18,7 @@ Future main() async {
   initializeDateFormatting('id', null);
   await PreferenceService.init();
   await Firebase.initializeApp();
+  await NotificationService.init();
   runApp(MyApp());
 }
 

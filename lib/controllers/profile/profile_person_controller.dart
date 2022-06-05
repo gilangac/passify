@@ -12,10 +12,11 @@ import 'package:passify/models/user.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ProfileController extends GetxController {
+class ProfilePersonController extends GetxController {
   var dataUser = <UserModel>[].obs;
   final name = "".obs;
   final hobby = "".obs;
+  final idUser = Get.arguments;
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference user = FirebaseFirestore.instance.collection('users');
@@ -68,8 +69,6 @@ class ProfileController extends GetxController {
   }
 
   onGetDataUser() async {
-    final User? users = auth.currentUser;
-    final String? idUser = users!.uid;
     await user
         .where("idUser", isEqualTo: idUser)
         // .orderBy("date", descending: true)
@@ -100,7 +99,7 @@ class ProfileController extends GetxController {
   onGetEventMember() async {
     listMyIdEvent.isNotEmpty ? listMyIdEvent.clear() : null;
     await eventMember
-        .where("idUser", isEqualTo: auth.currentUser!.uid)
+        .where("idUser", isEqualTo: idUser)
         .get()
         .then((QuerySnapshot memberEvent) {
       memberEvent.docs.forEach((element) {
@@ -113,7 +112,7 @@ class ProfileController extends GetxController {
   onGetCommunityMember() async {
     listMyIdCommunity.isNotEmpty ? listMyIdCommunity.clear() : null;
     await communityMember
-        .where("idUser", isEqualTo: auth.currentUser!.uid)
+        .where("idUser", isEqualTo: idUser)
         .where("status", isEqualTo: "verified")
         .get()
         .then((QuerySnapshot memberCommunity) {

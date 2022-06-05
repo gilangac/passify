@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:passify/controllers/base/service_controller.dart';
 import 'package:passify/controllers/home/home_controller.dart';
 import 'package:passify/controllers/profile/profile_controller.dart';
+import 'package:passify/extension/title_case.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/helpers/snackbar_helper.dart';
 import 'package:passify/models/provinsi.dart';
@@ -182,7 +183,7 @@ class EditProfileController extends GetxController with ServiceController {
             ? await dataUser.update({
                 "photoUser": urlImage.toString(),
                 "username": usernameFC.text,
-                "name": nameFC.text,
+                "name": nameFC.text.toTitleCase(),
                 "twitter": twitterFC.text,
                 "hobby": selectedHoby,
                 "province": provinsiFC.text,
@@ -191,7 +192,7 @@ class EditProfileController extends GetxController with ServiceController {
               })
             : await dataUser.update({
                 "username": usernameFC.text,
-                "name": nameFC.text,
+                "name": nameFC.text.toTitleCase(),
                 "twitter": twitterFC.text,
                 "hobby": selectedHoby,
                 "province": provinsiFC.text,
