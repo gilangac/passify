@@ -51,41 +51,70 @@ class DetailPostPage extends StatelessWidget {
   }
 
   Widget _body() {
-    return Obx(() => detailPostC.isLoadingDetail
-        ? Center(child: CircularProgressIndicator())
-        : Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: () => detailPostC.OnRefresh(),
-                  child: SingleChildScrollView(
-                    physics: BouncingScrollPhysics(
-                        parent: AlwaysScrollableScrollPhysics()),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _profile(),
-                        Divider(
-                          height: 5,
-                          thickness: 5,
-                          color: Colors.grey.shade200,
+    return Obx(
+      () => detailPostC.isLoadingDetail
+          ? Center(child: CircularProgressIndicator())
+          : detailPostC.isMemberCommunity.value
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: () => detailPostC.OnRefresh(),
+                        child: SingleChildScrollView(
+                          physics: BouncingScrollPhysics(
+                              parent: AlwaysScrollableScrollPhysics()),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _profile(),
+                              Divider(
+                                height: 5,
+                                thickness: 5,
+                                color: Colors.grey.shade200,
+                              ),
+                              _comment(),
+                            ],
+                          ),
                         ),
-                        _comment(),
-                      ],
+                      ),
                     ),
+                    Container(
+                      width: Get.width,
+                      color: Colors.white,
+                      child: _commentInput(),
+                    )
+                  ],
+                )
+              : Center(
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 100,
+                      ),
+                      Text(
+                        "Anda bukan anggota komunitas ${detailPostC.communityName}",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                            color: AppColors.tittleColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      Text(
+                        "Gabung komunitas untuk dapat melihat postingan ini",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                            color: Colors.grey.shade400,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      Container(height: 400)
+                    ],
                   ),
                 ),
-              ),
-              Container(
-                width: Get.width,
-                color: Colors.white,
-                child: _commentInput(),
-              )
-            ],
-          ));
+    );
   }
 
   Widget _profile() {
@@ -443,8 +472,9 @@ class DetailPostPage extends StatelessWidget {
                                   .toString(),
                               nama: detailPostC.commentPost[index].name,
                               photo: detailPostC.commentPost[index].photo,
-                              username:
-                                  detailPostC.commentPost[index].username);
+                              username: detailPostC.commentPost[index].username,
+                              date: detailPostC.commentPost[index].date
+                                  .toString());
                         })),
                     Container(height: 400)
                   ],

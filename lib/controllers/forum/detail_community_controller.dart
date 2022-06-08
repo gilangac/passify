@@ -10,7 +10,6 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:passify/controllers/base/service_controller.dart';
-import 'package:passify/controllers/forum/community_controller.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/helpers/snackbar_helper.dart';
 import 'package:passify/models/community.dart';
@@ -19,6 +18,8 @@ import 'package:passify/models/provinsi.dart';
 import 'package:passify/models/user.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:intl/intl.dart';
+import 'package:passify/routes/pages.dart';
+import 'package:passify/services/service_notification.dart';
 import 'package:passify/services/service_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -28,6 +29,8 @@ class DetailCommunityController extends GetxController with ServiceController {
   CollectionReference community =
       FirebaseFirestore.instance.collection('communities');
   CollectionReference user = FirebaseFirestore.instance.collection('users');
+  CollectionReference notification =
+      FirebaseFirestore.instance.collection('notifications');
   CollectionReference communityMember =
       FirebaseFirestore.instance.collection('communityMembers');
   CollectionReference post = FirebaseFirestore.instance.collection('post');
@@ -48,10 +51,12 @@ class DetailCommunityController extends GetxController with ServiceController {
   var urlImage = ''.obs;
   var urlImageEdit = ''.obs;
   var myAccountId = ''.obs;
+  final tokenLeader = [].obs;
   String idCommunity = Get.arguments;
   File? imageFile;
   var detailCommunity = <CommunityModel>[].obs;
   var userCommunity = <UserModel>[].obs;
+  var myProfile = <UserModel>[].obs;
   var memberCommunity = <UserModel>[].obs;
   var memberWaiting = <UserModel>[].obs;
   var dataDisccusion = <PostModel>[].obs;
@@ -80,6 +85,7 @@ class DetailCommunityController extends GetxController with ServiceController {
   @override
   void onInit() {
     onGetData();
+    onGetMyProfile();
     onScrollControlled();
     super.onInit();
   }
@@ -96,7 +102,24 @@ class DetailCommunityController extends GetxController with ServiceController {
     });
   }
 
+  Future<void> onGetMyProfile() async {
+    await user.doc(auth.currentUser!.uid).get().then((value) {
+      myProfile.assign(UserModel(
+          name: value["name"],
+          username: value["username"],
+          date: value["date"],
+          idUser: value["idUser"],
+          email: value["email"],
+          photo: value["photoUser"],
+          twitter: value["twitter"],
+          hobby: value["hobby"],
+          city: value["city"],
+          instagram: value["instagram"]));
+    });
+  }
+
   onGetData() async {
+    if (auth.currentUser == null) Get.offAndToNamed(AppPages.NOT_FOUND);
     final User? users = auth.currentUser;
     final String? myId = users!.uid;
     myAccountId.value = myId.toString();
@@ -105,6 +128,7 @@ class DetailCommunityController extends GetxController with ServiceController {
           .where("idCommunity", isEqualTo: idCommunity)
           .get()
           .then((QuerySnapshot snapshot) {
+        if (snapshot.size == 0) Get.offAndToNamed(AppPages.NOT_FOUND);
         // detailEvent.clear();
         memberCommunity.isNotEmpty ? memberCommunity.clear() : null;
         memberWaiting.isNotEmpty ? memberWaiting.clear() : null;
@@ -140,6 +164,7 @@ class DetailCommunityController extends GetxController with ServiceController {
                     memberCommunity.add(UserModel(
                         name: u["name"],
                         username: u["username"],
+                        fcmToken: u["fcmToken"],
                         date: u["date"],
                         idUser: u["idUser"],
                         email: u["email"],
@@ -150,10 +175,10 @@ class DetailCommunityController extends GetxController with ServiceController {
                         instagram: u["instagram"]));
                     memberCommunity.sort((a, b) =>
                         a.name!.toString().compareTo(b.name!.toString()));
-
-                    u["idUser"] == d["idUser"]
-                        ? nameUser.value = u["name"]
-                        : null;
+                    if (u["idUser"] == d["idUser"]) {
+                      nameUser.value = u["name"];
+                      tokenLeader.assignAll(u["fcmToken"]);
+                    }
                   });
                 });
               }
@@ -210,6 +235,7 @@ class DetailCommunityController extends GetxController with ServiceController {
           .get()
           .then((QuerySnapshot snapshot) {
         snapshot.docs.forEach((post) {
+          print(snapshot.size);
           user
               .where("idUser", isEqualTo: post["idUser"])
               .get()
@@ -280,6 +306,43 @@ class DetailCommunityController extends GetxController with ServiceController {
     String category = isDiscusion.value ? "disccusion" : "fjb";
     final dateNow = DateTime.now();
     if (this.formKeyPost.currentState!.validate()) {
+      if (category == "fjb") {
+        dataFjb.add(PostModel(
+          caption: captionFC.text,
+          category: category,
+          date: null,
+          idUser: auth.currentUser?.uid,
+          idCommunity: idCommunity,
+          photo: "",
+          idPost: idPost,
+          title: titleFC.text,
+          noHp: noHpFC.text,
+          price: priceFC.text,
+          status: "available",
+          name: myProfile[0].name,
+          username: myProfile[0].username,
+          photoUser: myProfile[0].photo,
+          comment: 0,
+        ));
+      } else {
+        dataDisccusion.add(PostModel(
+          caption: captionFC.text,
+          category: category,
+          date: null,
+          idUser: auth.currentUser?.uid,
+          idCommunity: idCommunity,
+          photo: "",
+          idPost: idPost,
+          title: titleFC.text,
+          noHp: noHpFC.text,
+          price: priceFC.text,
+          status: "available",
+          name: myProfile[0].name,
+          username: myProfile[0].username,
+          photoUser: myProfile[0].photo,
+          comment: 0,
+        ));
+      }
       try {
         selectedImagePath == ''
             ? await post.doc(idPost).set({
@@ -309,6 +372,7 @@ class DetailCommunityController extends GetxController with ServiceController {
                 "date": dateNow,
               });
 
+        pushNotifNewPost(idPost);
         onGetData();
         Get.back();
         Get.back();
@@ -317,6 +381,39 @@ class DetailCommunityController extends GetxController with ServiceController {
         print(e);
       }
     }
+  }
+
+  void pushNotifNewPost(String code) {
+    var memberList = <UserModel>[].obs;
+    List listFcmToken = [];
+    int i = 0;
+    memberList.assignAll(
+        memberCommunity.where((data) => data.idUser != auth.currentUser!.uid));
+    print(memberList.length);
+    memberList.forEach((element) async {
+      String idNotif = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+          getRandomString(8).toString();
+      i++;
+      listFcmToken.addAll(element.fcmToken!.toList());
+      if (i == memberList.length) {
+        print(listFcmToken);
+        NotificationService.pushNotif(
+            code: code,
+            registrationId: listFcmToken,
+            type: 4,
+            username: myProfile[0].name,
+            object: detailCommunity[0].name);
+      }
+      await notification.doc(idNotif).set({
+        "idNotification": idNotif,
+        "idUser": element.idUser,
+        "idFromUser": auth.currentUser?.uid,
+        "category": 4,
+        "code": code,
+        "readAt": null,
+        "date": DateTime.now(),
+      });
+    });
   }
 
   void pickImage() async {
@@ -360,7 +457,8 @@ class DetailCommunityController extends GetxController with ServiceController {
   onPrepareCreatePost() {
     if (this.formKeyPost.currentState!.validate()) {
       DialogHelper.showLoading();
-      String idPost = "post-" + getRandomString(15).toString();
+      String idPost = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+          getRandomString(8).toString();
       if (selectedImagePath == '') {
         onCreatePost(idPost);
       } else {
@@ -541,6 +639,26 @@ class DetailCommunityController extends GetxController with ServiceController {
       "idUser": auth.currentUser?.uid,
       "status": "waiting",
       "date": dateNow,
+    }).then((_) async {
+      String idNotif = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+          getRandomString(8).toString();
+      user.doc(auth.currentUser!.uid).get().then((value) {
+        NotificationService.pushNotif(
+            code: idCommunity,
+            registrationId: tokenLeader,
+            type: 0,
+            username: value['name'],
+            object: detailCommunity[0].name.toString());
+      });
+      await notification.doc(idNotif).set({
+        "idNotification": idNotif,
+        "code": idCommunity,
+        "idUser": detailCommunity[0].idUser,
+        "idFromUser": auth.currentUser?.uid,
+        "category": 0,
+        "readAt": null,
+        "date": DateTime.now(),
+      });
     });
   }
 
@@ -575,9 +693,31 @@ class DetailCommunityController extends GetxController with ServiceController {
         .where("idCommunity", isEqualTo: idCommunity)
         .get()
         .then((value) {
-      value.docs.forEach((element) {
-        communityMember.doc(element["idMember"]).update({"status": "verified"});
+      value.docs.forEach((element) async {
+        String idNotif = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+            getRandomString(5).toString();
+        communityMember
+            .doc(element["idMember"])
+            .update({"status": "verified"}).then((_) {
+          user.doc(idUser).get().then((userrequest) {
+            NotificationService.pushNotif(
+                code: idCommunity,
+                registrationId: userrequest['fcmToken'],
+                type: 1,
+                username: myProfile[0].name,
+                object: detailCommunity[0].name);
+          });
+        });
         // comunityC.onGetDataCommunity();
+        await notification.doc(idNotif).set({
+          "idNotification": idNotif,
+          "idUser": idUser,
+          "code": idCommunity,
+          "idFromUser": auth.currentUser?.uid,
+          "category": 1,
+          "readAt": null,
+          "date": DateTime.now(),
+        });
       });
     });
     onGetData();
@@ -610,14 +750,19 @@ class DetailCommunityController extends GetxController with ServiceController {
 
   onDeletePost(String idPost) async {
     DialogHelper.showLoading();
-    await post.doc(idPost).delete().then((value) {
+    dataDisccusion.removeWhere((data) => data.idPost == idPost);
+    dataFjb.removeWhere((data) => data.idPost == idPost);
+    dataDisccusion.refresh();
+    dataFjb.refresh();
+    await post.doc(idPost).delete().then((_) {
       postComment.where("idPost", isEqualTo: idPost).get().then((snapPost) {
         snapPost.docs.forEach((element) {
           postComment.doc(element["idComment"]).delete();
         });
-        onGetData();
-        Get.back();
       });
+      print("papapa");
+      onGetData();
+      Get.back();
     });
   }
 

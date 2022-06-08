@@ -10,6 +10,7 @@ class PreferenceService extends GetxService {
   static final _keyIsLogged = '_keyIsLogged';
   static final _keyStatus = 'unlogged';
   static final _keyUserId = 'userId';
+  static final _keyFcmToken = 'fcmToken';
   static final _keyC1 = '0';
   static final _keyC2 = '1';
   static final _keyC3 = '2';
@@ -52,6 +53,17 @@ class PreferenceService extends GetxService {
 
   static String? getUserId() {
     final data = _preferences.getString(_keyUserId);
+
+    if (data != null) return data;
+    return null;
+  }
+
+  static Future setFcmToken(String fcmToken) async {
+    await _preferences.setString(_keyFcmToken, fcmToken);
+  }
+
+  static String? getFcmToken() {
+    final data = _preferences.getString(_keyFcmToken);
 
     if (data != null) return data;
     return null;

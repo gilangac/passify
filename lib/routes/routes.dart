@@ -24,6 +24,7 @@ class AppRoutes {
         name: _Paths.PROFILE_PERSON + ':person',
         page: () => ProfilePersonPage()),
     GetPage(name: _Paths.EDIT_PROFILE, page: () => EditProfilePage()),
+    GetPage(name: _Paths.NOT_FOUND, page: () => NotFoundPage()),
     GetPage(
         name: _Paths.NAVIGATOR,
         page: () => BottomNavigator(),

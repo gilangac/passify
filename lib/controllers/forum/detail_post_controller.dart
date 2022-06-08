@@ -12,17 +12,26 @@ import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/models/post.dart';
 import 'package:passify/models/post_comment.dart';
 import 'package:passify/models/user.dart';
+import 'package:passify/routes/pages.dart';
+import 'package:passify/services/service_notification.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailPostController extends GetxController {
   // DetailCommunityController detailCommunityController = Get.find();
   var myAccountId = ''.obs;
+  var myName = ''.obs;
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference post = FirebaseFirestore.instance.collection('post');
+  CollectionReference community =
+      FirebaseFirestore.instance.collection('communities');
+  CollectionReference communityMember =
+      FirebaseFirestore.instance.collection('communityMembers');
   CollectionReference user = FirebaseFirestore.instance.collection('users');
   CollectionReference postComment =
       FirebaseFirestore.instance.collection('postComments');
+  CollectionReference notification =
+      FirebaseFirestore.instance.collection('notifications');
 
   String dateee = DateFormat("yyyy").format(DateTime.now());
   late final commentText = ''.obs;
@@ -30,20 +39,46 @@ class DetailPostController extends GetxController {
   final _isAvailable = true.obs;
   var detailPost = <PostModel>[].obs;
   var userPost = <UserModel>[].obs;
+  var myProfile = <UserModel>[].obs;
   var commentPost = <PostCommentModel>[].obs;
   var dataComment = <PostCommentModel>[].obs;
   final commentFC = TextEditingController();
   var idPost = Get.arguments;
   var idCommunity = ''.obs;
+  var communityName = ''.obs;
+  var isMemberCommunity = false.obs;
+  var memberCommunity = [];
 
   @override
   void onInit() async {
-    onGetDataDetail();
+    if (Get.arguments != null) {
+      onGetDataDetail();
+      onGetMyProfile();
+    } else {
+      Get.offAndToNamed(AppPages.NOT_FOUND);
+    }
     super.onInit();
   }
 
   Future<void> OnRefresh() async {
     await onGetDataDetail();
+  }
+
+  Future<void> onGetMyProfile() async {
+    await user.doc(auth.currentUser!.uid).get().then((value) {
+      myName.value = value['name'];
+      myProfile.assign(UserModel(
+          name: value["name"],
+          username: value["username"],
+          date: value["date"],
+          idUser: value["idUser"],
+          email: value["email"],
+          photo: value["photoUser"],
+          twitter: value["twitter"],
+          hobby: value["hobby"],
+          city: value["city"],
+          instagram: value["instagram"]));
+    });
   }
 
   Future<void> onGetDataDetail() async {
@@ -56,6 +91,7 @@ class DetailPostController extends GetxController {
           .where("idPost", isEqualTo: idPost)
           .get()
           .then((QuerySnapshot snapshot) {
+        if (snapshot.size == 0) Get.offAndToNamed(AppPages.NOT_FOUND);
         // detailEvent.clear();
         snapshot.docs.forEach((d) {
           detailPost.isNotEmpty ? detailPost.clear() : null;
@@ -76,6 +112,7 @@ class DetailPostController extends GetxController {
           detailPost[0].status != 'available'
               ? _isAvailable.value = false
               : _isAvailable.value = true;
+          onGetDataCommunity();
 
           user.where("idUser", isEqualTo: d["idUser"]).get().then((value) {
             value.docs.forEach((u) {
@@ -99,6 +136,25 @@ class DetailPostController extends GetxController {
     } catch (e) {
       print(e);
     }
+  }
+
+  onGetDataCommunity() {
+    memberCommunity.isNotEmpty ? memberCommunity.clear() : null;
+    community.doc(detailPost[0].idCommunity).get().then((value) {
+      communityName.value = value['name'];
+    });
+    communityMember
+        .where("idCommunity", isEqualTo: detailPost[0].idCommunity)
+        .where("status", isEqualTo: "verified")
+        .get()
+        .then((QuerySnapshot snapshot) {
+      snapshot.docs.forEach((element) {
+        memberCommunity.add(element['idUser']);
+        if (element['idUser'] == auth.currentUser!.uid) {
+          isMemberCommunity.value = true;
+        }
+      });
+    });
   }
 
   onGetComment(String idPost) {
@@ -163,22 +219,119 @@ class DetailPostController extends GetxController {
     });
   }
 
-  onPostComment() {
+  onPostComment() async {
     Timestamp dateNow = Timestamp.fromDate(DateTime.now());
-    String idComment = getRandomString(15).toString();
+    String idComment = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+        getRandomString(8).toString();
+    List tokenUser = [];
+    List idUserComment = [];
+    List idUserCommentFilter = [];
+    List listAllTokenComment = [];
+    commentPost.add(PostCommentModel(
+      date: null,
+      idUser: auth.currentUser?.uid,
+      idPost: Get.arguments,
+      idCommunity: idCommunity.value,
+      comment: commentFC.text,
+      name: myName.value,
+      username: myProfile[0].username,
+      photo: myProfile[0].photo,
+    ));
 
     if (commentText.isNotEmpty || commentText.value != '') {
       try {
-        postComment.doc(idComment).set({
+        await postComment.doc(idComment).set({
           "idComment": idComment,
           "idPost": Get.arguments,
           "idUser": auth.currentUser?.uid,
           "idCommunity": idCommunity.value,
           "comment": commentFC.text,
           "date": dateNow,
+        }).then((value) async {
+          commentFC.clear();
+          commentText.value = '';
+          int i = 0;
+          int j = 0;
+          if (auth.currentUser!.uid != userPost[0].idUser &&
+              memberCommunity.contains(userPost[0].idUser)) {
+            String idNotif =
+                DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+                    getRandomString(8).toString();
+            await user.doc(userPost[0].idUser).get().then((userpost) {
+              NotificationService.pushNotif(
+                  code: Get.arguments,
+                  registrationId: userpost['fcmToken'],
+                  type: 2,
+                  username: myName.value);
+            });
+            await notification.doc(idNotif).set({
+              "idNotification": idNotif,
+              "idUser": userPost[0].idUser,
+              "code": Get.arguments,
+              "idFromUser": auth.currentUser?.uid,
+              "category": 2,
+              "readAt": null,
+              "date": DateTime.now(),
+            });
+          }
+          await postComment
+              .where("idPost", isEqualTo: Get.arguments)
+              .get()
+              .then((QuerySnapshot snapshot) {
+            snapshot.docs.forEach((element) async {
+              i++;
+              // idUserComment.add(element['idUser']);
+              if (memberCommunity.contains(element['idUser'])) {
+                idUserComment.add(element['idUser']);
+              }
+              if (snapshot.size == i) {
+                idUserCommentFilter = idUserComment.toSet().toList();
+                print(idUserCommentFilter);
+                idUserCommentFilter.removeWhere(
+                    (idUserFilter) => idUserFilter == auth.currentUser!.uid);
+                idUserCommentFilter.removeWhere(
+                    (idUserFilter) => idUserFilter == userPost[0].idUser);
+                // print(idUserCommentFilter);
+                await Future.forEach(idUserCommentFilter, (idUser) async {
+                  await user
+                      .doc(idUser.toString())
+                      .get()
+                      .then((datauser) async {
+                    tokenUser.addAll(datauser['fcmToken']);
+                    if (idUserCommentFilter.length == tokenUser.length) {
+                      await Future.forEach(tokenUser, (token) async {
+                        j++;
+                        listAllTokenComment.add(token);
+                        if (tokenUser.length == j) {
+                          print(listAllTokenComment);
+                          NotificationService.pushNotif(
+                              code: Get.arguments,
+                              registrationId: listAllTokenComment,
+                              type: 3,
+                              username: myName.value,
+                              object: detailPost[0].title);
+                        }
+                      });
+                    }
+                  });
+                  String idNotif =
+                      DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+                          getRandomString(8).toString();
+                  await notification.doc(idNotif).set({
+                    "idNotification": idNotif,
+                    "idUser": idUser,
+                    "code": Get.arguments,
+                    "idFromUser": auth.currentUser?.uid,
+                    "category": 3,
+                    "readAt": null,
+                    "date": DateTime.now(),
+                  });
+                });
+              }
+            });
+          });
         });
-        commentFC.clear();
-        commentText.value = '';
+
         OnRefresh();
       } catch (e) {
         print(e);

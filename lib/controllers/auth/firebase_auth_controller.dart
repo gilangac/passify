@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/routes/pages.dart';
+import 'package:passify/services/service_notification.dart';
 import 'package:passify/services/service_preference.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -16,6 +17,7 @@ class FirebaseAuthController extends GetxController {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference user = FirebaseFirestore.instance.collection('users');
   List dataUser = [];
+  List listFcmToken = [];
 
   Stream<User?> authStatus() {
     return auth.authStateChanges();
@@ -55,23 +57,32 @@ class FirebaseAuthController extends GetxController {
   }
 
   onSuccessLogin() async {
-    // user.doc(auth.currentUser?.uid).set({
-    //   "name": auth.currentUser?.displayName,
-    //   "idUser": auth.currentUser?.uid,
-    //   "photoUser": auth.currentUser?.photoURL,
-    // });
-    FirebaseMessaging.instance.subscribeToTopic("all");
+    final fcmToken = await NotificationService.getFcmToken();
+    user.doc(auth.currentUser?.uid).update({
+      "fcmToken": fcmToken,
+    });
   }
 
   onGetUser() async {
+    final fcmToken = await NotificationService.getFcmToken();
     final email = auth.currentUser?.email;
     final userId = auth.currentUser?.uid;
     user.where("email", isEqualTo: email).get().then((QuerySnapshot snapshot) {
       print("jumlah : " + snapshot.size.toString());
       if (snapshot.size == 1) {
+        snapshot.docs.forEach((element) {
+          listFcmToken.assignAll(element['fcmToken']);
+        });
+        listFcmToken.add(fcmToken);
+        user.doc(auth.currentUser?.uid).update({
+          "fcmToken": listFcmToken,
+        });
+        print(listFcmToken);
+        print("token : $fcmToken");
         PreferenceService.setUserId(userId!);
+        PreferenceService.setFcmToken(fcmToken!);
         PreferenceService.setStatus("logged");
-        onSuccessLogin();
+        // onSuccessLogin();
         Get.offNamed(AppPages.NAVIGATOR);
       } else {
         onSuccessLogin();
@@ -81,13 +92,23 @@ class FirebaseAuthController extends GetxController {
   }
 
   void logout() async {
-    FirebaseMessaging.instance.deleteToken();
-    await auth.signOut();
-    PreferenceService.clear();
-    PreferenceService.setStatus("unlog");
-    await _googleSignIn.signOut().then((value) {
-      Get.offAllNamed(AppPages.LOGIN);
-      dispose();
+    var myToken = PreferenceService.getFcmToken();
+    List fcmTokenList = [];
+    user.doc(auth.currentUser?.uid).get().then((value) {
+      fcmTokenList.assignAll(value['fcmToken']);
+      fcmTokenList.removeWhere((token) => token == myToken);
+      user.doc(auth.currentUser?.uid).update({
+        "fcmToken": fcmTokenList,
+      }).then((value) async {
+        FirebaseMessaging.instance.deleteToken();
+        await auth.signOut();
+        PreferenceService.clear();
+        PreferenceService.setStatus("unlog");
+        await _googleSignIn.signOut().then((value) {
+          Get.offAllNamed(AppPages.LOGIN);
+          dispose();
+        });
+      });
     });
   }
 

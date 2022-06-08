@@ -16,6 +16,7 @@ import 'package:passify/helpers/snackbar_helper.dart';
 import 'package:passify/models/provinsi.dart';
 import 'package:passify/routes/pages.dart';
 import 'package:passify/services/service_exception.dart';
+import 'package:passify/services/service_notification.dart';
 import 'package:passify/services/service_provider.dart';
 import 'package:passify/services/service_preference.dart';
 import 'package:intl/intl.dart';
@@ -41,6 +42,7 @@ class RegisterController extends GetxController with ServiceController {
   final cityData = [].obs;
   final dataCity = <Provinsi>[];
   List city = [];
+  List listFcmToken = [];
 
   final nameFC = TextEditingController();
   final usernameFC = TextEditingController();
@@ -57,7 +59,9 @@ class RegisterController extends GetxController with ServiceController {
     super.onInit();
   }
 
-  onRegister() {
+  onRegister() async {
+    final fcmToken = await NotificationService.getFcmToken();
+    listFcmToken.add(fcmToken);
     onSend() {
       try {
         selectedImagePath != ""
@@ -65,6 +69,7 @@ class RegisterController extends GetxController with ServiceController {
                 "email": auth.currentUser?.email,
                 "name": nameFC.text.toTitleCase(),
                 "idUser": auth.currentUser?.uid,
+                "fcmToken": listFcmToken,
                 "photoUser": urlImage.toString(),
                 "username": usernameFC.text.toLowerCase(),
                 "city": cityFC.text,
@@ -78,6 +83,7 @@ class RegisterController extends GetxController with ServiceController {
                 "email": auth.currentUser?.email,
                 "name": nameFC.text.toTitleCase(),
                 "idUser": auth.currentUser?.uid,
+                "fcmToken": listFcmToken,
                 "photoUser": auth.currentUser?.photoURL,
                 "username": usernameFC.text.toLowerCase(),
                 "city": cityFC.text,
@@ -87,6 +93,7 @@ class RegisterController extends GetxController with ServiceController {
                 "twitter": twitterFC.text.toLowerCase(),
                 "date": dateNow
               });
+        PreferenceService.setFcmToken(fcmToken!);
         Get.back();
         PreferenceService.setStatus("logged");
         Get.offAllNamed(AppPages.NAVIGATOR);

@@ -9,6 +9,7 @@ import 'package:passify/bindings/navigator_binding.dart';
 import 'package:passify/bindings/notification_binding.dart';
 import 'package:passify/bindings/profile_binding.dart';
 import 'package:passify/bindings/search_binding.dart';
+import 'package:passify/views/error/not_found_page.dart';
 import 'package:passify/views/forum/community_page.dart';
 import 'package:passify/views/forum/detail_post_page.dart';
 import 'package:passify/views/forum/detail_trend.dart';
@@ -48,6 +49,7 @@ class AppPages {
   static const COMMUNITY = _Paths.COMMUNITY;
   static const PROFILE_PERSON = _Paths.PROFILE_PERSON;
   static const EDIT_PROFILE = _Paths.EDIT_PROFILE;
+  static const NOT_FOUND = _Paths.NOT_FOUND;
 }
 
 abstract class _Paths {
@@ -70,4 +72,5 @@ abstract class _Paths {
   static const COMMUNITY = '/community/';
   static const PROFILE_PERSON = '/profile-person/';
   static const EDIT_PROFILE = '/edit-profile';
+  static const NOT_FOUND = '/404';
 }

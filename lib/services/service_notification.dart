@@ -4,7 +4,7 @@ import 'dart:convert';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:passify/constant/color_constant.dart';
+import 'package:http/http.dart';
 import 'package:passify/routes/pages.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
@@ -35,6 +35,64 @@ class NotificationService extends GetxService {
     FirebaseMessaging.onMessage.listen(_onForeground);
     FirebaseMessaging.onBackgroundMessage(_onBackground);
     // FirebaseMessaging.onMessageOpenedApp.listen(_onOpenedFromBackground);
+  }
+
+  static Future<void> pushNotif(
+      {required String code,
+      required List registrationId,
+      String? username,
+      required int type,
+      String? object}) async {
+    List titleNotif = [
+      "Permintaan Bergabung",
+      "Yeay, permintaan anda disetujui",
+      "Komentar Baru",
+      "Komentar Baru",
+      "Postingan Baru",
+      "Komentar Baru",
+      "Partisipan Event Baru"
+    ];
+
+    List messageNotif = [
+      "meminta bergabung dengan komunitas $object",
+      "menyetujui permintaan anda bergabung dengan komunitas $object",
+      "mengomentari postingan anda",
+      "juga mengomentari postingan $object",
+      "membuat postingan baru di komunitas $object",
+      "mengomentari event $object",
+      "juga mengikuti event $object"
+    ];
+
+    String titleBody = titleNotif[type].toString();
+    String messageBody = messageNotif[type].toString();
+    final uri = Uri.parse('https://fcm.googleapis.com/fcm/send');
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization':
+          'key=AAAAArjUtLY:APA91bEW6WwuUon_D1J3ym66LRSWm3_axedChbkkE06zWsOmcVqliiUSRy8dSui4JTc50ldZ3bgiic4ayzdhCzo7Y2SSa4W7DjK5VcnGikaaewvGSEYNOjvAx8PKKfyB0u2aPaB69n0X'
+    };
+    Map<String, dynamic> body = {
+      "notification": {
+        "title": titleBody,
+        "body": "$username $messageBody",
+      },
+      "data": {
+        "code": code,
+        "type": type,
+      },
+      "registration_ids": registrationId,
+    };
+    String jsonBody = json.encode(body);
+    final encoding = Encoding.getByName('utf-8');
+
+    var response = await post(
+      uri,
+      headers: headers,
+      body: jsonBody,
+      encoding: encoding,
+    );
+
+    print(response.body);
   }
 
   static Future<String?> getFcmToken() async {
@@ -96,7 +154,23 @@ class NotificationService extends GetxService {
     print(payload);
     if (payload != null) {
       final jsonPayload = json.decode(payload);
-      Get.toNamed(AppPages.DETAIL_POST, arguments: jsonPayload['code']);
+      if (jsonPayload['type'].toString() == "0" ||
+          jsonPayload['type'].toString() == "1") {
+        print(jsonPayload['type']);
+        Get.toNamed(AppPages.COMMUNITY + jsonPayload['code'].toString(),
+            arguments: jsonPayload['code']);
+      } else if (jsonPayload['type'].toString() == "2" ||
+          jsonPayload['type'].toString() == "3" ||
+          jsonPayload['type'].toString() == "4") {
+        print(jsonPayload['type']);
+        Get.toNamed(AppPages.DETAIL_POST + jsonPayload['code'].toString(),
+            arguments: jsonPayload['code']);
+      } else if (jsonPayload['type'].toString() == "5" ||
+          jsonPayload['type'].toString() == "6") {
+        print(jsonPayload['type']);
+        Get.toNamed(AppPages.DETAIL_EVENT + jsonPayload['code'].toString(),
+            arguments: jsonPayload['code']);
+      }
     }
   }
 }

@@ -47,8 +47,9 @@ class EventController extends GetxController {
   onCreateEvent() async {
     final dateNow = DateTime.now();
     if (this.formKeyEvent.currentState!.validate()) {
-      DialogHelper.showLoading();
-      String idEvent = "event-" + getRandomString(15).toString();
+      DialogHelper.showLoading();    
+      String idEvent = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+            getRandomString(8).toString();
 
       try {
         await event.doc(idEvent).set({
@@ -63,7 +64,8 @@ class EventController extends GetxController {
           "time": timeFC.text,
         });
 
-        var idMember = getRandomString(20);
+        String idMember = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+            getRandomString(8).toString();
         await eventMember.doc(idMember).set({
           "idEvent": idEvent,
           "idUser": auth.currentUser?.uid,

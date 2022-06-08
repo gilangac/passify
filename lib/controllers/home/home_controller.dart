@@ -56,7 +56,6 @@ class HomeController extends GetxController {
 
   @override
   void onInit() async {
-    FirebaseMessaging.instance.subscribeToTopic("all");
     onRefreshData();
     super.onInit();
   }

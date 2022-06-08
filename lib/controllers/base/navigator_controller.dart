@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:passify/controllers/notification/notification_controller.dart';
 
 class NavigatorController extends GetxController {
   var tabIndex = 0;
@@ -6,6 +7,7 @@ class NavigatorController extends GetxController {
   final countBadge = 0.obs;
 
   void onChangeTab(int index) {
+  final NotificationController notificationController = Get.find();
     tabIndex = index;
     update();
   }

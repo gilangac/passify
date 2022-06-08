@@ -17,8 +17,7 @@ import 'package:intl/intl.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:passify/services/service_provider.dart';
 
-class CommunityController extends GetxController with ServiceController{
-
+class CommunityController extends GetxController with ServiceController {
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference community =
@@ -84,7 +83,8 @@ class CommunityController extends GetxController with ServiceController{
                 "date": dateNow,
               });
 
-        var idMember = getRandomString(20);
+        String idMember = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+            getRandomString(8).toString();
         await communityMember.doc(idMember).set({
           "idMember": idMember,
           "idCommunity": idCommunity,
@@ -174,8 +174,9 @@ class CommunityController extends GetxController with ServiceController{
     });
   }
 
-  onPrepareCreateCommunity() {
-    String idCommunity = "community-" + getRandomString(25).toString();
+  onPrepareCreateCommunity() {      
+    String idCommunity = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+            getRandomString(8).toString();
     if (this.formKeyCommunity.currentState!.validate()) {
       DialogHelper.showLoading();
       if (selectedImagePath == '') {

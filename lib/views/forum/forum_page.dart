@@ -54,7 +54,7 @@ class ForumPage extends StatelessWidget {
                       child: Column(
                         children: [
                           SizedBox(
-                            height: 200,
+                            height: 150,
                           ),
                           LottieBuilder.asset("assets/json/empty_data.json",
                               height: 180),

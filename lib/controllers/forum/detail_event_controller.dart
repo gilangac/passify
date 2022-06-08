@@ -12,6 +12,8 @@ import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/models/event.dart';
 import 'package:passify/models/event_comment.dart';
 import 'package:passify/models/user.dart';
+import 'package:passify/routes/pages.dart';
+import 'package:passify/services/service_notification.dart';
 
 class DetailEventController extends GetxController {
   HomeController homeController = Get.find();
@@ -24,12 +26,15 @@ class DetailEventController extends GetxController {
       FirebaseFirestore.instance.collection('eventMembers');
   CollectionReference eventComment =
       FirebaseFirestore.instance.collection('eventComments');
+  CollectionReference notification =
+      FirebaseFirestore.instance.collection('notifications');
 
   String dateee = DateFormat("yyyy").format(DateTime.now());
   late final commentText = ''.obs;
   var isFollow = false.obs;
   final _isLoadingDetail = true.obs;
   var detailEvent = <EventModel>[].obs;
+  var myProfile = <UserModel>[].obs;
   var userEvent = <UserModel>[].obs;
   var memberEvent = <UserModel>[].obs;
   var commentEvent = <EventCommentModel>[].obs;
@@ -51,11 +56,29 @@ class DetailEventController extends GetxController {
   @override
   void onInit() async {
     onGetDetailEvent();
+    onGetMyProfile();
     super.onInit();
   }
 
   Future<void> OnRefresh() async {
     await onGetDetailEvent();
+  }
+
+  Future<void> onGetMyProfile() async {
+    await user.doc(auth.currentUser!.uid).get().then((value) {
+      myProfile.assign(UserModel(
+          name: value["name"],
+          username: value["username"],
+          fcmToken: value["fcmToken"],
+          date: value["date"],
+          idUser: value["idUser"],
+          email: value["email"],
+          photo: value["photoUser"],
+          twitter: value["twitter"],
+          hobby: value["hobby"],
+          city: value["city"],
+          instagram: value["instagram"]));
+    });
   }
 
   onGetDetailEvent() async {
@@ -66,6 +89,7 @@ class DetailEventController extends GetxController {
         .where("idEvent", isEqualTo: idEvent)
         .get()
         .then((QuerySnapshot snapshot) {
+        if (snapshot.size == 0) Get.offAndToNamed(AppPages.NOT_FOUND);
       // detailEvent.clear();
       snapshot.docs.forEach((d) {
         eventMember
@@ -97,6 +121,7 @@ class DetailEventController extends GetxController {
                 memberEvent.add(UserModel(
                     name: u["name"],
                     username: u["username"],
+                    fcmToken: u["fcmToken"],
                     date: u["date"],
                     idUser: u["idUser"],
                     email: u["email"],
@@ -201,6 +226,8 @@ class DetailEventController extends GetxController {
         "idUser": auth.currentUser?.uid,
         "idEvent": idEvent,
         "date": DateTime.now(),
+      }).then((_) {
+        pushNotifNewParticipant("follow");
       });
       onGetDetailEvent();
       homeController.onRefreshData();
@@ -208,6 +235,104 @@ class DetailEventController extends GetxController {
     } catch (e) {
       isFollow.value = false;
     }
+  }
+
+  void pushNotifNewParticipant(String action) {
+    List listFcmToken = [];
+    List listFcmTokenComment = [];
+    int i = 0;
+
+    var member = <UserModel>[];
+    member = memberEvent
+        .where((data) => data.idUser != auth.currentUser!.uid)
+        .toList();
+    member.forEach((element) async {
+      i++;
+      listFcmToken.addAll(element.fcmToken!.toList());
+      if (i == member.length) {
+        print(listFcmToken);
+        if (action == "follow") {
+          NotificationService.pushNotif(
+              code: Get.arguments,
+              registrationId: listFcmToken,
+              type: 6,
+              username: myProfile[0].name,
+              object: detailEvent[0].name);
+        } else if (action == "comment") {
+          int j = 0;
+          int k = 0;
+          List tokenUser = [];
+          List listAllTokenComment = [];
+          List idUserComment = [];
+          List idUserCommentFilter = [];
+          await eventComment
+              .where("idEvent", isEqualTo: Get.arguments)
+              .get()
+              .then((QuerySnapshot snapshot) {
+            snapshot.docs.forEach((userComment) async {
+              k++;
+              idUserComment.add(userComment['idUser']);
+              if (snapshot.size == k) {
+                idUserCommentFilter = idUserComment.toSet().toList();
+                idUserCommentFilter.removeWhere(
+                    (idUserFilter) => idUserFilter == auth.currentUser!.uid);
+                // print(idUserCommentFilter);
+                await Future.forEach(idUserCommentFilter, (idUser) async {
+                  await user
+                      .doc(idUser.toString())
+                      .get()
+                      .then((datauser) async {
+                    tokenUser.addAll(datauser['fcmToken']);
+                    if (idUserCommentFilter.length == tokenUser.length) {
+                      await Future.forEach(tokenUser, (token) async {
+                        j++;
+                        listAllTokenComment.add(token);
+                        if (tokenUser.length == j) {
+                          listFcmToken.addAll(listAllTokenComment);
+                          listFcmTokenComment = listFcmToken.toSet().toList();
+                          print(listFcmTokenComment);
+                          NotificationService.pushNotif(
+                              code: Get.arguments,
+                              registrationId: listFcmToken,
+                              type: 5,
+                              username: myProfile[0].name,
+                              object: detailEvent[0].name);
+                        }
+                      });
+                    }
+                  });
+                });
+              }
+            });
+          });
+        }
+      }
+      if (action == "follow") {
+        String idNotif = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+            getRandomString(8).toString();
+        await notification.doc(idNotif).set({
+          "idNotification": idNotif,
+          "idUser": element.idUser,
+          "code": Get.arguments,
+          "idFromUser": auth.currentUser?.uid,
+          "category": 6,
+          "readAt": null,
+          "date": DateTime.now(),
+        });
+      } else if (action == "comment") {
+        String idNotif = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+            getRandomString(8).toString();
+        await notification.doc(idNotif).set({
+          "idNotification": idNotif,
+          "idUser": element.idUser,
+          "code": Get.arguments,
+          "idFromUser": auth.currentUser?.uid,
+          "category": 5,
+          "readAt": null,
+          "date": DateTime.now(),
+        });
+      }
+    });
   }
 
   onUnfollowEvent() {
@@ -245,7 +370,8 @@ class DetailEventController extends GetxController {
 
   onPostComment() {
     Timestamp dateNow = Timestamp.fromDate(DateTime.now());
-    String idComment = getRandomString(15).toString();
+    String idComment = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+        getRandomString(8).toString();
 
     if (commentText.isNotEmpty || commentText.value != '') {
       try {
@@ -256,6 +382,7 @@ class DetailEventController extends GetxController {
           "comment": commentFC.text,
           "date": dateNow,
         });
+        pushNotifNewParticipant("comment");
         commentFC.clear();
         commentText.value = '';
         OnRefresh();
