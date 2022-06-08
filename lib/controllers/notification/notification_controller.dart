@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 import 'package:passify/controllers/base/navigator_controller.dart';
 import 'package:passify/models/notification.dart';
+import 'package:passify/routes/pages.dart';
 
 class NotificationController extends GetxController {
   final NavigatorController navigatorController = Get.find();
@@ -62,6 +63,27 @@ class NotificationController extends GetxController {
     }).then((_) {
       _isLoading.value = false;
     });
+  }
+
+  void onClickNotif(String idNotification, String code, int category) {
+    notification
+        .doc(idNotification)
+        .update({"readAt": DateTime.now()}).then((_) => onGetData());
+
+        if (category == 0 ||
+          category == 1) {
+        Get.toNamed(AppPages.COMMUNITY + code.toString(),
+            arguments: code);
+      } else if (category == 2 ||
+          category == 3 ||
+          category == 4) {
+        Get.toNamed(AppPages.DETAIL_POST + code.toString(),
+            arguments: code);
+      } else if (category == 5 ||
+          category == 6) {
+        Get.toNamed(AppPages.DETAIL_EVENT + code.toString(),
+            arguments: code);
+      }
   }
 
   get isLoading => this._isLoading.value;

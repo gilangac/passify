@@ -179,79 +179,106 @@ class SearchPage extends StatelessWidget {
         physics: BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
         child: Padding(
           padding: const EdgeInsets.all(25.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Tren tagar untukmu',
-                style: GoogleFonts.poppins(
-                    fontSize: 18, fontWeight: FontWeight.w700),
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              ListView.builder(
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: searchController.dataHashtag.length >= 5
-                      ? 5
-                      : searchController.dataHashtag.length,
-                  padding: EdgeInsets.only(bottom: 300),
-                  itemBuilder: (context, index) {
-                    var data = searchController.dataHashtag[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 15),
-                      child: GestureDetector(
-                        onTap: () {
-                          Get.to(() => DetailTrend(),
-                              arguments: data['hashtag'].toString());
-                        },
-                        child: Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(25),
-                                  bottomRight: Radius.circular(25),
-                                  topRight: Radius.circular(10),
-                                  bottomLeft: Radius.circular(10)),
-                              child: Container(
-                                height: 60,
-                                width: 60,
-                                color: Colors.grey.shade100,
-                                child: Center(
-                                  child: Icon(Feather.hash),
-                                ),
+          child: searchController.dataHashtag.isEmpty
+              ? Center(
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 120,
+                      ),
+                      Text(
+                        "Gabung komunitas sesuai hobimu!",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                            color: AppColors.tittleColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      Text(
+                        "Gabung komunitas dan mulai diskusi dengan teman sehobimu!",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                            color: Colors.grey.shade400,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                )
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Tren tagar untukmu',
+                      style: GoogleFonts.poppins(
+                          fontSize: 18, fontWeight: FontWeight.w700),
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    ListView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: searchController.dataHashtag.length >= 5
+                            ? 5
+                            : searchController.dataHashtag.length,
+                        padding: EdgeInsets.only(bottom: 300),
+                        itemBuilder: (context, index) {
+                          var data = searchController.dataHashtag[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 15),
+                            child: GestureDetector(
+                              onTap: () {
+                                Get.to(() => DetailTrend(),
+                                    arguments: data['hashtag'].toString());
+                              },
+                              child: Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(25),
+                                        bottomRight: Radius.circular(25),
+                                        topRight: Radius.circular(10),
+                                        bottomLeft: Radius.circular(10)),
+                                    child: Container(
+                                      height: 60,
+                                      width: 60,
+                                      color: Colors.grey.shade100,
+                                      child: Center(
+                                        child: Icon(Feather.hash),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        data['hashtag'],
+                                        style: GoogleFonts.poppins(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      Text(
+                                        data['total'].toString() + " Postingan",
+                                        style: GoogleFonts.poppins(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  data['hashtag'],
-                                  style: GoogleFonts.poppins(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                                Text(
-                                  data['total'].toString() + " Postingan",
-                                  style: GoogleFonts.poppins(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }),
-            ],
-          ),
+                          );
+                        }),
+                  ],
+                ),
         ),
       ),
     );

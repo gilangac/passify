@@ -5,11 +5,10 @@ import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart';
+import 'package:passify/controllers/notification/notification_controller.dart';
 import 'package:passify/routes/pages.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
-import 'package:get/get_utils/get_utils.dart';
-import 'package:get/state_manager.dart';
+import 'package:get/get.dart';
 
 class NotificationService extends GetxService {
   static late FirebaseMessaging _fcm;
@@ -135,7 +134,8 @@ class NotificationService extends GetxService {
 
   static void _onForeground(RemoteMessage message) async {
     // final notificationController = Get.put(NotificationController());
-
+    NotificationController notificationController = Get.find();
+    notificationController.onGetData();
     _showNotification(message);
     // notificationController.onGetNotifications();
   }
@@ -145,6 +145,8 @@ class NotificationService extends GetxService {
 
     // await _showNotification(message);
     // _showNotification(message);
+    NotificationController notificationController = Get.find();
+    notificationController.onGetData();
     print("Handling a background message: ${message.messageId}");
     // notificationController.onGetNotifications();
   }
@@ -152,6 +154,7 @@ class NotificationService extends GetxService {
   static Future<void> _onOpenedNotification(String? payload) async {
     // final notificationController = Get.put(NotificationController());
     print(payload);
+    
     if (payload != null) {
       final jsonPayload = json.decode(payload);
       if (jsonPayload['type'].toString() == "0" ||

@@ -15,9 +15,7 @@ class NotFoundPage extends StatelessWidget {
         child: Center(
           child: Column(
             children: [
-              SizedBox(
-                height: 100,
-              ),
+              SizedBox(height: 100,),
               Text(
                 '404',
                 style: GoogleFonts.poppins(
