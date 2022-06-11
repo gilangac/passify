@@ -704,6 +704,26 @@ class DetailCommunityController extends GetxController with ServiceController {
         });
   }
 
+  onRemoveMember(String? idMemberRemove) async {
+    Get.back();
+    Get.back();
+    DialogHelper.showLoading();
+    isRequestJoin.value = false;
+    isMember.value = false;
+    await communityMember
+        .where("idUser", isEqualTo: idMemberRemove)
+        .get()
+        .then((value) {
+      value.docs.forEach((element) async {
+        await communityMember.doc(element['idMember']).delete().then((value) {
+          onGetData();
+          SnackBarHelper.showSucces(
+              description: "Berhasil mengeluarkan partisipan");
+        });
+      });
+    });
+  }
+
   onAccMember(String idUser) async {
     Get.back();
     await communityMember

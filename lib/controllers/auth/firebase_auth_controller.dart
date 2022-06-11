@@ -102,6 +102,8 @@ class FirebaseAuthController extends GetxController {
   }
 
   void logout() async {
+    Get.back();
+    DialogHelper.showLoading();
     var myToken = PreferenceService.getFcmToken();
     List fcmTokenList = [];
     user.doc(auth.currentUser?.uid).get().then((value) {

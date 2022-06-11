@@ -41,6 +41,7 @@ class ForumController extends GetxController {
         .where("status", isEqualTo: "verified")
         .get()
         .then((QuerySnapshot memberCommunity) {
+      if (memberCommunity.size == 0) _isLoading.value = false;
       memberCommunity.docs.forEach((element) {
         listMyIdCommunity.add(element['idCommunity']);
       });
@@ -57,6 +58,7 @@ class ForumController extends GetxController {
           .get()
           .then((QuerySnapshot snapshot) {
         snapshot.docs.forEach((post) {
+          if (snapshot.size == 0) _isLoading.value = false;
           user
               .where("idUser", isEqualTo: post["idUser"])
               .get()

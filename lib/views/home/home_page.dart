@@ -342,9 +342,16 @@ class HomePage extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   physics: BouncingScrollPhysics(
                       parent: AlwaysScrollableScrollPhysics()),
-                  child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 25),
-                      child: _boxCommunity()),
+                  child: Row(
+                    children: [
+                      Padding(
+                          padding: const EdgeInsets.fromLTRB(25, 0, 10, 0),
+                          child: _boxCommunity()),
+                      Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
+                          child: _boxCommunity()),
+                    ],
+                  ),
                 ),
               )
             : FadeInRight(
@@ -608,7 +615,7 @@ class HomePage extends StatelessWidget {
                           child: Column(
                             children: [
                               LottieBuilder.asset("assets/json/empty_data.json",
-                                  height: 180),
+                                  height: 150),
                               SizedBox(
                                 height: 0,
                               ),
@@ -617,7 +624,7 @@ class HomePage extends StatelessWidget {
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.poppins(
                                     color: AppColors.tittleColor,
-                                    fontSize: 16,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w600),
                               ),
                               Text(

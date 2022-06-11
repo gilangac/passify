@@ -40,7 +40,7 @@ class CommunityPage extends StatelessWidget {
     return appBar(title: "");
   }
 
-  void handleClick(int value) {
+  void handleClick(int value, {String? idUser}) {
     switch (value) {
       case 0:
         _communityMembers(
@@ -66,6 +66,16 @@ class CommunityPage extends StatelessWidget {
             description: "Apakah anda yakin akan menghapus komunitas?",
             action: () => detailCommunityC.onDeleteCommunity(),
             titlePrimary: "Hapus",
+            titleSecondary: "Batal");
+
+        break;
+      case 6:
+        DialogHelper.showConfirm(
+            title: "Keluarkan Partisipan",
+            description:
+                "Apakah anda yakin akan megeluarkan partisipan dari komunitas?",
+            action: () => detailCommunityC.onRemoveMember(idUser),
+            titlePrimary: "Keluarkan",
             titleSecondary: "Batal");
 
         break;
@@ -939,7 +949,38 @@ class CommunityPage extends StatelessWidget {
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w400),
                                           )
-                                        : SizedBox()),
+                                        : detailCommunityC.isCreator.value &&
+                                                title != "Permintaan Bergabung"
+                                            ? PopupMenuButton<int>(
+                                                child: Container(
+                                                  child: Center(
+                                                    child: Icon(
+                                                      Feather.more_vertical,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12)),
+                                                onSelected: (item) =>
+                                                    handleClick(item,
+                                                        idUser: member[index]
+                                                            .idUser),
+                                                itemBuilder: (context) => [
+                                                      PopupMenuItem<int>(
+                                                          value: 6,
+                                                          child: Text(
+                                                            'Keluarkan dari komunitas',
+                                                            style: GoogleFonts
+                                                                .poppins(
+                                                                    color: Colors
+                                                                        .red
+                                                                        .shade300),
+                                                          )),
+                                                    ])
+                                            : SizedBox()),
                                     title == "Permintaan Bergabung"
                                         ? Container(
                                             width: 60,

@@ -114,7 +114,7 @@ class NotificationPage extends StatelessWidget {
                             height: 150,
                           ),
                           LottieBuilder.asset("assets/json/empty_data.json",
-                              height: 180),
+                              height: 150),
                           SizedBox(
                             height: 0,
                           ),
@@ -123,7 +123,7 @@ class NotificationPage extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: GoogleFonts.poppins(
                                 color: AppColors.tittleColor,
-                                fontSize: 16,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w600),
                           ),
                           Container(height: 300)

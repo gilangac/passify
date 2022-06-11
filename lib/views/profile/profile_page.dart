@@ -243,13 +243,13 @@ class ProfilePage extends StatelessWidget {
                       height: 50,
                     ),
                     LottieBuilder.asset("assets/json/empty_data.json",
-                        height: 180),
+                        height: 150),
                     Text(
                       "Belum ada event yang diikuti",
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                           color: AppColors.tittleColor,
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600),
                     ),
                     Container(height: 100)
@@ -297,13 +297,13 @@ class ProfilePage extends StatelessWidget {
                       height: 50,
                     ),
                     LottieBuilder.asset("assets/json/empty_data.json",
-                        height: 180),
+                        height: 150),
                     Text(
                       "Belum ada komunitas yang diikuti",
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                           color: AppColors.tittleColor,
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600),
                     ),
                     Container(height: 100)
