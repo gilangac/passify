@@ -25,7 +25,7 @@ class SnackBarHelper {
       GetBar(
         icon: Icon(Feather.check_circle,
             color: Color.fromARGB(255, 243, 237, 237)),
-        backgroundColor: Colors.green.shade400,
+        backgroundColor: Colors.green.shade600,
         title: "Berhasil",
         message: description,
         duration: Duration(seconds: 4),

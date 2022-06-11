@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:passify/constant/color_constant.dart';
 
 class DialogHelper {
@@ -114,7 +115,12 @@ class DialogHelper {
     );
   }
 
-  static showInfo({String? title, String? description}) {
+  static showInfo({String? title, String? description}) async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String version = packageInfo.version;
+    String code = packageInfo.buildNumber;
+    String appName = packageInfo.appName;
+    String packageName = packageInfo.packageName;
     Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -132,8 +138,18 @@ class DialogHelper {
                 child: Image.asset("assets/images/logo.png", height: 150),
               ),
               Text(
-                description ?? 'Versi Aplikasi : v1.0',
+                description ?? 'App Version : v$version',
                 style: GoogleFonts.poppins(fontSize: 14),
+              ),
+              Text(
+                description ?? 'App Name: $appName',
+                style: GoogleFonts.poppins(
+                    fontSize: 12, color: Colors.grey.shade400),
+              ),
+              Text(
+                description ?? 'Package Name : $packageName',
+                style: GoogleFonts.poppins(
+                    fontSize: 12, color: Colors.grey.shade400),
               ),
               SizedBox(height: 20),
               ElevatedButton(

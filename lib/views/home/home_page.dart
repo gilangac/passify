@@ -349,7 +349,7 @@ class HomePage extends StatelessWidget {
                           child: _boxCommunity()),
                       Padding(
                           padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
-                          child: _boxCommunity()),
+                          child: _boxCommunity(title: "Temukan teman dengan kesamaan hobi dengamu di komunitas hobi")),
                     ],
                   ),
                 ),
@@ -516,7 +516,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _boxCommunity() {
+  Widget _boxCommunity({String? title}) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(15),
       child: Stack(
@@ -572,7 +572,7 @@ class HomePage extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: Text(
-                    'Pilih kategori hobi dan kamu dapat mencari atau membuat komunitas  sesuai hobimu',
+                    title??'Pilih kategori hobi dan kamu dapat mencari atau membuat komunitas sesuai hobimu',
                     style: GoogleFonts.poppins(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,

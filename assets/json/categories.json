@@ -86,6 +86,48 @@
         },
         {
             "id": "12",
+            "name": "Gaming",
+            "path": "gaming",
+            "icon": "gaming_icon.png",
+            "value": false
+        },
+        {
+            "id": "13",
+            "name": "Masak",
+            "path": "masak",
+            "icon": "cooking_icon.png",
+            "value": false
+        },
+        {
+            "id": "14",
+            "name": "Otomotif",
+            "path": "otomotif",
+            "icon": "automotive_icon.png",
+            "value": false
+        },
+        {
+            "id": "15",
+            "name": "Bela Diri",
+            "path": "bela-diri",
+            "icon": "bela_diri_icon.png",
+            "value": false
+        },
+        {
+            "id": "16",
+            "name": "Alam",
+            "path": "pecinta-alam",
+            "icon": "pecinta_alam_icon.png",
+            "value": false
+        },
+        {
+            "id": "17",
+            "name": "Hewan",
+            "path": "pecinta-hewan",
+            "icon": "pecinta_hewan_icon.png",
+            "value": false
+        },
+        {
+            "id": "18",
             "name": "Lainnya",
             "path": "lainnya",
             "icon": "other_icon.png",
