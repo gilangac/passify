@@ -58,6 +58,7 @@ class RegisterController extends GetxController with ServiceController {
     onGetProvince();
     super.onInit();
   }
+  
 
   onRegister() async {
     final fcmToken = await NotificationService.getFcmToken();
