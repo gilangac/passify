@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:passify/controllers/forum/detail_community_controller.dart';
+import 'package:path/path.dart' as Path;
 import 'package:passify/controllers/forum/detail_post_controller.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/models/post.dart';
@@ -125,6 +125,12 @@ class EditPostController extends GetxController {
 
   void onDeleteImage() {
     void _action() async {
+      var fileUrl = Uri.decodeFull(Path.basename(dataPost[0].photo.toString()))
+          .replaceAll(new RegExp(r'(\?alt).*'), '');
+
+      final firebase_storage.Reference firebaseStorageRef =
+          firebase_storage.FirebaseStorage.instance.ref().child(fileUrl);
+      await firebaseStorageRef.delete();
       Get.back();
       DialogHelper.showLoading();
       DocumentReference dataPhoto = firestore.collection("post").doc(idPost);

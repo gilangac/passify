@@ -194,6 +194,9 @@ class EditProfilePage extends StatelessWidget {
         if (value.split(' ').length > 1) {
           return 'Username tidak boleh terdapat spasi';
         }
+        if (value.length > 32) {
+          return 'Username tidak boleh lebih dari 32 karakter';
+        }
         return null;
       },
       controller: editProfileC.usernameFC

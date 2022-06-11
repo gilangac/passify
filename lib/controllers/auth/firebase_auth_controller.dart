@@ -57,9 +57,11 @@ class FirebaseAuthController extends GetxController {
   }
 
   onSuccessLogin() async {
+    List listFcmToken = [];
     final fcmToken = await NotificationService.getFcmToken();
+    listFcmToken.add(fcmToken);
     user.doc(auth.currentUser?.uid).update({
-      "fcmToken": fcmToken,
+      "fcmToken": listFcmToken,
     });
   }
 
@@ -67,11 +69,14 @@ class FirebaseAuthController extends GetxController {
     final fcmToken = await NotificationService.getFcmToken();
     final email = auth.currentUser?.email;
     final userId = auth.currentUser?.uid;
-    user.where("email", isEqualTo: email).get().then((QuerySnapshot snapshot) {
+    user
+        .where("email", isEqualTo: email)
+        .get()
+        .then((QuerySnapshot snapshot) async {
       print("jumlah : " + snapshot.size.toString());
       if (snapshot.size == 1) {
         snapshot.docs.forEach((element) {
-          listFcmToken.assignAll(element['fcmToken']);
+          listFcmToken.add(element['fcmToken']);
         });
         listFcmToken.add(fcmToken);
         user.doc(auth.currentUser?.uid).update({
@@ -86,6 +91,11 @@ class FirebaseAuthController extends GetxController {
         Get.offNamed(AppPages.NAVIGATOR);
       } else {
         onSuccessLogin();
+        await user.doc(auth.currentUser?.uid).set({
+          "email": auth.currentUser?.email,
+          "idUser": auth.currentUser?.uid,
+          "fcmToken": [],
+        });
         Get.toNamed(AppPages.REGISTER);
       }
     });
@@ -106,7 +116,7 @@ class FirebaseAuthController extends GetxController {
         PreferenceService.setStatus("unlog");
         await _googleSignIn.signOut().then((value) {
           Get.offAllNamed(AppPages.LOGIN);
-          dispose();
+          super.dispose();
         });
       });
     });

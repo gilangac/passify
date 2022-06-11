@@ -23,13 +23,13 @@ class ProfileActionMenuWidget extends StatelessWidget {
           margin: EdgeInsets.symmetric(horizontal: 20),
           child: Icon(Feather.menu, size: 24)),
       onTap: () {
-        _bottomSheetContent();
+        _bottomSheetContentProfile();
       },
     );
   }
 }
 
-void _bottomSheetContent() {
+void _bottomSheetContentProfile() {
   Get.bottomSheet(
       SafeArea(
         child: Padding(
@@ -40,27 +40,30 @@ void _bottomSheetContent() {
             children: [
               Container(color: AppColors.lightGrey, width: 35, height: 4),
               SizedBox(height: 30),
-              _listAction(
-                  icon: Feather.edit,
-                  title: "Edit Profil",
-                  path: AppPages.EDIT_PROFILE),
-              _listAction(
-                  icon: Feather.info,
-                  title: "Tentang Aplikasi",
-                  type: "about",
-                  path: AppPages.HOME),
-              SizedBox(height: 10),
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 12),
-                color: AppColors.lightGrey,
-                height: 0.5,
-                width: Get.width,
-              ),
-              SizedBox(height: 10),
-              _logoutAction(
-                icon: Feather.log_out,
-                title: "Keluar",
-              ),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.grey.shade100),
+                  child: Column(
+                    children: [
+                      _listAction2(
+                          icon: Feather.edit,
+                          title: "Edit Profil",
+                          path: AppPages.EDIT_PROFILE,
+                          type: "report"),
+                      Divider(
+                        height: 1,
+                        color: Colors.grey.shade300,
+                      ),
+                      _listAction2(
+                          icon: Feather.info,
+                          title: "Tentang Aplikasi",
+                          path: AppPages.HOME,
+                          type: "about"),
+                    ],
+                  )),
+              SizedBox(height: 13),
+              _logoutAction()
             ],
           ),
         ),
@@ -74,50 +77,72 @@ void _bottomSheetContent() {
       isScrollControlled: true);
 }
 
-Widget _listAction(
-    {IconData? icon,
-    required String title,
-    String? type,
-    required String path}) {
-  return InkWell(
-    child: Container(
-      decoration: BoxDecoration(
+Widget _listAction2({
+  IconData? icon,
+  required String title,
+  required String path,
+  String? type,
+}) {
+  return Container(
+    width: Get.width,
+    child: Material(
+      color: Colors.transparent,
+      child: InkWell(
         borderRadius: BorderRadius.circular(10),
-      ),
-      child: ListTile(
-        minLeadingWidth: 0,
-        leading: Icon(icon),
-        title: Text(title),
-        trailing: Icon(Feather.chevron_right),
-      ),
-    ),
-    onTap: () {
-      Get.back();
-      type == "about" ? DialogHelper.showInfo() : Get.toNamed(path);
-    },
-  );
-}
-
-Widget _logoutAction({IconData? icon, required String title}) {
-  final ProfileController controller = Get.find();
-
-  return InkWell(
-    child: Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: ListTile(
-        minLeadingWidth: 0,
-        leading: Icon(icon, color: Colors.red.shade400),
-        title: Text(
-          title,
-          style: GoogleFonts.poppins(color: Colors.red.shade400),
+        onTap: () {
+          Get.back();
+          type == "about" ? DialogHelper.showInfo() : Get.toNamed(path);
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          child: ListTile(
+            minLeadingWidth: 0,
+            leading: Icon(icon),
+            title: Text(
+              title,
+              style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textColor),
+            ),
+            trailing: Icon(Feather.chevron_right),
+          ),
         ),
       ),
     ),
-    onTap: () => DialogHelper.showConfirm(
-        title: "Logout",
-        description: "Anda yakin akan keluar aplikasi?",
-        action: () => firebaseAuthController.logout()),
+  );
+}
+
+Widget _logoutAction() {
+  return Container(
+    width: Get.width,
+    decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10), color: Colors.grey.shade100),
+    child: Material(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: () {
+          Get.back();
+          DialogHelper.showConfirm(
+              title: "Logout",
+              description: "Anda yakin akan keluar aplikasi?",
+              titlePrimary: "Logout",
+              titleSecondary: "Batal",
+              action: () => firebaseAuthController.logout());
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          child: ListTile(
+            minLeadingWidth: 0,
+            leading: Icon(Feather.log_out, color: Colors.red.shade400),
+            title: Text(
+              "Keluar",
+              style: GoogleFonts.poppins(color: Colors.red.shade400),
+            ),
+          ),
+        ),
+      ),
+      color: Colors.transparent,
+    ),
   );
 }

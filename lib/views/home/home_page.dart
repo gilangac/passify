@@ -12,7 +12,6 @@ import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/home/home_controller.dart';
 import 'package:passify/routes/pages.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
-import 'package:passify/widgets/general/community_widget.dart';
 import 'package:lottie/lottie.dart';
 import 'package:passify/widgets/general/event_widget.dart';
 import 'package:intl/intl.dart';
@@ -24,59 +23,6 @@ final List<String> imgList = [
   'https://firebasestorage.googleapis.com/v0/b/passify-app-347b7.appspot.com/o/csm_22095_fussball_92c034a746.jpg?alt=media&token=1d6cf0f6-0111-4cb1-9876-a7cf200cab1d',
   'https://firebasestorage.googleapis.com/v0/b/passify-app-347b7.appspot.com/o/Untitled.png?alt=media&token=0b7bd39d-30ac-4e48-987f-c5e6292c5069',
 ];
-
-final List<Widget> imageSliders = imgList
-    .map((item) => Container(
-          child: Container(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5),
-              child: ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                  child: Stack(
-                    children: [
-                      // Image.network(item, fit: BoxFit.cover, width: 1000.0),
-                      CachedNetworkImage(
-                        imageUrl: item,
-                        width: Get.width,
-                        fit: BoxFit.cover,
-                        errorWidget: (context, url, error) =>
-                            Center(child: Icon(Icons.error)),
-                        progressIndicatorBuilder:
-                            (context, url, downloadProgress) => Container(
-                          color: Colors.white,
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              value: downloadProgress.progress,
-                              color: AppColors.primaryColor,
-                              strokeWidth: 2,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: Get.width,
-                        height: Get.height * 0.18,
-                        color: AppColors.primaryColor.withOpacity(0.3),
-                        child: Padding(
-                          padding: const EdgeInsets.all(25.0),
-                          child: Center(
-                            child: Text(
-                                "Komunitas Hobi, Tempat Diskusi Tentang Hobi Bersama Temanmu",
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700,
-                                )),
-                          ),
-                        ),
-                      ),
-                    ],
-                  )),
-            ),
-          ),
-        ))
-    .toList();
 
 class HomePage extends StatelessWidget {
   HomePage({Key? key}) : super(key: key);
@@ -158,6 +104,57 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _carousel() {
+    final List<Widget> imageSliders = homeController.bannerList
+        .map((item) => Container(
+              child: Container(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                      child: Stack(
+                        children: [
+                          // Image.network(item, fit: BoxFit.cover, width: 1000.0),
+                          CachedNetworkImage(
+                            imageUrl: item['photo'],
+                            width: Get.width,
+                            fit: BoxFit.cover,
+                            errorWidget: (context, url, error) =>
+                                Center(child: Icon(Icons.error)),
+                            progressIndicatorBuilder:
+                                (context, url, downloadProgress) => Container(
+                              color: Colors.white,
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  value: downloadProgress.progress,
+                                  color: AppColors.primaryColor,
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: Get.width,
+                            height: Get.height * 0.18,
+                            color: AppColors.primaryColor.withOpacity(0.3),
+                            child: Padding(
+                              padding: const EdgeInsets.all(25.0),
+                              child: Center(
+                                child: Text(item['title'],
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    )),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )),
+                ),
+              ),
+            ))
+        .toList();
     return FadeInDown(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -651,6 +648,7 @@ class HomePage extends StatelessWidget {
                                   .format(data.dateEvent!.toDate())
                                   .toString(),
                               idEvent: data.idEvent,
+                              description: data.description,
                               location: data.location,
                               membersCount: data.member?.toString(),
                               name: data.name,

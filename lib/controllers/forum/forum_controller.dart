@@ -26,6 +26,7 @@ class ForumController extends GetxController {
   var dataUser = <UserModel>[].obs;
   var dataPost = <PostModel>[].obs;
   var listMyIdCommunity = [].obs;
+  var dataNameCommunity = [].obs;
 
   @override
   void onInit() {
@@ -48,8 +49,9 @@ class ForumController extends GetxController {
   }
 
   onGetPost() {
+    dataNameCommunity.isNotEmpty ? dataNameCommunity.clear() : null;
     dataPost.isNotEmpty ? dataPost.clear() : null;
-    for (int i = 0; i < listMyIdCommunity.length; i++)
+    for (int i = 0; i < listMyIdCommunity.length; i++) {
       post
           .where('idCommunity', isEqualTo: listMyIdCommunity[i])
           .get()
@@ -91,6 +93,7 @@ class ForumController extends GetxController {
         });
         _isLoading.value = false;
       });
+    }
   }
 
   get isLoading => this._isLoading.value;

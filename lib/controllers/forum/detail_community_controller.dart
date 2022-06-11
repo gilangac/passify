@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_this, unrelated_type_equality_checks, avoid_print, unnecessary_brace_in_string_interps, avoid_function_literals_in_foreach_calls
+// ignore_for_file: unnecessary_this, unrelated_type_equality_checks, avoid_print, unnecessary_brace_in_string_interps, avoid_function_literals_in_foreach_calls, unnecessary_new
 
 import 'dart:io';
 import 'dart:math';
@@ -10,6 +10,10 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:passify/controllers/base/service_controller.dart';
+import 'package:passify/controllers/forum/community_controller.dart';
+import 'package:passify/controllers/home/home_controller.dart';
+import 'package:passify/controllers/profile/profile_controller.dart';
+import 'package:passify/helpers/bottomsheet_helper.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/helpers/snackbar_helper.dart';
 import 'package:passify/models/community.dart';
@@ -17,6 +21,7 @@ import 'package:passify/models/post.dart';
 import 'package:passify/models/provinsi.dart';
 import 'package:passify/models/user.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:path/path.dart' as Path;
 import 'package:intl/intl.dart';
 import 'package:passify/routes/pages.dart';
 import 'package:passify/services/service_notification.dart';
@@ -24,6 +29,8 @@ import 'package:passify/services/service_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailCommunityController extends GetxController with ServiceController {
+  HomeController homeController = Get.find();
+  ProfileController profileController = Get.find();
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference community =
@@ -36,6 +43,7 @@ class DetailCommunityController extends GetxController with ServiceController {
   CollectionReference post = FirebaseFirestore.instance.collection('post');
   CollectionReference postComment =
       FirebaseFirestore.instance.collection('postComments');
+  CollectionReference report = FirebaseFirestore.instance.collection('reports');
 
   ScrollController? controller;
   var isExtends = true.obs;
@@ -458,6 +466,7 @@ class DetailCommunityController extends GetxController with ServiceController {
     if (this.formKeyPost.currentState!.validate()) {
       DialogHelper.showLoading();
       String idPost = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+          "-post-" +
           getRandomString(8).toString();
       if (selectedImagePath == '') {
         onCreatePost(idPost);
@@ -510,6 +519,13 @@ class DetailCommunityController extends GetxController with ServiceController {
     void _action() async {
       Get.back();
       DialogHelper.showLoading();
+      var fileUrl =
+          Uri.decodeFull(Path.basename(detailCommunity[0].photo.toString()))
+              .replaceAll(new RegExp(r'(\?alt).*'), '');
+
+      final firebase_storage.Reference firebaseStorageRef =
+          firebase_storage.FirebaseStorage.instance.ref().child(fileUrl);
+      await firebaseStorageRef.delete();
       DocumentReference dataPhoto =
           firestore.collection("communities").doc(idCommunity);
 
@@ -668,6 +684,8 @@ class DetailCommunityController extends GetxController with ServiceController {
         description: type == "cancel"
             ? "Batal bergabung dengan komunitas?"
             : 'Apa anda yakin akan meinggalkan komunitas?',
+        titlePrimary: type == "cancel" ? "Ya" : 'Keluar',
+        titleSecondary: type == "cancel" ? "Tidak" : 'Batal',
         action: () async {
           Get.back();
           isRequestJoin.value = false;
@@ -742,10 +760,77 @@ class DetailCommunityController extends GetxController with ServiceController {
     DialogHelper.showConfirm(
         title: "Hapus Postingan",
         description: "Anda yakin akan menghapus postingan ini?",
+        titlePrimary: "Hapus",
+        titleSecondary: "Batal",
         action: () {
           Get.back();
           onDeletePost(idPost);
         });
+  }
+
+  onDeleteCommunity() async {
+    Get.back();
+    DialogHelper.showLoading();
+    var fileUrl =
+        Uri.decodeFull(Path.basename(detailCommunity[0].photo.toString()))
+            .replaceAll(new RegExp(r'(\?alt).*'), '');
+
+    final firebase_storage.Reference firebaseStorageRef =
+        firebase_storage.FirebaseStorage.instance.ref().child(fileUrl);
+    await firebaseStorageRef.delete();
+
+    community.doc(idCommunity).delete().then((_) {
+      communityMember
+          .where("idCommunity", isEqualTo: idCommunity)
+          .get()
+          .then((QuerySnapshot snapshotMember) {
+        snapshotMember.docs.forEach((element) {
+          communityMember.doc(element['idMember']).delete();
+        });
+      });
+      post
+          .where("idCommunity", isEqualTo: idCommunity)
+          .get()
+          .then((QuerySnapshot snapshotPost) {
+        snapshotPost.docs.forEach((element) async {
+          var fileUrl =
+              Uri.decodeFull(Path.basename(element['photo'].toString()))
+                  .replaceAll(new RegExp(r'(\?alt).*'), '');
+
+          final firebase_storage.Reference firebaseStorageRef =
+              firebase_storage.FirebaseStorage.instance.ref().child(fileUrl);
+          await firebaseStorageRef.delete();
+          post.doc(element['idPost']).delete();
+        });
+      });
+      postComment
+          .where("idCommunity", isEqualTo: idCommunity)
+          .get()
+          .then((QuerySnapshot snapshotComment) {
+        snapshotComment.docs.forEach((element) {
+          postComment.doc(element['idComment']).delete();
+        });
+      });
+      notification
+          .where("code", isEqualTo: idCommunity)
+          .get()
+          .then((snapshotNotif) {
+        snapshotNotif.docs.forEach((element) {
+          notification.doc(element['idNotification']).delete();
+        });
+      });
+      report.where("code", isEqualTo: idCommunity).get().then((snapshotReport) {
+        snapshotReport.docs.forEach((element) {
+          notification.doc(element['idReport']).delete();
+        });
+      });
+      CommunityController communityController = Get.put(CommunityController());
+      communityController.onGetDataCommunity();
+      homeController.onRefreshData();
+      profileController.onRefresh();
+      Get.back();
+      Get.back();
+    });
   }
 
   onDeletePost(String idPost) async {
@@ -763,6 +848,42 @@ class DetailCommunityController extends GetxController with ServiceController {
       print("papapa");
       onGetData();
       Get.back();
+    });
+  }
+
+  onReportCommunity() async {
+    Get.back();
+    DialogHelper.showLoading();
+    String idReport = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+        getRandomString(8).toString();
+    await report.doc(idReport).set({
+      "idReport": idReport,
+      "idFromUser": auth.currentUser?.uid,
+      "category": 1,
+      "code": idCommunity,
+      "readAt": null,
+      "date": DateTime.now(),
+    }).then((_) {
+      Get.back();
+      BottomSheetHelper.successReport();
+    });
+  }
+
+  onReportPost(var idPost) async {
+    Get.back();
+    DialogHelper.showLoading();
+    String idReport = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+        getRandomString(8).toString();
+    await report.doc(idReport).set({
+      "idReport": idReport,
+      "idFromUser": auth.currentUser?.uid,
+      "category": 2,
+      "code": idPost,
+      "readAt": null,
+      "date": DateTime.now(),
+    }).then((_) {
+      Get.back();
+      BottomSheetHelper.successReport();
     });
   }
 

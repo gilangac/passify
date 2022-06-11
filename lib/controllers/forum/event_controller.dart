@@ -47,9 +47,10 @@ class EventController extends GetxController {
   onCreateEvent() async {
     final dateNow = DateTime.now();
     if (this.formKeyEvent.currentState!.validate()) {
-      DialogHelper.showLoading();    
+      DialogHelper.showLoading();
       String idEvent = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
-            getRandomString(8).toString();
+          "-evn-" +
+          getRandomString(8).toString();
 
       try {
         await event.doc(idEvent).set({
@@ -83,14 +84,15 @@ class EventController extends GetxController {
   }
 
   Future<void> onGetDataEvent() async {
+    eventData.isNotEmpty ? eventData.clear() : null;
+    dataEvent.isNotEmpty ? dataEvent.clear() : null;
     await event
         .where("category", isEqualTo: category)
         .orderBy("date", descending: true)
         .get()
         .then((QuerySnapshot snapshot) {
-      eventData.clear();
+      print(snapshot.size);
       snapshot.docs.forEach((d) {
-        dataEvent.isNotEmpty ? dataEvent.clear() : null;
         eventMember
             .where("idEvent", isEqualTo: d["idEvent"])
             .get()

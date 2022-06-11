@@ -2,19 +2,23 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hashtagable/hashtagable.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/forum/detail_post_controller.dart';
+import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/routes/pages.dart';
+import 'package:passify/services/service_timeago.dart';
 import 'package:passify/widgets/general/app_bar.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:passify/widgets/general/comment_widget.dart';
 import 'package:passify/widgets/general/dotted_separator.dart';
 import 'package:intl/intl.dart';
 import 'package:passify/widgets/post/form_edit_post.dart';
+import 'package:share_plus/share_plus.dart';
 
 class DetailPostPage extends StatelessWidget {
   DetailPostPage({Key? key}) : super(key: key);
@@ -124,40 +128,46 @@ class DetailPostPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              circleAvatar(
-                  imageData: detailPostC.userPost[0].photo,
-                  nameData: detailPostC.userPost[0].name.toString(),
-                  size: 22),
-              SizedBox(
-                width: 10,
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    detailPostC.userPost[0].name.toString(),
-                    style: GoogleFonts.poppins(
-                        height: 1.2,
-                        color: AppColors.tittleColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600),
-                  ),
-                  Text(
-                    detailPostC.userPost[0].username.toString(),
-                    style: GoogleFonts.poppins(
-                        height: 1.2,
-                        color: Colors.grey.shade500,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400),
-                  ),
-                ],
-              ),
-            ],
+          GestureDetector(
+            onTap: () => Get.toNamed(
+                AppPages.PROFILE_PERSON +
+                    detailPostC.userPost[0].idUser.toString(),
+                arguments: detailPostC.userPost[0].idUser.toString()),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                circleAvatar(
+                    imageData: detailPostC.userPost[0].photo,
+                    nameData: detailPostC.userPost[0].name.toString(),
+                    size: 22),
+                SizedBox(
+                  width: 10,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      detailPostC.userPost[0].name.toString(),
+                      style: GoogleFonts.poppins(
+                          height: 1.2,
+                          color: AppColors.tittleColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      detailPostC.userPost[0].username.toString(),
+                      style: GoogleFonts.poppins(
+                          height: 1.2,
+                          color: Colors.grey.shade500,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
           detailPostC.detailPost[0].category == 'fjb'
               ? Row(
@@ -448,12 +458,31 @@ class DetailPostPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Komentar (' + detailPostC.commentPost.length.toString() + ')',
-            style: GoogleFonts.poppins(
-                color: AppColors.tittleColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w600),
+          Row(
+            children: [
+              Text(
+                'Komentar (' + detailPostC.commentPost.length.toString() + ')',
+                style: GoogleFonts.poppins(
+                    color: AppColors.tittleColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600),
+              ),
+              Spacer(),
+              GestureDetector(
+                onTap: () async {
+                  String url = await AppUtils.buildDynamicLink(
+                      detailPostC.detailPost[0].idPost!, detailPostC.detailPost[0].title!,detailPostC.detailPost[0].caption!, detailPostC.detailPost[0].photo!,"post");
+                  Share.share('${url}');
+                },
+                child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey.shade100),
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    child: SvgPicture.asset("assets/svg/icon_share.svg",
+                        color: Colors.grey.shade400, height: 19)),
+              ),
+            ],
           ),
           dotSeparator(
             color: Colors.grey.shade400,
@@ -470,11 +499,11 @@ class DetailPostPage extends StatelessWidget {
                           return commentWidget(
                               comment: detailPostC.commentPost[index].comment
                                   .toString(),
+                              idUser: detailPostC.commentPost[index].idUser,
                               nama: detailPostC.commentPost[index].name,
                               photo: detailPostC.commentPost[index].photo,
                               username: detailPostC.commentPost[index].username,
-                              date: detailPostC.commentPost[index].date
-                                  .toString());
+                              date: detailPostC.commentPost[index].date);
                         })),
                     Container(height: 400)
                   ],
@@ -639,10 +668,18 @@ class DetailPostPage extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           onTap: () {
             Get.back();
-            type == "edit"
-                ? Get.toNamed(AppPages.EDIT_POST + Get.arguments.toString(),
-                    arguments: [Get.arguments, "detail"])
-                : null;
+            if (type == 'edit') {
+              Get.toNamed(AppPages.EDIT_POST + Get.arguments.toString(),
+                  arguments: [Get.arguments, "detail"]);
+            } else if (type == 'report') {
+              DialogHelper.showConfirm(
+                  title: "Laporkan Postingan",
+                  description:
+                      "Apakah anda yakin akan melaporkan postingan ini?",
+                  action: () => detailPostC.onReportPost(),
+                  titlePrimary: "Laporkan",
+                  titleSecondary: "Batal");
+            }
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),

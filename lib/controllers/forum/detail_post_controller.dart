@@ -7,7 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:passify/controllers/forum/detail_community_controller.dart';
+import 'package:passify/helpers/bottomsheet_helper.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/models/post.dart';
 import 'package:passify/models/post_comment.dart';
@@ -15,6 +15,8 @@ import 'package:passify/models/user.dart';
 import 'package:passify/routes/pages.dart';
 import 'package:passify/services/service_notification.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:path/path.dart' as Path;
 
 class DetailPostController extends GetxController {
   // DetailCommunityController detailCommunityController = Get.find();
@@ -32,6 +34,7 @@ class DetailPostController extends GetxController {
       FirebaseFirestore.instance.collection('postComments');
   CollectionReference notification =
       FirebaseFirestore.instance.collection('notifications');
+  CollectionReference report = FirebaseFirestore.instance.collection('reports');
 
   String dateee = DateFormat("yyyy").format(DateTime.now());
   late final commentText = ''.obs;
@@ -196,6 +199,8 @@ class DetailPostController extends GetxController {
     DialogHelper.showConfirm(
         title: "Hapus Postingan",
         description: "Anda yakin akan menghapus postingan ini?",
+        titlePrimary: "Hapus",
+        titleSecondary: "Batal",
         action: () {
           Get.back();
           onDeletePost();
@@ -204,6 +209,12 @@ class DetailPostController extends GetxController {
 
   onDeletePost() async {
     DialogHelper.showLoading();
+    var fileUrl = Uri.decodeFull(Path.basename(detailPost[0].photo.toString()))
+        .replaceAll(new RegExp(r'(\?alt).*'), '');
+
+    final firebase_storage.Reference firebaseStorageRef =
+        firebase_storage.FirebaseStorage.instance.ref().child(fileUrl);
+    await firebaseStorageRef.delete();
     await post.doc(detailPost[0].idPost).delete().then((value) {
       postComment
           .where("idPost", isEqualTo: detailPost[0].idPost)
@@ -211,6 +222,22 @@ class DetailPostController extends GetxController {
           .then((snapPost) {
         snapPost.docs.forEach((element) {
           postComment.doc(element["idComment"]).delete();
+        });
+        notification
+            .where("code", isEqualTo: detailPost[0].idPost)
+            .get()
+            .then((snapshotNotif) {
+          snapshotNotif.docs.forEach((element) {
+            notification.doc(element['idNotification']).delete();
+          });
+        });
+        report
+            .where("code", isEqualTo: detailPost[0].idPost)
+            .get()
+            .then((snapshotReport) {
+          snapshotReport.docs.forEach((element) {
+            notification.doc(element['idReport']).delete();
+          });
         });
         // detailCommunityController.onGetData();
         Get.back();
@@ -352,6 +379,24 @@ class DetailPostController extends GetxController {
     } catch (e) {
       print(e);
     }
+  }
+
+  onReportPost() async {
+    Get.back();
+    DialogHelper.showLoading();
+    String idReport = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+        getRandomString(8).toString();
+    await report.doc(idReport).set({
+      "idReport": idReport,
+      "idFromUser": auth.currentUser?.uid,
+      "category": 2,
+      "code": idPost,
+      "readAt": null,
+      "date": DateTime.now(),
+    }).then((_) {
+      Get.back();
+      BottomSheetHelper.successReport();
+    });
   }
 
   Future<void> onLaunchUrl(String number) async {

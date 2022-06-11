@@ -1,13 +1,18 @@
-// ignore_for_file: unnecessary_this, non_constant_identifier_names, prefer_final_fields, avoid_function_literals_in_foreach_calls, avoid_print
+// ignore_for_file: unnecessary_this, non_constant_identifier_names, prefer_final_fields, avoid_function_literals_in_foreach_calls, avoid_print, prefer_const_constructors
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'dart:math';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
+import 'package:passify/constant/color_constant.dart';
+import 'package:passify/controllers/forum/event_controller.dart';
 import 'package:passify/controllers/home/home_controller.dart';
 import 'package:passify/controllers/profile/profile_controller.dart';
+import 'package:passify/helpers/bottomsheet_helper.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/models/event.dart';
 import 'package:passify/models/event_comment.dart';
@@ -28,6 +33,7 @@ class DetailEventController extends GetxController {
       FirebaseFirestore.instance.collection('eventComments');
   CollectionReference notification =
       FirebaseFirestore.instance.collection('notifications');
+  CollectionReference report = FirebaseFirestore.instance.collection('reports');
 
   String dateee = DateFormat("yyyy").format(DateTime.now());
   late final commentText = ''.obs;
@@ -89,7 +95,7 @@ class DetailEventController extends GetxController {
         .where("idEvent", isEqualTo: idEvent)
         .get()
         .then((QuerySnapshot snapshot) {
-        if (snapshot.size == 0) Get.offAndToNamed(AppPages.NOT_FOUND);
+      if (snapshot.size == 0) Get.offAndToNamed(AppPages.NOT_FOUND);
       // detailEvent.clear();
       snapshot.docs.forEach((d) {
         eventMember
@@ -366,6 +372,70 @@ class DetailEventController extends GetxController {
         title: "Batal Mengikuti Event",
         description: "Apa anda yakin batal mengikuti event ini?",
         action: _action);
+  }
+
+  onDeleteEvent() async {
+    Get.back();
+    DialogHelper.showLoading();
+    event.doc(idEvent).delete().then((_) {
+      eventMember
+          .where("idEvent", isEqualTo: idEvent)
+          .get()
+          .then((QuerySnapshot snapshotMember) {
+        snapshotMember.docs.forEach((element) {
+          eventMember.doc(element['idMember']).delete();
+        });
+      });
+      eventComment
+          .where("idEvent", isEqualTo: idEvent)
+          .get()
+          .then((QuerySnapshot snapshotComment) {
+        snapshotComment.docs.forEach((element) {
+          eventMember.doc(element['idComment']).delete();
+        });
+      });
+      notification
+          .where("code", isEqualTo: idEvent)
+          .get()
+          .then((snapshotNotif) {
+        snapshotNotif.docs.forEach((element) {
+          notification.doc(element['idNotification']).delete();
+        });
+      });
+       report
+          .where("code", isEqualTo: idEvent)
+          .get()
+          .then((snapshotReport) {
+        snapshotReport.docs.forEach((element) {
+          notification.doc(element['idReport']).delete();
+        });
+      });
+      EventController eventController = Get.put(EventController());
+      eventController.onGetDataEvent();
+      homeController.onRefreshData();
+      profileController.onRefresh();
+      Get.back();
+      Get.back();
+      Get.back();
+    });
+  }
+
+  onReportEvent() async {
+    Get.back();
+    DialogHelper.showLoading();
+    String idReport = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+        getRandomString(8).toString();
+    await report.doc(idReport).set({
+      "idReport": idReport,
+      "idFromUser": auth.currentUser?.uid,
+      "category": 0,
+      "code": idEvent,
+      "readAt": null,
+      "date": DateTime.now(),
+    }).then((_) {
+      Get.back();
+      BottomSheetHelper.successReport();
+    });
   }
 
   onPostComment() {

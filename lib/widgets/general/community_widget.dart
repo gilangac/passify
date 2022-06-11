@@ -237,11 +237,13 @@ Widget communityCard(
                                     return SizedBox();
                                   } else {
                                     return circleAvatar(
-                                        imageData:
-                                            snapshot.data!.get("photoUser") ??
-                                                "",
-                                        nameData:
-                                            snapshot.data!.get("name") ?? "",
+                                        imageData: snapshot.hasData
+                                            ? snapshot.data!.get("photoUser") ??
+                                                ""
+                                            : "",
+                                        nameData: snapshot.hasData
+                                            ? snapshot.data!.get("name") ?? ""
+                                            : "",
                                         size: 15);
                                   }
                                 },

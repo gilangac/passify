@@ -30,6 +30,7 @@ class HomeController extends GetxController {
       FirebaseFirestore.instance.collection('communityMembers');
   CollectionReference eventComment =
       FirebaseFirestore.instance.collection('eventComments');
+  CollectionReference banner = FirebaseFirestore.instance.collection('banners');
 
   final currentCarousel = 0.obs;
   final icon = true.obs;
@@ -43,6 +44,7 @@ class HomeController extends GetxController {
   var communityLength = 0.obs;
   var listMyIdEvent = [].obs;
   var listMyHobby = [].obs;
+  var bannerList = [].obs;
   var myCity = ''.obs;
   var city = ''.obs;
   var myProvince = ''.obs;
@@ -87,6 +89,15 @@ class HomeController extends GetxController {
         otherItems.refresh();
       }
     }
+  }
+
+  onGetBanner() async {
+    bannerList.isNotEmpty ? bannerList.clear() : null;
+    await banner.get().then((QuerySnapshot snapshotBanner) {
+      snapshotBanner.docs.forEach((element) {
+        bannerList.add(element);
+      });
+    });
   }
 
   Future<void> onGetDataUser() async {
@@ -239,6 +250,7 @@ class HomeController extends GetxController {
   Future<void> onRefreshData() async {
     await onGetDataUser();
     await onGetEventMember();
+    await onGetBanner();
   }
 
   get isLoading => this._isLoading.value;

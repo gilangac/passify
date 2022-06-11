@@ -66,24 +66,28 @@ class NotificationController extends GetxController {
   }
 
   void onClickNotif(String idNotification, String code, int category) {
-    notification
-        .doc(idNotification)
-        .update({"readAt": DateTime.now()}).then((_) => onGetData());
+    onReadNotif(idNotification);
 
-        if (category == 0 ||
-          category == 1) {
-        Get.toNamed(AppPages.COMMUNITY + code.toString(),
-            arguments: code);
-      } else if (category == 2 ||
-          category == 3 ||
-          category == 4) {
-        Get.toNamed(AppPages.DETAIL_POST + code.toString(),
-            arguments: code);
-      } else if (category == 5 ||
-          category == 6) {
-        Get.toNamed(AppPages.DETAIL_EVENT + code.toString(),
-            arguments: code);
-      }
+    if (category == 0 || category == 1) {
+      Get.toNamed(AppPages.COMMUNITY + code.toString(), arguments: code);
+    } else if (category == 2 || category == 3 || category == 4) {
+      Get.toNamed(AppPages.DETAIL_POST + code.toString(), arguments: code);
+    } else if (category == 5 || category == 6) {
+      Get.toNamed(AppPages.DETAIL_EVENT + code.toString(), arguments: code);
+    }
+  }
+
+  onReadNotif(var idNotif) async {
+    await notification
+        .doc(idNotif)
+        .update({"readAt": DateTime.now()}).then((_) => onGetData());
+  }
+
+  onDeleteNotif(var idNotif) async {
+    Get.back();
+    await notification.doc(idNotif).delete().then((_) {
+      onGetData();
+    });
   }
 
   get isLoading => this._isLoading.value;

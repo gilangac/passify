@@ -121,6 +121,7 @@ class HobbyPage extends StatelessWidget {
                             return eventCard(
                                 idEvent: data.idEvent,
                                 name: data.name,
+                                description: data.description,
                                 date: DateFormat("EEEE, dd MMMM yyyy", "id")
                                     .format(data.dateEvent!.toDate())
                                     .toString(),

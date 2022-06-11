@@ -1,12 +1,15 @@
 // ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, avoid_unnecessary_containers
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/forum/event_controller.dart';
 import 'package:passify/routes/pages.dart';
+import 'package:passify/services/service_timeago.dart';
+import 'package:share_plus/share_plus.dart';
 
 EventController eventC = Get.find();
 Widget eventCard(
@@ -16,6 +19,7 @@ Widget eventCard(
     String? date,
     String? time,
     String? category,
+    String? description,
     String? membersCount,
     String? commentCount}) {
   return Container(
@@ -263,40 +267,72 @@ Widget eventCard(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(
-                    Feather.message_circle,
-                    size: 18,
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey.shade100),
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Get.toNamed(
+                                AppPages.DETAIL_EVENT + idEvent.toString(),
+                                arguments: idEvent);
+                          },
+                          child: Container(
+                            child: Center(
+                                child: SvgPicture.asset(
+                              "assets/svg/icon_comment.svg",
+                              height: 19,
+                              color: Colors.grey.shade400,
+                            )),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 3,
+                        ),
+                        Text(
+                          '$commentCount',
+                          style: GoogleFonts.poppins(
+                              color: Colors.grey.shade400,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(
                     width: 5,
                   ),
-                  Row(
-                    children: [
-                      Text(
-                        commentCount ?? "0",
-                        style: GoogleFonts.poppins(
-                            fontSize: 12, fontWeight: FontWeight.w400),
-                      ),
-                      Text(
-                        " Komentar",
-                        style: GoogleFonts.poppins(
-                            fontSize: 12, fontWeight: FontWeight.w400),
-                      ),
-                    ],
+                  GestureDetector(
+                    onTap: () async {
+                      String url = await AppUtils.buildDynamicLink(
+                          idEvent!, name!, description!, "", "event");
+                      Share.share('${url}');
+                    },
+                    child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.grey.shade100),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        child: SvgPicture.asset("assets/svg/icon_share.svg",
+                            color: Colors.grey.shade400, height: 19)),
                   ),
                   Spacer(),
-                  Container(
-                    child: GestureDetector(
-                      onTap: () {
-                        Get.toNamed(AppPages.DETAIL_EVENT + idEvent.toString(),
-                            arguments: idEvent);
-                      },
+                  GestureDetector(
+                    onTap: () {
+                      Get.toNamed(AppPages.DETAIL_EVENT + idEvent.toString(),
+                          arguments: idEvent);
+                    },
+                    child: Container(
                       child: Text(
                         'Lihat Detail',
                         style: GoogleFonts.poppins(
-                            fontStyle: FontStyle.italic,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400),
+                            fontSize: 11, fontWeight: FontWeight.w600),
                       ),
                     ),
                   )

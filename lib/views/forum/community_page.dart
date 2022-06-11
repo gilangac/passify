@@ -2,19 +2,25 @@
 
 import 'dart:io';
 
+import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/forum/detail_community_controller.dart';
+import 'package:passify/helpers/dialog_helper.dart';
+import 'package:passify/routes/pages.dart';
+import 'package:passify/services/service_timeago.dart';
 import 'package:passify/widgets/general/app_bar.dart';
 import 'package:passify/widgets/general/bottomsheet_widget.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:passify/widgets/general/dotted_separator.dart';
 import 'package:passify/widgets/general/post_card_widget.dart';
+import 'package:share_plus/share_plus.dart';
 
 class CommunityPage extends StatelessWidget {
   CommunityPage({Key? key}) : super(key: key);
@@ -41,6 +47,12 @@ class CommunityPage extends StatelessWidget {
             detailCommunityC.memberWaiting, "Permintaan Bergabung");
         break;
       case 1:
+        DialogHelper.showConfirm(
+            title: "Laporkan Komunitas",
+            description: "Apakah anda yakin akan melaporkan komunitas ini?",
+            action: () => detailCommunityC.onReportCommunity(),
+            titlePrimary: "Laporkan",
+            titleSecondary: "Batal");
         break;
       case 2:
         detailCommunityC.onLeaveCommunity("leave");
@@ -48,7 +60,140 @@ class CommunityPage extends StatelessWidget {
       case 3:
         _formEditCommunity();
         break;
+      case 5:
+        DialogHelper.showConfirm(
+            title: "Hapus Komunitas",
+            description: "Apakah anda yakin akan menghapus komunitas?",
+            action: () => detailCommunityC.onDeleteCommunity(),
+            titlePrimary: "Hapus",
+            titleSecondary: "Batal");
+
+        break;
     }
+  }
+
+  Widget _popUpMenu() {
+    return detailCommunityC.isCreator.value
+        ? Stack(
+            children: [
+              Container(
+                child: PopupMenuButton<int>(
+                  child: Container(
+                    height: 40,
+                    width: 40,
+                    margin: EdgeInsets.only(right: 10, top: 14, bottom: 14),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Feather.more_horizontal,
+                      color: Colors.black,
+                    ),
+                  ),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  onSelected: (item) => handleClick(item),
+                  itemBuilder: (context) => [
+                    PopupMenuItem<int>(value: 1, child: Text('Laporkan')),
+                    PopupMenuItem<int>(
+                        value: 0,
+                        child: Row(
+                          children: [
+                            Badge(
+                              showBadge: detailCommunityC.memberWaiting.isEmpty
+                                  ? false
+                                  : true,
+                              position: BadgePosition.topEnd(top: -8, end: -17),
+                              badgeContent: Text(
+                                  detailCommunityC.memberWaiting.length
+                                      .toString(),
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 10)),
+                              child: Text('Permintaan Gabung'),
+                              animationType: BadgeAnimationType.scale,
+                              animationDuration: Duration(milliseconds: 300),
+                            ),
+                          ],
+                        )),
+                    PopupMenuItem<int>(value: 3, child: Text('Edit Komunitas')),
+                    PopupMenuItem<int>(
+                        value: 5,
+                        child: Text('Hapus Komunitas',
+                            style: GoogleFonts.poppins(
+                                color: Colors.red.shade300))),
+                  ],
+                ),
+              ),
+              detailCommunityC.memberWaiting.isNotEmpty
+                  ? Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        height: 18,
+                        width: 18,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: Colors.red.shade600),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: Text(
+                                detailCommunityC.memberWaiting.length
+                                    .toString(),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 9,
+                                )),
+                          ),
+                        ),
+                      ),
+                    )
+                  : SizedBox()
+            ],
+          )
+        : detailCommunityC.isMember.value
+            ? PopupMenuButton<int>(
+                child: Container(
+                  height: 32,
+                  width: 40,
+                  margin: EdgeInsets.only(right: 10, top: 14, bottom: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Feather.more_horizontal,
+                    color: Colors.black,
+                  ),
+                ),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                onSelected: (item) => handleClick(item),
+                itemBuilder: (context) => [
+                  PopupMenuItem<int>(value: 1, child: Text('Laporkan')),
+                  PopupMenuItem<int>(value: 2, child: Text('Keluar Komunitas'))
+                ],
+              )
+            : PopupMenuButton<int>(
+                child: Container(
+                  height: 32,
+                  width: 40,
+                  margin: EdgeInsets.only(right: 10, top: 14, bottom: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Feather.more_horizontal,
+                    color: Colors.black,
+                  ),
+                ),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                onSelected: (item) => handleClick(item),
+                itemBuilder: (context) => [
+                      PopupMenuItem<int>(value: 1, child: Text('Laporkan')),
+                    ]);
   }
 
   Widget _body() {
@@ -59,40 +204,7 @@ class CommunityPage extends StatelessWidget {
             headerSliverBuilder: (context, innerBoxIsScrolled) => [
               SliverAppBar(
                 leadingWidth: 60,
-                actions: [
-                  PopupMenuButton<int>(
-                    child: Container(
-                      height: 32,
-                      width: 40,
-                      margin: EdgeInsets.only(right: 10, top: 14, bottom: 14),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.8),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Feather.more_horizontal,
-                        color: Colors.black,
-                      ),
-                    ),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    onSelected: (item) => handleClick(item),
-                    itemBuilder: (context) => [
-                      PopupMenuItem<int>(value: 1, child: Text('Laporkan')),
-                      detailCommunityC.isCreator.value
-                          ? PopupMenuItem<int>(
-                              value: 0, child: Text('Permintaan Gabung'))
-                          : detailCommunityC.isMember.value
-                              ? PopupMenuItem<int>(
-                                  value: 2, child: Text('Keluar Komunitas'))
-                              : PopupMenuItem<int>(value: 4, child: Text('')),
-                      detailCommunityC.isCreator.value
-                          ? PopupMenuItem<int>(
-                              value: 3, child: Text('Edit Komunitas'))
-                          : PopupMenuItem<int>(value: 4, child: Text('')),
-                    ],
-                  ),
-                ],
+                actions: [_popUpMenu()],
                 leading: AnimatedOpacity(
                   duration: Duration(milliseconds: 100),
                   opacity: 1,
@@ -321,42 +433,65 @@ class CommunityPage extends StatelessWidget {
           SizedBox(
             height: 10,
           ),
-          Container(
-            height: 30,
-            child: Row(
-              children: [
-                ListView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: member.length > 7 ? 7 : member.length,
-                  itemBuilder: (context, index) {
-                    return Align(
-                      widthFactor: 0.7,
-                      child: CircleAvatar(
-                        radius: 18,
-                        backgroundColor: AppColors.inputBoxColor,
-                        child: circleAvatar(
-                            imageData: member[index].photo.toString(),
-                            nameData: member[index].name.toString(),
-                            size: 15),
-                      ),
-                    );
-                  },
-                ),
-                if (member.length > 7)
-                  Padding(
-                    padding: EdgeInsets.only(left: 8),
-                    child: Text(
-                      '+${member.length - 7}',
-                      style: GoogleFonts.poppins(
-                          color: Colors.black45,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16),
+          Row(
+            children: [
+              Container(
+                height: 30,
+                child: Row(
+                  children: [
+                    ListView.builder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: member.length > 7 ? 7 : member.length,
+                      itemBuilder: (context, index) {
+                        return Align(
+                          widthFactor: 0.7,
+                          child: CircleAvatar(
+                            radius: 18,
+                            backgroundColor: AppColors.inputBoxColor,
+                            child: circleAvatar(
+                                imageData: member[index].photo.toString(),
+                                nameData: member[index].name.toString(),
+                                size: 15),
+                          ),
+                        );
+                      },
                     ),
-                  ),
-              ],
-            ),
+                    if (member.length > 7)
+                      Padding(
+                        padding: EdgeInsets.only(left: 8),
+                        child: Text(
+                          '+${member.length - 7}',
+                          style: GoogleFonts.poppins(
+                              color: Colors.black45,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              Spacer(),
+              GestureDetector(
+                onTap: () async {
+                  String url = await AppUtils.buildDynamicLink(
+                      data.idCommunity!,
+                      data.name!,
+                      data.description!,
+                      data.photo!,
+                      "community");
+                  Share.share('${url}');
+                },
+                child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey.shade100),
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    child: SvgPicture.asset("assets/svg/icon_share.svg",
+                        color: Colors.grey.shade400, height: 19)),
+              ),
+            ],
           ),
         ],
       ),
@@ -614,9 +749,11 @@ class CommunityPage extends StatelessWidget {
                       name: data.name,
                       username: data.username,
                       photoUser: data.photoUser,
+                      idCommunity: data.idCommunity.toString(),
                       caption: data.caption,
                       photo: data.photo,
                       category: data.category,
+                      date: data.date!.toDate(),
                       comment: data.comment);
                 }),
       ],
@@ -711,9 +848,11 @@ class CommunityPage extends StatelessWidget {
                       username: data.username,
                       photoUser: data.photoUser,
                       caption: data.caption,
+                      idCommunity: data.idCommunity.toString(),
                       category: data.category,
                       photo: data.photo,
                       number: number,
+                      date: data.date!.toDate(),
                       comment: data.comment);
                 }),
       ],
@@ -737,105 +876,111 @@ class CommunityPage extends StatelessWidget {
                       itemCount: member.length,
                       padding: EdgeInsets.all(15),
                       itemBuilder: (context, index) {
-                        return Container(
-                          margin: EdgeInsets.only(bottom: 15),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  circleAvatar(
-                                      imageData: member[index].photo,
-                                      nameData: member[index].name.toString(),
-                                      size: 20),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Container(
-                                    width: Get.width - 160,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          member[index].name.toString(),
-                                          overflow: TextOverflow.ellipsis,
-                                          style: GoogleFonts.poppins(
-                                              color: AppColors.tittleColor,
-                                              height: 1.2,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                        Text(
-                                          member[index].username.toString(),
-                                          overflow: TextOverflow.ellipsis,
-                                          style: GoogleFonts.poppins(
-                                              height: 1.2,
-                                              color: Colors.grey.shade500,
-                                              fontStyle: FontStyle.normal,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ],
+                        return GestureDetector(
+                          onTap: () => Get.toNamed(
+                              AppPages.PROFILE_PERSON +
+                                  member[index].idUser.toString(),
+                              arguments: member[index].idUser.toString()),
+                          child: Container(
+                            margin: EdgeInsets.only(bottom: 15),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    circleAvatar(
+                                        imageData: member[index].photo,
+                                        nameData: member[index].name.toString(),
+                                        size: 20),
+                                    SizedBox(
+                                      width: 10,
                                     ),
-                                  ),
-                                  Spacer(),
-                                  Obx(() => detailCommunityC
-                                              .detailCommunity[0].idUser ==
-                                          member[index].idUser
-                                      ? Text(
-                                          "Pembuat",
-                                          style: GoogleFonts.poppins(
-                                              height: 1.2,
-                                              color: Colors.grey.shade500,
-                                              fontStyle: FontStyle.normal,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w400),
-                                        )
-                                      : SizedBox()),
-                                  title == "Permintaan Bergabung"
-                                      ? Container(
-                                          width: 60,
-                                          color: Colors.transparent,
-                                          child: Row(
-                                            children: [
-                                              InkWell(
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                                child: Icon(Feather.check),
-                                                onTap: () => detailCommunityC
-                                                    .onAccMember(
-                                                        member[index].idUser),
-                                              ),
-                                              SizedBox(
-                                                width: 10,
-                                              ),
-                                              InkWell(
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                                child: Icon(Feather.x),
-                                                onTap: () => detailCommunityC
-                                                    .onRejectMember(
-                                                        member[index].idUser),
-                                              )
-                                            ],
+                                    Container(
+                                      width: Get.width - 160,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            member[index].name.toString(),
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFonts.poppins(
+                                                color: AppColors.tittleColor,
+                                                height: 1.2,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600),
                                           ),
-                                        )
-                                      : SizedBox()
-                                ],
-                              ),
-                              SizedBox(
-                                height: 15,
-                              ),
-                              Container(
-                                height: 1,
-                                width: Get.width,
-                                color: Colors.grey.shade200,
-                              )
-                            ],
+                                          Text(
+                                            member[index].username.toString(),
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFonts.poppins(
+                                                height: 1.2,
+                                                color: Colors.grey.shade500,
+                                                fontStyle: FontStyle.normal,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w400),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    Obx(() => detailCommunityC
+                                                .detailCommunity[0].idUser ==
+                                            member[index].idUser
+                                        ? Text(
+                                            "Pembuat",
+                                            style: GoogleFonts.poppins(
+                                                height: 1.2,
+                                                color: Colors.grey.shade500,
+                                                fontStyle: FontStyle.normal,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w400),
+                                          )
+                                        : SizedBox()),
+                                    title == "Permintaan Bergabung"
+                                        ? Container(
+                                            width: 60,
+                                            color: Colors.transparent,
+                                            child: Row(
+                                              children: [
+                                                InkWell(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                  child: Icon(Feather.check),
+                                                  onTap: () => detailCommunityC
+                                                      .onAccMember(
+                                                          member[index].idUser),
+                                                ),
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                InkWell(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                  child: Icon(Feather.x),
+                                                  onTap: () => detailCommunityC
+                                                      .onRejectMember(
+                                                          member[index].idUser),
+                                                )
+                                              ],
+                                            ),
+                                          )
+                                        : SizedBox()
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 15,
+                                ),
+                                Container(
+                                  height: 1,
+                                  width: Get.width,
+                                  color: Colors.grey.shade200,
+                                )
+                              ],
+                            ),
                           ),
                         );
                       }),

@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:passify/controllers/base/service_controller.dart';
+import 'package:passify/controllers/home/home_controller.dart';
+import 'package:passify/controllers/profile/profile_controller.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/models/community.dart';
 import 'package:passify/models/community_member.dart';
@@ -18,6 +20,8 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:passify/services/service_provider.dart';
 
 class CommunityController extends GetxController with ServiceController {
+  HomeController homeController = Get.find();
+  ProfileController profileController = Get.find();
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference community =
@@ -83,7 +87,7 @@ class CommunityController extends GetxController with ServiceController {
                 "date": dateNow,
               });
 
-        String idMember = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+        String idMember = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +"-cmt-"+
             getRandomString(8).toString();
         await communityMember.doc(idMember).set({
           "idMember": idMember,
@@ -92,6 +96,8 @@ class CommunityController extends GetxController with ServiceController {
           "status": "verified",
           "date": dateNow,
         });
+        homeController.onRefreshData();
+        profileController.onRefresh();
         onGetDataCommunity();
         Get.back();
         Get.back();
@@ -174,9 +180,9 @@ class CommunityController extends GetxController with ServiceController {
     });
   }
 
-  onPrepareCreateCommunity() {      
+  onPrepareCreateCommunity() {
     String idCommunity = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
-            getRandomString(8).toString();
+        getRandomString(8).toString();
     if (this.formKeyCommunity.currentState!.validate()) {
       DialogHelper.showLoading();
       if (selectedImagePath == '') {

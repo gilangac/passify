@@ -1,10 +1,86 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:passify/constant/color_constant.dart';
 
+
+class BottomSheetHelper {
+  static successReport(){
+     Get.bottomSheet(
+      SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(10),
+          child: Container(
+            height: 500,
+            child: Column(
+              children: [
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      LottieBuilder.asset("assets/json/lottie_success.json",
+                          height: 300),
+                      Text(
+                        "Laporan berhasil terkirim",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                            color: AppColors.tittleColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      Text(
+                        "Terimakasih telah membantu kami untuk melaporkan aktivitas pelanggaran, laporkan kembali jika terdapat aktivitas pelanggaran lainnya!",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                            color: Colors.grey.shade400,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: AppColors.primaryColor, elevation: 0.5),
+                        onPressed: () {
+                          Get.back();
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 70),
+                          child: Text(
+                            "Kembali",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+      isDismissible: true,
+      enableDrag: true,
+      isScrollControlled: true,
+    );
+  }
+}
 class BottomsheetEvent extends StatelessWidget {
   const BottomsheetEvent({Key? key}) : super(key: key);
 

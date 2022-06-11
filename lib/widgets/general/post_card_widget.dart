@@ -1,13 +1,18 @@
 // ignore_for_file: prefer_const_constructors, avoid_unnecessary_containers
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/forum/detail_community_controller.dart';
+import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/routes/pages.dart';
+import 'package:passify/services/service_timeago.dart';
+import 'package:share_plus/share_plus.dart';
 import 'circle_avatar.dart';
 import 'package:intl/intl.dart';
 import 'package:hashtagable/hashtagable.dart';
@@ -21,12 +26,15 @@ Widget postCard(
     String? status,
     String? name,
     String? idUser,
+    required String idCommunity,
     String? username,
     String? caption,
     String? photo,
     String? photoUser,
     String? category,
     String? number,
+    DateTime? date,
+    bool isFromForum = false,
     int? comment}) {
   NumberFormat currencyFormatter = NumberFormat.currency(
     locale: 'id',
@@ -53,51 +61,128 @@ Widget postCard(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                circleAvatar(
-                    imageData: photoUser ?? "",
-                    nameData: name ?? "Gilang",
-                    size: 17),
-                SizedBox(
-                  width: 10,
-                ),
-                Container(
-                  width: Get.width * 0.55,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+            // StreamBuilder<DocumentSnapshot>(
+            //     stream: FirebaseFirestore.instance
+            //         .collection('communities')
+            //         .doc(idCommunity)
+            //         .snapshots(),
+            //     builder: (context, snapshot) {
+            //       return Column(
+            //           mainAxisAlignment: MainAxisAlignment.start,
+            //           crossAxisAlignment: CrossAxisAlignment.start,
+            //           children: [
+            //             Text(
+            //               snapshot.data!.get("name").toString(),
+            //               maxLines: 2,
+            //               overflow: TextOverflow.ellipsis,
+            //               style: GoogleFonts.poppins(
+            //                   height: 1,
+            //                   fontSize: 14,
+            //                   fontWeight: FontWeight.w600),
+            //             ),
+            //             Divider(
+            //               height: 15,
+            //               thickness: 2,
+            //               color: Colors.grey.shade300,
+            //             )
+            //           ]);
+            //     }),
+            isFromForum
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        name ?? "",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.poppins(
-                            height: 1,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600),
-                      ),
-                      Text(
-                        username ?? "",
-                        overflow: TextOverflow.clip,
-                        style: GoogleFonts.poppins(
-                            color: Colors.grey.shade600,
-                            height: 1.5,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w400),
-                      ),
-                    ],
+                        Text(
+                          idCommunity,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.poppins(
+                              height: 1,
+                              fontSize: 14,
+                              color: Colors.grey.shade400,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        Divider(
+                          height: 15,
+                          thickness: 2,
+                          color: Colors.grey.shade200,
+                        )
+                      ])
+                : SizedBox(),
+            GestureDetector(
+              onTap: () => Get.toNamed(
+                  AppPages.PROFILE_PERSON + idUser.toString(),
+                  arguments: idUser.toString()),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  circleAvatar(
+                      imageData: photoUser ?? "",
+                      nameData: name ?? "Gilang",
+                      size: 17),
+                  SizedBox(
+                    width: 10,
                   ),
-                ),
-                Spacer(),
-                Container(
-                    alignment: Alignment.topRight,
-                    child: GestureDetector(
-                        onTap: () => _bottomSheetContent(idUser, idPost!),
-                        child: Icon(Feather.more_horizontal)))
-              ],
+                  Container(
+                    width: Get.width * 0.55,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name ?? "",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.poppins(
+                              height: 1,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600),
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              username ?? "",
+                              overflow: TextOverflow.clip,
+                              style: GoogleFonts.poppins(
+                                  color: Colors.grey.shade600,
+                                  height: 1.5,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                            Container(
+                              margin: EdgeInsets.symmetric(horizontal: 5),
+                              height: 3,
+                              width: 3,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  color: Colors.grey),
+                            ),
+                            Text(
+                                TimeAgo2.timeAgoSinceDate(
+                                    DateFormat("dd-MM-yyyy h:mma")
+                                        .format(date!)),
+                                overflow: TextOverflow.clip,
+                                style: GoogleFonts.poppins(
+                                    color: Colors.grey.shade600,
+                                    height: 1.5,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w400)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Spacer(),
+                  isFromForum
+                      ? SizedBox()
+                      : Container(
+                          alignment: Alignment.topRight,
+                          child: GestureDetector(
+                              onTap: () => _bottomSheetContent(idUser, idPost!),
+                              child: Icon(Feather.more_horizontal)))
+                ],
+              ),
             ),
             category == 'fjb'
                 ? Row(
@@ -288,17 +373,59 @@ Widget postCard(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(
-                  Feather.message_circle,
-                  size: 18,
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.grey.shade100),
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Get.toNamed(AppPages.DETAIL_POST + idPost.toString(),
+                              arguments: idPost);
+                        },
+                        child: Container(
+                          child: Center(
+                              child: SvgPicture.asset(
+                            "assets/svg/icon_comment.svg",
+                            height: 19,
+                            color: Colors.grey.shade400,
+                          )),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 3,
+                      ),
+                      Text(
+                        '$comment',
+                        style: GoogleFonts.poppins(
+                            color: Colors.grey.shade400,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(
                   width: 5,
                 ),
-                Text(
-                  '$comment Komentar',
-                  style: GoogleFonts.poppins(
-                      fontSize: 12, fontWeight: FontWeight.w400),
+                GestureDetector(
+                  onTap: () async {
+                    String url = await AppUtils.buildDynamicLink(
+                        idPost!, title!, caption!, photo!, "post");
+                    Share.share('${url}');
+                  },
+                  child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.grey.shade100),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      child: SvgPicture.asset("assets/svg/icon_share.svg",
+                          color: Colors.grey.shade400, height: 19)),
                 ),
                 Spacer(),
                 GestureDetector(
@@ -310,9 +437,7 @@ Widget postCard(
                     child: Text(
                       'Lihat Detail',
                       style: GoogleFonts.poppins(
-                          fontStyle: FontStyle.italic,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400),
+                          fontSize: 11, fontWeight: FontWeight.w600),
                     ),
                   ),
                 )
@@ -344,6 +469,7 @@ void _bottomSheetContent(var idUser, String idPost) {
                       _listAction(
                           title: "Laporkan",
                           idPost: idPost,
+                          type: "report",
                           path: AppPages.EDIT_PROFILE),
                       myId == idUser
                           ? Column(
@@ -400,10 +526,17 @@ Widget _listAction(
         borderRadius: BorderRadius.circular(10),
         onTap: () {
           Get.back();
-          type == "edit"
-              ? Get.toNamed(AppPages.EDIT_POST + idPost,
-                  arguments: [idPost, "community"])
-              : null;
+          if (type == 'edit') {
+            Get.toNamed(AppPages.EDIT_POST + Get.arguments.toString(),
+                arguments: [idPost, "community"]);
+          } else if (type == 'report') {
+            DialogHelper.showConfirm(
+                title: "Laporkan Postingan",
+                description: "Apakah anda yakin akan melaporkan postingan ini?",
+                action: () => controller.onReportPost(idPost),
+                titlePrimary: "Laporkan",
+                titleSecondary: "Batal");
+          }
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),

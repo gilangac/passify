@@ -82,7 +82,9 @@ class DetailTrend extends StatelessWidget {
                     photoUser: data.photoUser,
                     caption: data.caption,
                     photo: data.photo,
+                    idCommunity: data.idCommunity.toString(),
                     category: data.category,
+                    date: data.date!.toDate(),
                     comment: data.comment);
               }),
     );

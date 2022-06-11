@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -80,19 +81,31 @@ class ForumPage extends StatelessWidget {
                     itemCount: forumController.dataPost.length,
                     itemBuilder: (context, index) {
                       var data = forumController.dataPost[index];
-                      return postCard(
-                          idPost: data.idPost,
-                          idUser: data.idUser,
-                          title: data.title,
-                          price: data.price,
-                          status: data.status,
-                          name: data.name,
-                          username: data.username,
-                          photoUser: data.photoUser,
-                          caption: data.caption,
-                          photo: data.photo,
-                          category: data.category,
-                          comment: data.comment);
+                      return StreamBuilder<DocumentSnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('communities')
+                              .doc(data.idCommunity)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            return postCard(
+                                idPost: data.idPost,
+                                idUser: data.idUser,
+                                title: data.title,
+                                price: data.price,
+                                status: data.status,
+                                name: data.name,
+                                idCommunity: snapshot.hasData
+                                    ? snapshot.data!.get("name")
+                                    : "",
+                                username: data.username,
+                                photoUser: data.photoUser,
+                                caption: data.caption,
+                                photo: data.photo,
+                                category: data.category,
+                                isFromForum: true,
+                                date: data.date!.toDate(),
+                                comment: data.comment);
+                          });
                     }),
           );
   }

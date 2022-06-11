@@ -2,18 +2,22 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/forum/detail_event_controller.dart';
 import 'package:intl/intl.dart';
+import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/routes/pages.dart';
+import 'package:passify/services/service_timeago.dart';
 import 'package:passify/widgets/general/app_bar.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:passify/widgets/general/comment_widget.dart';
 import 'package:passify/widgets/general/dotted_separator.dart';
 import 'package:passify/widgets/post/form_edit_post.dart';
+import 'package:share_plus/share_plus.dart';
 
 class EventPage extends StatelessWidget {
   EventPage({Key? key}) : super(key: key);
@@ -108,40 +112,48 @@ class EventPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              circleAvatar(
-                  imageData: detailEventController.userEvent[0].photo,
-                  nameData: detailEventController.userEvent[0].name.toString(),
-                  size: 22),
-              SizedBox(
-                width: 10,
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    detailEventController.userEvent[0].name.toString(),
-                    style: GoogleFonts.poppins(
-                        height: 1.2,
-                        color: AppColors.tittleColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600),
-                  ),
-                  Text(
-                    detailEventController.userEvent[0].username.toString(),
-                    style: GoogleFonts.poppins(
-                        height: 1.2,
-                        color: Colors.grey.shade500,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400),
-                  ),
-                ],
-              )
-            ],
+          GestureDetector(
+            onTap: () => Get.toNamed(
+                AppPages.PROFILE_PERSON +
+                    detailEventController.userEvent[0].idUser.toString(),
+                arguments:
+                    detailEventController.userEvent[0].idUser.toString()),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                circleAvatar(
+                    imageData: detailEventController.userEvent[0].photo,
+                    nameData:
+                        detailEventController.userEvent[0].name.toString(),
+                    size: 22),
+                SizedBox(
+                  width: 10,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      detailEventController.userEvent[0].name.toString(),
+                      style: GoogleFonts.poppins(
+                          height: 1.2,
+                          color: AppColors.tittleColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      detailEventController.userEvent[0].username.toString(),
+                      style: GoogleFonts.poppins(
+                          height: 1.2,
+                          color: Colors.grey.shade500,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400),
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
           SizedBox(
             height: 10,
@@ -383,14 +395,33 @@ class EventPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Komentar (' +
-                detailEventController.commentEvent.length.toString() +
-                ')',
-            style: GoogleFonts.poppins(
-                color: AppColors.tittleColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w600),
+          Row(
+            children: [
+              Text(
+                'Komentar (' +
+                    detailEventController.commentEvent.length.toString() +
+                    ')',
+                style: GoogleFonts.poppins(
+                    color: AppColors.tittleColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600),
+              ),
+              Spacer(),
+              GestureDetector(
+                onTap: () async {
+                  String url = await AppUtils.buildDynamicLink(
+                      detailEventController.detailEvent[0].idEvent!, detailEventController.detailEvent[0].name!,detailEventController.detailEvent[0].description!, "", "event");
+                  Share.share('${url}');
+                },
+                child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey.shade100),
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    child: SvgPicture.asset("assets/svg/icon_share.svg",
+                        color: Colors.grey.shade400, height: 19)),
+              ),
+            ],
           ),
           dotSeparator(
             color: Colors.grey.shade400,
@@ -406,6 +437,9 @@ class EventPage extends StatelessWidget {
                         comment: detailEventController
                             .commentEvent[index].comment
                             .toString(),
+                        idUser:
+                            detailEventController.commentEvent[index].idUser,
+                        date: detailEventController.commentEvent[index].date,
                         nama: detailEventController.commentEvent[index].name,
                         photo: detailEventController.commentEvent[index].photo,
                         username:
@@ -515,83 +549,93 @@ class EventPage extends StatelessWidget {
                       itemCount: detailEventController.memberEvent.length,
                       padding: EdgeInsets.all(15),
                       itemBuilder: (context, index) {
-                        return Container(
-                          margin: EdgeInsets.only(bottom: 15),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  circleAvatar(
-                                      imageData: detailEventController
-                                          .memberEvent[index].photo
-                                          .toString(),
-                                      nameData: detailEventController
-                                          .memberEvent[index].name
-                                          .toString(),
-                                      size: 20),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Container(
-                                    width: Get.width * 0.55,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          detailEventController
-                                              .memberEvent[index].name
-                                              .toString(),
-                                          style: GoogleFonts.poppins(
-                                              color: AppColors.tittleColor,
-                                              height: 1.2,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                        Text(
-                                          detailEventController
-                                              .memberEvent[index].username
-                                              .toString(),
-                                          style: GoogleFonts.poppins(
-                                              height: 1.2,
-                                              color: Colors.grey.shade500,
-                                              fontStyle: FontStyle.normal,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w400),
-                                        ),
-                                      ],
+                        return GestureDetector(
+                          onTap: () => Get.toNamed(
+                              AppPages.PROFILE_PERSON +
+                                  detailEventController
+                                      .memberEvent[index].idUser
+                                      .toString(),
+                              arguments: detailEventController
+                                  .memberEvent[index].idUser
+                                  .toString()),
+                          child: Container(
+                            margin: EdgeInsets.only(bottom: 15),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    circleAvatar(
+                                        imageData: detailEventController
+                                            .memberEvent[index].photo
+                                            .toString(),
+                                        nameData: detailEventController
+                                            .memberEvent[index].name
+                                            .toString(),
+                                        size: 20),
+                                    SizedBox(
+                                      width: 10,
                                     ),
-                                  ),
-                                  Spacer(),
-                                  Obx(() => detailEventController
-                                              .memberEvent[index].idUser ==
-                                          detailEventController
-                                              .detailEvent[0].idUser
-                                      ? Text(
-                                          "Pembuat",
-                                          style: GoogleFonts.poppins(
-                                              height: 1.2,
-                                              color: Colors.grey.shade500,
-                                              fontStyle: FontStyle.normal,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w400),
-                                        )
-                                      : SizedBox(height: 0)),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 15,
-                              ),
-                              Container(
-                                height: 1,
-                                width: Get.width,
-                                color: Colors.grey.shade200,
-                              )
-                            ],
+                                    Container(
+                                      width: Get.width * 0.55,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            detailEventController
+                                                .memberEvent[index].name
+                                                .toString(),
+                                            style: GoogleFonts.poppins(
+                                                color: AppColors.tittleColor,
+                                                height: 1.2,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600),
+                                          ),
+                                          Text(
+                                            detailEventController
+                                                .memberEvent[index].username
+                                                .toString(),
+                                            style: GoogleFonts.poppins(
+                                                height: 1.2,
+                                                color: Colors.grey.shade500,
+                                                fontStyle: FontStyle.normal,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w400),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    Obx(() => detailEventController
+                                                .memberEvent[index].idUser ==
+                                            detailEventController
+                                                .detailEvent[0].idUser
+                                        ? Text(
+                                            "Pembuat",
+                                            style: GoogleFonts.poppins(
+                                                height: 1.2,
+                                                color: Colors.grey.shade500,
+                                                fontStyle: FontStyle.normal,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w400),
+                                          )
+                                        : SizedBox(height: 0)),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 15,
+                                ),
+                                Container(
+                                  height: 1,
+                                  width: Get.width,
+                                  color: Colors.grey.shade200,
+                                )
+                              ],
+                            ),
                           ),
                         );
                       }),
@@ -724,7 +768,16 @@ class EventPage extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           onTap: () {
             Get.back();
-            type == "edit" ? formCreateEvent() : null;
+            if (type == "edit") {
+              formCreateEvent();
+            } else if (type == 'report') {
+              DialogHelper.showConfirm(
+                  title: "Laporkan Event",
+                  description: "Apakah anda yakin akan melaporkan event ini?",
+                  action: () => detailEventController.onReportEvent(),
+                  titlePrimary: "Laporkan",
+                  titleSecondary: "Batal");
+            }
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
@@ -750,7 +803,12 @@ class EventPage extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
           onTap: () {
-            // detailEventController.onConfirmDelete();
+            DialogHelper.showConfirm(
+                title: "Hapus Event",
+                description: "Apa anda yakin menghapus event ini?",
+                titlePrimary: "Hapus",
+                titleSecondary: "Batal",
+                action: () => detailEventController.onDeleteEvent());
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
