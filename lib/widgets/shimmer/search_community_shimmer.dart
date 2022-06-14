@@ -93,32 +93,32 @@ class SearchCommunityShimmer extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Positioned(
-                      top: Get.height * 0.2 - 20,
-                      left: 20,
-                      child: Container(
-                          decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  spreadRadius: 1,
-                                  blurRadius: 1,
-                                  offset: Offset(
-                                      0, 1), // changes position of shadow
-                                ),
-                              ],
-                              color: Colors.grey.shade300,
-                              border: Border.all(color: Colors.white, width: 2),
-                              borderRadius: BorderRadius.circular(10)),
-                          height: 45,
-                          width: 130,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Center(
-                                child: Row(
-                              children: [],
-                            )),
-                          )))
+                  // Positioned(
+                  //     top: Get.height * 0.2 - 20,
+                  //     left: 20,
+                  //     child: Container(
+                  //         decoration: BoxDecoration(
+                  //             boxShadow: [
+                  //               BoxShadow(
+                  //                 color: Colors.grey.withOpacity(0.2),
+                  //                 spreadRadius: 1,
+                  //                 blurRadius: 1,
+                  //                 offset: Offset(
+                  //                     0, 1), // changes position of shadow
+                  //               ),
+                  //             ],
+                  //             color: Colors.grey.shade300,
+                  //             border: Border.all(color: Colors.white, width: 2),
+                  //             borderRadius: BorderRadius.circular(10)),
+                  //         height: 45,
+                  //         width: 130,
+                  //         child: Padding(
+                  //           padding: const EdgeInsets.symmetric(horizontal: 10),
+                  //           child: Center(
+                  //               child: Row(
+                  //             children: [],
+                  //           )),
+                  //         )))
                 ],
               ),
             ),

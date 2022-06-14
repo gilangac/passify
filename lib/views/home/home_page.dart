@@ -256,13 +256,21 @@ class HomePage extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  _iconCategories(c1),
+                  FadeInDown(
+                      delay: Duration(milliseconds: 0),
+                      child: _iconCategories(c1)),
                   Spacer(),
-                  _iconCategories(c2),
+                  FadeInDown(
+                      delay: Duration(milliseconds: 100),
+                      child: _iconCategories(c2)),
                   Spacer(),
-                  _iconCategories(c3),
+                  FadeInDown(
+                      delay: Duration(milliseconds: 200),
+                      child: _iconCategories(c3)),
                   Spacer(),
-                  _iconCategories(c4),
+                  FadeInDown(
+                      delay: Duration(milliseconds: 300),
+                      child: _iconCategories(c4)),
                 ],
               ),
             ],
@@ -278,40 +286,38 @@ class HomePage extends StatelessWidget {
           AppPages.HOBBY +
               homeController.items[index]["path"].toString().toLowerCase(),
           arguments: homeController.items[index]["name"]),
-      child: FadeInDown(
-        child: Container(
-          width: 70,
-          child: Column(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(360.0),
-                child: Container(
-                  height: 60,
-                  width: 60,
-                  color: AppColors.accentBoxColor,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 7),
-                    child: Container(
-                      height: 65,
-                      child: Image.asset(
-                        'assets/images/categories/' +
-                            homeController.items[index]["icon"],
-                        alignment: Alignment.center,
-                      ),
+      child: Container(
+        width: 70,
+        child: Column(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(360.0),
+              child: Container(
+                height: 60,
+                width: 60,
+                color: AppColors.accentBoxColor,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 7),
+                  child: Container(
+                    height: 65,
+                    child: Image.asset(
+                      'assets/images/categories/' +
+                          homeController.items[index]["icon"],
+                      alignment: Alignment.center,
                     ),
                   ),
                 ),
               ),
-              SizedBox(
-                height: 5,
-              ),
-              AutoSizeText(homeController.items[index]["name"],
-                  maxLines: 1,
-                  minFontSize: 12,
-                  style: GoogleFonts.poppins(
-                      fontSize: 12, fontWeight: FontWeight.w400))
-            ],
-          ),
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            AutoSizeText(homeController.items[index]["name"],
+                maxLines: 1,
+                minFontSize: 12,
+                style: GoogleFonts.poppins(
+                    fontSize: 12, fontWeight: FontWeight.w400))
+          ],
         ),
       ),
     );
@@ -349,7 +355,9 @@ class HomePage extends StatelessWidget {
                           child: _boxCommunity()),
                       Padding(
                           padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
-                          child: _boxCommunity(title: "Temukan teman dengan kesamaan hobi dengamu di komunitas hobi")),
+                          child: _boxCommunity(
+                              title:
+                                  "Temukan teman dengan kesamaan hobi dengamu di komunitas hobi")),
                     ],
                   ),
                 ),
@@ -517,73 +525,76 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _boxCommunity({String? title}) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(15),
-      child: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [
-                AppColors.accentColor.withOpacity(0.5),
-                AppColors.primaryColor.withOpacity(0.5),
-              ],
-            )),
-            width: 280,
-            height: 135,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(
-                  child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Image(
-                        image: AssetImage("assets/images/logo_name.png"),
-                        height: 16,
-                      ),
-                      Spacer()
-                    ],
-                  ),
-                  Spacer(),
-                  Row(
-                    children: [
-                      Spacer(),
-                      Image(
-                        image: AssetImage("assets/images/logo_icon.png"),
-                        height: 80,
-                        fit: BoxFit.cover,
-                        opacity: AlwaysStoppedAnimation<double>(0.3),
-                      ),
-                    ],
-                  )
+    return FadeInRight(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                colors: [
+                  AppColors.accentColor.withOpacity(0.5),
+                  AppColors.primaryColor.withOpacity(0.5),
                 ],
               )),
-            ),
-          ),
-          Positioned(
-            child: Container(
-              color: Colors.transparent,
               width: 280,
               height: 135,
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: Text(
-                    title??'Pilih kategori hobi dan kamu dapat mencari atau membuat komunitas sesuai hobimu',
-                    style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white),
-                    textAlign: TextAlign.left,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                    child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Image(
+                          image: AssetImage("assets/images/logo_name.png"),
+                          height: 16,
+                        ),
+                        Spacer()
+                      ],
+                    ),
+                    Spacer(),
+                    Row(
+                      children: [
+                        Spacer(),
+                        Image(
+                          image: AssetImage("assets/images/logo_icon.png"),
+                          height: 80,
+                          fit: BoxFit.cover,
+                          opacity: AlwaysStoppedAnimation<double>(0.3),
+                        ),
+                      ],
+                    )
+                  ],
+                )),
+              ),
+            ),
+            Positioned(
+              child: Container(
+                color: Colors.transparent,
+                width: 280,
+                height: 135,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Text(
+                      title ??
+                          'Pilih kategori hobi dan kamu dapat mencari atau membuat komunitas sesuai hobimu',
+                      style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white),
+                      textAlign: TextAlign.left,
+                    ),
                   ),
                 ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }
@@ -640,27 +651,29 @@ class HomePage extends StatelessWidget {
                           ),
                         ),
                       )
-                    : ListView.builder(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.symmetric(horizontal: 25),
-                        physics: NeverScrollableScrollPhysics(),
-                        scrollDirection: Axis.vertical,
-                        itemCount: homeController.dataEvent.length,
-                        itemBuilder: (context, index) {
-                          var data = homeController.dataEvent[index];
-                          return eventCard(
-                              category: data.category,
-                              commentCount: data.comment.toString(),
-                              date: DateFormat("EEEE, dd MMMM yyyy", "id")
-                                  .format(data.dateEvent!.toDate())
-                                  .toString(),
-                              idEvent: data.idEvent,
-                              description: data.description,
-                              location: data.location,
-                              membersCount: data.member?.toString(),
-                              name: data.name,
-                              time: data.time);
-                        }),
+                    : FadeInRight(
+                        child: ListView.builder(
+                            shrinkWrap: true,
+                            padding: EdgeInsets.symmetric(horizontal: 25),
+                            physics: NeverScrollableScrollPhysics(),
+                            scrollDirection: Axis.vertical,
+                            itemCount: homeController.dataEvent.length,
+                            itemBuilder: (context, index) {
+                              var data = homeController.dataEvent[index];
+                              return eventCard(
+                                  category: data.category,
+                                  commentCount: data.comment.toString(),
+                                  date: DateFormat("EEEE, dd MMMM yyyy", "id")
+                                      .format(data.dateEvent!.toDate())
+                                      .toString(),
+                                  idEvent: data.idEvent,
+                                  description: data.description,
+                                  location: data.location,
+                                  membersCount: data.member?.toString(),
+                                  name: data.name,
+                                  time: data.time);
+                            }),
+                      ),
               ),
             ],
           ),

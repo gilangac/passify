@@ -10,7 +10,7 @@ import 'package:lottie/lottie.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/notification/notification_controller.dart';
 import 'package:passify/helpers/dialog_helper.dart';
-import 'package:passify/services/service_timeago.dart';
+import 'package:passify/services/service_additional.dart';
 import 'package:passify/widgets/general/app_bar.dart';
 import 'package:get/get.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';

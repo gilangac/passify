@@ -84,20 +84,25 @@ class EventController extends GetxController {
   }
 
   Future<void> onGetDataEvent() async {
+    _isLoading.value = true;
     eventData.isNotEmpty ? eventData.clear() : null;
     dataEvent.isNotEmpty ? dataEvent.clear() : null;
+    int i = 0;
     await event
         .where("category", isEqualTo: category)
         .orderBy("date", descending: true)
         .get()
         .then((QuerySnapshot snapshot) {
-      print(snapshot.size);
-      snapshot.docs.forEach((d) {
-        eventMember
+      if (snapshot.size == 0) {
+        _isLoading.value = false;
+      }
+      snapshot.docs.forEach((d) async {
+        i++;
+        await eventMember
             .where("idEvent", isEqualTo: d["idEvent"])
             .get()
-            .then((QuerySnapshot snapshotMember) {
-          eventComment
+            .then((QuerySnapshot snapshotMember) async {
+          await eventComment
               .where("idEvent", isEqualTo: d["idEvent"])
               .get()
               .then((QuerySnapshot snapshotComment) {
@@ -117,10 +122,12 @@ class EventController extends GetxController {
                 member: snapshotMember.size,
                 comment: snapshotComment.size));
             dataEvent.sort((a, b) => b.sort!.compareTo(a.sort!));
+            if (i == snapshot.size) {
+              _isLoading.value = false;
+            }
           });
         });
       });
-      _isLoading.value = false;
     });
   }
 

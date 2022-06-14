@@ -402,10 +402,7 @@ class DetailEventController extends GetxController {
           notification.doc(element['idNotification']).delete();
         });
       });
-       report
-          .where("code", isEqualTo: idEvent)
-          .get()
-          .then((snapshotReport) {
+      report.where("code", isEqualTo: idEvent).get().then((snapshotReport) {
         snapshotReport.docs.forEach((element) {
           notification.doc(element['idReport']).delete();
         });
@@ -433,6 +430,11 @@ class DetailEventController extends GetxController {
       "readAt": null,
       "date": DateTime.now(),
     }).then((_) {
+      NotificationService.pushNotifAdmin(
+          code: idEvent,
+          type: 0,
+          username: myProfile[0].name,
+          object: detailEvent[0].name);
       Get.back();
       BottomSheetHelper.successReport();
     });
@@ -444,13 +446,22 @@ class DetailEventController extends GetxController {
         getRandomString(8).toString();
 
     if (commentText.isNotEmpty || commentText.value != '') {
+      commentEvent.add(EventCommentModel(
+          date: Timestamp.fromDate(DateTime.now()),
+          idUser: auth.currentUser?.uid,
+          idEvent: Get.arguments,
+          comment: commentFC.text,
+          name: myProfile[0].name,
+          username: myProfile[0].username,
+          photo: myProfile[0].photo,
+          sort: 0));
       try {
         eventComment.doc(idComment).set({
           "idComment": idComment,
           "idEvent": Get.arguments,
           "idUser": auth.currentUser?.uid,
           "comment": commentFC.text,
-          "date": dateNow,
+          "date": DateTime.now(),
         });
         pushNotifNewParticipant("comment");
         commentFC.clear();

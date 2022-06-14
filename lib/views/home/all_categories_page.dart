@@ -164,9 +164,12 @@ class AllCategoriesPage extends StatelessWidget {
                     childAspectRatio: 1 / 6,
                     mainAxisSpacing: 5),
                 itemBuilder: (BuildContext ctx, index) {
-                  return _iconCategories(
-                      homeController.otherItems[index]["icon"],
-                      homeController.otherItems[index]["name"]);
+                  return FadeInDown(
+                    delay: Duration(milliseconds: 100 * index),
+                    child: _iconCategories(
+                        homeController.otherItems[index]["icon"],
+                        homeController.otherItems[index]["name"]),
+                  );
                 }),
           ),
         ],

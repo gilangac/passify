@@ -75,26 +75,44 @@ class FirebaseAuthController extends GetxController {
         .then((QuerySnapshot snapshot) async {
       print("jumlah : " + snapshot.size.toString());
       if (snapshot.size == 1) {
-        snapshot.docs.forEach((element) {
-          listFcmToken.add(element['fcmToken']);
+        user.doc(snapshot.docs[0]['idUser']).get().then((value) {
+          if (value['username'] != '') {
+            snapshot.docs.forEach((element) {
+              listFcmToken.assignAll(element['fcmToken']);
+            });
+            print("1 : $listFcmToken");
+            listFcmToken.add(fcmToken);
+            user.doc(auth.currentUser?.uid).update({
+              "fcmToken": listFcmToken,
+            });
+            print("2 : $listFcmToken");
+            print("token : $fcmToken");
+            PreferenceService.setUserId(userId!);
+            PreferenceService.setFcmToken(fcmToken!);
+            PreferenceService.setStatus("logged");
+            // onSuccessLogin();
+            Get.offNamed(AppPages.NAVIGATOR);
+          } else {
+            onSuccessLogin();
+            Get.toNamed(AppPages.REGISTER);
+          }
         });
-        listFcmToken.add(fcmToken);
-        user.doc(auth.currentUser?.uid).update({
-          "fcmToken": listFcmToken,
-        });
-        print(listFcmToken);
-        print("token : $fcmToken");
-        PreferenceService.setUserId(userId!);
-        PreferenceService.setFcmToken(fcmToken!);
-        PreferenceService.setStatus("logged");
-        // onSuccessLogin();
-        Get.offNamed(AppPages.NAVIGATOR);
       } else {
         onSuccessLogin();
+        List initHobby = [];
         await user.doc(auth.currentUser?.uid).set({
           "email": auth.currentUser?.email,
           "idUser": auth.currentUser?.uid,
           "fcmToken": [],
+          "name": '',
+          "photoUser": '',
+          "username": '',
+          "city": '',
+          "province": '',
+          "hobby": initHobby,
+          "instagram": '',
+          "twitter": '',
+          "date": DateTime.now()
         });
         Get.toNamed(AppPages.REGISTER);
       }
@@ -118,7 +136,7 @@ class FirebaseAuthController extends GetxController {
         PreferenceService.setStatus("unlog");
         await _googleSignIn.signOut().then((value) {
           Get.offAllNamed(AppPages.LOGIN);
-          super.dispose();
+          // super.dispose();
         });
       });
     });

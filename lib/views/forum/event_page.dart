@@ -11,7 +11,7 @@ import 'package:passify/controllers/forum/detail_event_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/routes/pages.dart';
-import 'package:passify/services/service_timeago.dart';
+import 'package:passify/services/service_additional.dart';
 import 'package:passify/widgets/general/app_bar.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:passify/widgets/general/comment_widget.dart';
@@ -410,7 +410,11 @@ class EventPage extends StatelessWidget {
               GestureDetector(
                 onTap: () async {
                   String url = await AppUtils.buildDynamicLink(
-                      detailEventController.detailEvent[0].idEvent!, detailEventController.detailEvent[0].name!,detailEventController.detailEvent[0].description!, "", "event");
+                      detailEventController.detailEvent[0].idEvent!,
+                      detailEventController.detailEvent[0].name!,
+                      detailEventController.detailEvent[0].description!,
+                      "",
+                      "event");
                   Share.share('${url}');
                 },
                 child: Container(
@@ -442,6 +446,7 @@ class EventPage extends StatelessWidget {
                         date: detailEventController.commentEvent[index].date,
                         nama: detailEventController.commentEvent[index].name,
                         photo: detailEventController.commentEvent[index].photo,
+                        sort: detailEventController.commentEvent[index].sort,
                         username:
                             detailEventController.commentEvent[index].username);
                   }))

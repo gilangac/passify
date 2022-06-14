@@ -8,7 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/forum/event_controller.dart';
 import 'package:passify/routes/pages.dart';
-import 'package:passify/services/service_timeago.dart';
+import 'package:passify/services/service_additional.dart';
 import 'package:share_plus/share_plus.dart';
 
 EventController eventC = Get.find();

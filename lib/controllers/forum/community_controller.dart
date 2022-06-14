@@ -87,7 +87,7 @@ class CommunityController extends GetxController with ServiceController {
                 "date": dateNow,
               });
 
-        String idMember = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +"-cmt-"+
+        String idMember = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
             getRandomString(8).toString();
         await communityMember.doc(idMember).set({
           "idMember": idMember,
@@ -109,12 +109,17 @@ class CommunityController extends GetxController with ServiceController {
   }
 
   Future<void> onGetDataCommunity() async {
+    _isLoading.value = true;
     try {
       await community
           .where("category", isEqualTo: category)
           .get()
           .then((QuerySnapshot snapshot) {
-        snapshot.size == 0 ? _isLoading.value = false : communityData.clear();
+        if (snapshot.size == 0) {
+          _isLoading.value = false;
+          dataCommunity.isNotEmpty ? dataCommunity.clear() : null;
+        }
+        communityData.isNotEmpty ? communityData.clear() : null;
         dataMember.isNotEmpty ? dataMember.clear() : null;
         snapshot.docs.forEach((d) {
           communityMember
@@ -182,6 +187,7 @@ class CommunityController extends GetxController with ServiceController {
 
   onPrepareCreateCommunity() {
     String idCommunity = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+        "-cmt-" +
         getRandomString(8).toString();
     if (this.formKeyCommunity.currentState!.validate()) {
       DialogHelper.showLoading();

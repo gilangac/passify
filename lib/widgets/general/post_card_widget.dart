@@ -11,7 +11,7 @@ import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/forum/detail_community_controller.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/routes/pages.dart';
-import 'package:passify/services/service_timeago.dart';
+import 'package:passify/services/service_additional.dart';
 import 'package:share_plus/share_plus.dart';
 import 'circle_avatar.dart';
 import 'package:intl/intl.dart';
@@ -533,7 +533,7 @@ Widget _listAction(
             DialogHelper.showConfirm(
                 title: "Laporkan Postingan",
                 description: "Apakah anda yakin akan melaporkan postingan ini?",
-                action: () => controller.onReportPost(idPost),
+                action: () => controller.onReportPost(idPost, title),
                 titlePrimary: "Laporkan",
                 titleSecondary: "Batal");
           }

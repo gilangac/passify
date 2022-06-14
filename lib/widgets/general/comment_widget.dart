@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/routes/pages.dart';
-import 'package:passify/services/service_timeago.dart';
+import 'package:passify/services/service_additional.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:passify/widgets/general/dotted_separator.dart';
 import 'package:intl/intl.dart';
@@ -17,13 +17,14 @@ Widget commentWidget(
     String? username,
     String? idUser,
     String? comment,
+    int? sort,
     Timestamp? date}) {
   return Container(
     width: Get.width,
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(5),
-      color: date == "null"
-          ? Colors.grey.shade200.withOpacity(0.5)
+      color: sort == 0
+          ? Colors.grey.shade400.withOpacity(0.5)
           : Colors.transparent,
     ),
     child: Column(

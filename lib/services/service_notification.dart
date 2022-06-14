@@ -94,6 +94,48 @@ class NotificationService extends GetxService {
     print(response.body);
   }
 
+  static Future<void> pushNotifAdmin(
+      {required String code,
+      String? username,
+      required int type,
+      String? object}) async {
+    List messageNotif = [
+      "melaporkan event $object",
+      "melaporkan komunitas $object",
+      "melaporkan postingan $object",
+    ];
+
+    String messageBody = messageNotif[type].toString();
+    final uri = Uri.parse('https://fcm.googleapis.com/fcm/send');
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization':
+          'key=AAAAArjUtLY:APA91bEW6WwuUon_D1J3ym66LRSWm3_axedChbkkE06zWsOmcVqliiUSRy8dSui4JTc50ldZ3bgiic4ayzdhCzo7Y2SSa4W7DjK5VcnGikaaewvGSEYNOjvAx8PKKfyB0u2aPaB69n0X'
+    };
+    Map<String, dynamic> body = {
+      "notification": {
+        "title": "Laporan Masuk",
+        "body": "$username $messageBody",
+      },
+      "data": {
+        "code": code,
+        "type": type,
+      },
+      "to": "/topics/admin"
+    };
+    String jsonBody = json.encode(body);
+    final encoding = Encoding.getByName('utf-8');
+
+    var response = await post(
+      uri,
+      headers: headers,
+      body: jsonBody,
+      encoding: encoding,
+    );
+
+    print(response.body);
+  }
+
   static Future<String?> getFcmToken() async {
     final token = await _fcm.getToken();
     return token;
@@ -154,7 +196,7 @@ class NotificationService extends GetxService {
   static Future<void> _onOpenedNotification(String? payload) async {
     // final notificationController = Get.put(NotificationController());
     print(payload);
-    
+
     if (payload != null) {
       final jsonPayload = json.decode(payload);
       if (jsonPayload['type'].toString() == "0" ||

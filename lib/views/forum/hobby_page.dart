@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -17,6 +18,8 @@ import 'package:passify/widgets/general/app_bar.dart';
 import 'package:passify/widgets/general/bottomsheet_widget.dart';
 import 'package:passify/widgets/general/community_widget.dart';
 import 'package:passify/widgets/general/event_widget.dart';
+import 'package:passify/widgets/shimmer/search_community_shimmer.dart';
+import 'package:passify/widgets/shimmer/search_event_shimmer.dart';
 
 class HobbyPage extends StatelessWidget {
   HobbyPage({Key? key}) : super(key: key);
@@ -104,7 +107,7 @@ class HobbyPage extends StatelessWidget {
   Widget _event() {
     return eventC.isLoading
         ? Center(
-            child: CircularProgressIndicator(),
+            child: SearchEventShimmer(),
           )
         : Stack(
             children: [
@@ -118,18 +121,22 @@ class HobbyPage extends StatelessWidget {
                           padding: EdgeInsets.all(25),
                           itemBuilder: (context, index) {
                             EventModel data = eventC.dataEvent[index];
-                            return eventCard(
-                                idEvent: data.idEvent,
-                                name: data.name,
-                                description: data.description,
-                                date: DateFormat("EEEE, dd MMMM yyyy", "id")
-                                    .format(data.dateEvent!.toDate())
-                                    .toString(),
-                                location: data.location,
-                                time: data.time,
-                                category: data.category,
-                                commentCount: data.comment.toString(),
-                                membersCount: data.member?.toString());
+                            return FadeInDown(
+                              delay: Duration(milliseconds: 10 * index),
+                              duration: Duration(milliseconds: 400),
+                              child: eventCard(
+                                  idEvent: data.idEvent,
+                                  name: data.name,
+                                  description: data.description,
+                                  date: DateFormat("EEEE, dd MMMM yyyy", "id")
+                                      .format(data.dateEvent!.toDate())
+                                      .toString(),
+                                  location: data.location,
+                                  time: data.time,
+                                  category: data.category,
+                                  commentCount: data.comment.toString(),
+                                  membersCount: data.member?.toString()),
+                            );
                           }),
                     )
                   : RefreshIndicator(
@@ -185,9 +192,7 @@ class HobbyPage extends StatelessWidget {
 
   Widget _community() {
     return communityC.isLoading
-        ? Center(
-            child: CircularProgressIndicator(),
-          )
+        ? Center(child: SearchCommunityShimmer())
         : Stack(
             children: [
               communityC.dataCommunity.isNotEmpty
@@ -201,13 +206,17 @@ class HobbyPage extends StatelessWidget {
                           itemBuilder: (context, index) {
                             CommunityModel data =
                                 communityC.dataCommunity[index];
-                            return communityCard(
-                                idCommunity: data.idCommunity,
-                                category: data.category,
-                                city: data.city,
-                                name: data.name,
-                                photo: data.photo,
-                                membere: data.member);
+                            return FadeInDown(
+                              delay: Duration(milliseconds: 10 * index),
+                              duration: Duration(milliseconds: 400),
+                              child: communityCard(
+                                  idCommunity: data.idCommunity,
+                                  category: data.category,
+                                  city: data.city,
+                                  name: data.name,
+                                  photo: data.photo,
+                                  membere: data.member),
+                            );
                           }),
                     )
                   : RefreshIndicator(

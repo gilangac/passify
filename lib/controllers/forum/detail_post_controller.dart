@@ -211,10 +211,12 @@ class DetailPostController extends GetxController {
     DialogHelper.showLoading();
     var fileUrl = Uri.decodeFull(Path.basename(detailPost[0].photo.toString()))
         .replaceAll(new RegExp(r'(\?alt).*'), '');
+    if (detailPost[0].photo != "") {
+      final firebase_storage.Reference firebaseStorageRef =
+          firebase_storage.FirebaseStorage.instance.ref().child(fileUrl);
+      await firebaseStorageRef.delete();
+    }
 
-    final firebase_storage.Reference firebaseStorageRef =
-        firebase_storage.FirebaseStorage.instance.ref().child(fileUrl);
-    await firebaseStorageRef.delete();
     await post.doc(detailPost[0].idPost).delete().then((value) {
       postComment
           .where("idPost", isEqualTo: detailPost[0].idPost)
@@ -255,15 +257,15 @@ class DetailPostController extends GetxController {
     List idUserCommentFilter = [];
     List listAllTokenComment = [];
     commentPost.add(PostCommentModel(
-      date: null,
-      idUser: auth.currentUser?.uid,
-      idPost: Get.arguments,
-      idCommunity: idCommunity.value,
-      comment: commentFC.text,
-      name: myName.value,
-      username: myProfile[0].username,
-      photo: myProfile[0].photo,
-    ));
+        date: Timestamp.fromDate(DateTime.now()),
+        idUser: auth.currentUser?.uid,
+        idPost: Get.arguments,
+        idCommunity: idCommunity.value,
+        comment: commentFC.text,
+        name: myName.value,
+        username: myProfile[0].username,
+        photo: myProfile[0].photo,
+        sort: 0));
 
     if (commentText.isNotEmpty || commentText.value != '') {
       try {
@@ -273,7 +275,7 @@ class DetailPostController extends GetxController {
           "idUser": auth.currentUser?.uid,
           "idCommunity": idCommunity.value,
           "comment": commentFC.text,
-          "date": dateNow,
+          "date": DateTime.now(),
         }).then((value) async {
           commentFC.clear();
           commentText.value = '';
@@ -394,6 +396,11 @@ class DetailPostController extends GetxController {
       "readAt": null,
       "date": DateTime.now(),
     }).then((_) {
+      NotificationService.pushNotifAdmin(
+          code: idPost,
+          type: 2,
+          username: myProfile[0].name,
+          object: detailPost[0].title);
       Get.back();
       BottomSheetHelper.successReport();
     });

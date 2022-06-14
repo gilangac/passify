@@ -114,13 +114,10 @@ class ProfilePage extends StatelessWidget {
         SizedBox(
           height: 20,
         ),
-        GestureDetector(
-          onTap: () => profileC.onRefresh(),
-          child: circleAvatar(
-              imageData: dataUser.photo.toString(),
-              nameData: dataUser.name.toString(),
-              size: 45),
-        ),
+        circleAvatar(
+            imageData: dataUser.photo.toString(),
+            nameData: dataUser.name.toString(),
+            size: 45),
         SizedBox(
           height: 10,
         ),

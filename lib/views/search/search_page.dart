@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors, prefer_is_empty, sized_box_for_whitespace, unrelated_type_equality_checks
 
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -202,6 +203,9 @@ class SearchPage extends StatelessWidget {
                             fontSize: 12,
                             fontWeight: FontWeight.w500),
                       ),
+                      SizedBox(
+                        height: 200,
+                      ),
                     ],
                   ),
                 )
@@ -347,43 +351,47 @@ class SearchPage extends StatelessWidget {
                       var data = searchController.personDataSearch[index];
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 15),
-                        child: GestureDetector(
-                          onTap: () {
-                            Get.toNamed(
-                                AppPages.PROFILE_PERSON +
-                                    data.idUser.toString(),
-                                arguments: data.idUser.toString());
-                          },
-                          child: Row(
-                            children: [
-                              circleAvatar(
-                                  imageData: data.photo,
-                                  nameData: data.name.toString(),
-                                  size: 25),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    data.name.toString(),
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                  Text(
-                                    data.username.toString(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.grey.shade500,
-                                        fontStyle: FontStyle.normal,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w400),
-                                  ),
-                                ],
-                              ),
-                            ],
+                        child: FadeInDown(
+                          delay: Duration(milliseconds: 80 * index),
+                          duration: Duration(milliseconds: 400),
+                          child: GestureDetector(
+                            onTap: () {
+                              Get.toNamed(
+                                  AppPages.PROFILE_PERSON +
+                                      data.idUser.toString(),
+                                  arguments: data.idUser.toString());
+                            },
+                            child: Row(
+                              children: [
+                                circleAvatar(
+                                    imageData: data.photo,
+                                    nameData: data.name.toString(),
+                                    size: 25),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      data.name.toString(),
+                                      style: GoogleFonts.poppins(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    Text(
+                                      data.username.toString(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.grey.shade500,
+                                          fontStyle: FontStyle.normal,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );
@@ -451,18 +459,22 @@ class SearchPage extends StatelessWidget {
                     padding: EdgeInsets.all(25),
                     itemBuilder: (context, index) {
                       var data = searchController.eventDataSearch[index];
-                      return eventCard(
-                          idEvent: data.idEvent,
-                          name: data.name,
-                          description: data.description,
-                          date: DateFormat("EEEE, dd MMMM yyyy", "id")
-                              .format(data.dateEvent!.toDate())
-                              .toString(),
-                          location: data.location,
-                          time: data.time,
-                          category: data.category,
-                          commentCount: data.comment.toString(),
-                          membersCount: data.member?.toString());
+                      return FadeInDown(
+                        delay: Duration(milliseconds: 10 * index),
+                        duration: Duration(milliseconds: 400),
+                        child: eventCard(
+                            idEvent: data.idEvent,
+                            name: data.name,
+                            description: data.description,
+                            date: DateFormat("EEEE, dd MMMM yyyy", "id")
+                                .format(data.dateEvent!.toDate())
+                                .toString(),
+                            location: data.location,
+                            time: data.time,
+                            category: data.category,
+                            commentCount: data.comment.toString(),
+                            membersCount: data.member?.toString()),
+                      );
                     });
   }
 
@@ -527,13 +539,17 @@ class SearchPage extends StatelessWidget {
                     padding: EdgeInsets.all(25),
                     itemBuilder: (context, index) {
                       var data = searchController.communityDataSearch[index];
-                      return communityCard(
-                          idCommunity: data.idCommunity,
-                          category: data.category,
-                          city: data.city,
-                          name: data.name,
-                          photo: data.photo,
-                          membere: data.member);
+                      return FadeInDown(
+                        delay: Duration(milliseconds: 10 * index),
+                        duration: Duration(milliseconds: 400),
+                        child: communityCard(
+                            idCommunity: data.idCommunity,
+                            category: data.category,
+                            city: data.city,
+                            name: data.name,
+                            photo: data.photo,
+                            membere: data.member),
+                      );
                     });
   }
 

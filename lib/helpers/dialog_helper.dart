@@ -142,7 +142,7 @@ class DialogHelper {
                 style: GoogleFonts.poppins(fontSize: 14),
               ),
               Text(
-                description ?? 'App Name: $appName',
+                description ?? 'App Name : $appName',
                 style: GoogleFonts.poppins(
                     fontSize: 12, color: Colors.grey.shade400),
               ),

@@ -11,6 +11,7 @@ class SnackBarHelper {
         icon: Icon(Feather.alert_circle, color: Colors.white),
         title: "Gagal",
         message: description,
+        backgroundColor: Colors.red.shade600.withOpacity(0.95),
         duration: Duration(seconds: 4),
         snackStyle: SnackStyle.FLOATING,
         snackPosition: SnackPosition.TOP,
@@ -25,7 +26,7 @@ class SnackBarHelper {
       GetBar(
         icon: Icon(Feather.check_circle,
             color: Color.fromARGB(255, 243, 237, 237)),
-        backgroundColor: Colors.green.shade600,
+        backgroundColor: Colors.green.shade600.withOpacity(0.95),
         title: "Berhasil",
         message: description,
         duration: Duration(seconds: 4),

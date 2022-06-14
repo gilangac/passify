@@ -14,7 +14,7 @@ import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/forum/detail_community_controller.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/routes/pages.dart';
-import 'package:passify/services/service_timeago.dart';
+import 'package:passify/services/service_additional.dart';
 import 'package:passify/widgets/general/app_bar.dart';
 import 'package:passify/widgets/general/bottomsheet_widget.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
@@ -316,7 +316,7 @@ class CommunityPage extends StatelessWidget {
             body: Obx(() => RefreshIndicator(
                   onRefresh: () {
                     HapticFeedback.vibrate();
-                    return detailCommunityC.onGetData();
+                    return detailCommunityC.onRefresh();
                   },
                   child: SingleChildScrollView(
                     physics: BouncingScrollPhysics(
@@ -716,56 +716,67 @@ class CommunityPage extends StatelessWidget {
             ),
           ),
         ),
-        detailCommunityC.dataDisccusion.isEmpty
+        detailCommunityC.isLoadingPost.value
             ? Center(
                 child: Column(
                   children: [
                     SizedBox(
                       height: 20,
                     ),
-                    Text(
-                      "Belum ada postingan",
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                          color: AppColors.tittleColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    Text(
-                      "Silahkan refresh halaman atau buat postingan anda",
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                          color: Colors.grey.shade400,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    Container(height: 400)
+                    CircularProgressIndicator(),
                   ],
                 ),
               )
-            : ListView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                padding: EdgeInsets.symmetric(vertical: 15),
-                itemCount: detailCommunityC.dataDisccusion.length,
-                itemBuilder: (context, index) {
-                  var data = detailCommunityC.dataDisccusion[index];
-                  return postCard(
-                      idPost: data.idPost,
-                      idUser: data.idUser,
-                      title: data.title,
-                      price: data.price,
-                      status: data.status,
-                      name: data.name,
-                      username: data.username,
-                      photoUser: data.photoUser,
-                      idCommunity: data.idCommunity.toString(),
-                      caption: data.caption,
-                      photo: data.photo,
-                      category: data.category,
-                      date: data.date!.toDate(),
-                      comment: data.comment);
-                }),
+            : detailCommunityC.dataDisccusion.isEmpty
+                ? Center(
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Text(
+                          "Belum ada postingan",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                              color: AppColors.tittleColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600),
+                        ),
+                        Text(
+                          "Silahkan refresh halaman atau buat postingan anda",
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                              color: Colors.grey.shade400,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        Container(height: 400)
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    itemCount: detailCommunityC.dataDisccusion.length,
+                    itemBuilder: (context, index) {
+                      var data = detailCommunityC.dataDisccusion[index];
+                      return postCard(
+                          idPost: data.idPost,
+                          idUser: data.idUser,
+                          title: data.title,
+                          price: data.price,
+                          status: data.status,
+                          name: data.name,
+                          username: data.username,
+                          photoUser: data.photoUser,
+                          idCommunity: data.idCommunity.toString(),
+                          caption: data.caption,
+                          photo: data.photo,
+                          category: data.category,
+                          date: data.date!.toDate(),
+                          comment: data.comment);
+                    }),
       ],
     );
   }

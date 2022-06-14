@@ -56,13 +56,13 @@ class RegisterController extends GetxController with ServiceController {
   void onInit() async {
     onReadJson();
     onGetProvince();
+    final fcmToken = await NotificationService.getFcmToken();
+    listFcmToken.add(fcmToken);
     super.onInit();
   }
-  
 
   onRegister() async {
     final fcmToken = await NotificationService.getFcmToken();
-    listFcmToken.add(fcmToken);
     onSend() {
       try {
         selectedImagePath != ""

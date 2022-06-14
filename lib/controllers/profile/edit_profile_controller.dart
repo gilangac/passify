@@ -203,7 +203,7 @@ class EditProfileController extends GetxController with ServiceController {
         Get.back();
         SnackBarHelper.showSucces(description: "Berhasil mengubah profile");
         homeC.onRefreshData();
-        profileC.onGetDataUser();
+        profileC.onRefresh();
       } catch (e) {
         Get.back();
         SnackBarHelper.showError(description: "Gagal mengubah profile");

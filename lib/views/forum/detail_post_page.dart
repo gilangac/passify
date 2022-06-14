@@ -11,13 +11,12 @@ import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/forum/detail_post_controller.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/routes/pages.dart';
-import 'package:passify/services/service_timeago.dart';
+import 'package:passify/services/service_additional.dart';
 import 'package:passify/widgets/general/app_bar.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:passify/widgets/general/comment_widget.dart';
 import 'package:passify/widgets/general/dotted_separator.dart';
 import 'package:intl/intl.dart';
-import 'package:passify/widgets/post/form_edit_post.dart';
 import 'package:share_plus/share_plus.dart';
 
 class DetailPostPage extends StatelessWidget {
@@ -156,13 +155,35 @@ class DetailPostPage extends StatelessWidget {
                           fontSize: 16,
                           fontWeight: FontWeight.w600),
                     ),
-                    Text(
-                      detailPostC.userPost[0].username.toString(),
-                      style: GoogleFonts.poppins(
-                          height: 1.2,
-                          color: Colors.grey.shade500,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400),
+                    Row(
+                      children: [
+                        Text(
+                          detailPostC.userPost[0].username.toString(),
+                          style: GoogleFonts.poppins(
+                              height: 1.2,
+                              color: Colors.grey.shade500,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        Container(
+                          margin: EdgeInsets.symmetric(horizontal: 5),
+                          height: 3,
+                          width: 3,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              color: Colors.grey),
+                        ),
+                        Text(
+                          TimeAgo2.timeAgoSinceDate(
+                              DateFormat("dd-MM-yyyy h:mma").format(
+                                  detailPostC.detailPost[0].date!.toDate())),
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.poppins(
+                            fontSize: 10,
+                            color: Colors.grey.shade500,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -389,12 +410,11 @@ class DetailPostPage extends StatelessWidget {
                 height: 1.5,
                 fontSize: 11,
                 fontWeight: FontWeight.w400),
-            textAlign: TextAlign.justify,
+            textAlign: TextAlign.left,
             onTap: (text) {
               print(text);
             },
             softWrap: true,
-            overflow: TextOverflow.ellipsis,
           ),
           // Text(
           //   detailPostC.detailPost[0].caption.toString(),
@@ -471,7 +491,11 @@ class DetailPostPage extends StatelessWidget {
               GestureDetector(
                 onTap: () async {
                   String url = await AppUtils.buildDynamicLink(
-                      detailPostC.detailPost[0].idPost!, detailPostC.detailPost[0].title!,detailPostC.detailPost[0].caption!, detailPostC.detailPost[0].photo!,"post");
+                      detailPostC.detailPost[0].idPost!,
+                      detailPostC.detailPost[0].title!,
+                      detailPostC.detailPost[0].caption!,
+                      detailPostC.detailPost[0].photo!,
+                      "post");
                   Share.share('${url}');
                 },
                 child: Container(
@@ -503,6 +527,7 @@ class DetailPostPage extends StatelessWidget {
                               nama: detailPostC.commentPost[index].name,
                               photo: detailPostC.commentPost[index].photo,
                               username: detailPostC.commentPost[index].username,
+                              sort: detailPostC.commentPost[index].sort,
                               date: detailPostC.commentPost[index].date);
                         })),
                     Container(height: 400)
