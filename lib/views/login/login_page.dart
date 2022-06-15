@@ -165,6 +165,11 @@ class LoginPage extends StatelessWidget {
                   firebaseAuthController.signInWithGoogle().then((_) {
                     Get.back();
                     firebaseAuthController.onGetUser();
+                  }).onError((error, stackTrace) {
+                    if (error.toString() ==
+                        '[firebase_auth/user-disabled] The user account has been disabled by an administrator.') {
+                      print("Disabled");
+                    }
                   });
                 },
                 child: Row(

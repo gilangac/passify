@@ -40,7 +40,9 @@ class FirebaseAuthController extends GetxController {
       );
       return await FirebaseAuth.instance.signInWithCredential(credential);
     } catch (e) {
+      print(e);
       Get.back();
+
       // Obtain the auth details from the request
       final GoogleSignInAuthentication googleAuth =
           await googleUser!.authentication;
@@ -50,6 +52,7 @@ class FirebaseAuthController extends GetxController {
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
+      await _googleSignIn.signOut();
       return await FirebaseAuth.instance.signInWithCredential(credential);
     }
 
