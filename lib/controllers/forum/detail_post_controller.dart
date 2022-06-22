@@ -219,7 +219,7 @@ class DetailPostController extends GetxController {
 
     await post.doc(detailPost[0].idPost).delete().then((value) {
       postComment
-          .where("idPost", isEqualTo: detailPost[0].idPost)
+          .where("idPost", isEqualTo: detailPost[0].idPost) 
           .get()
           .then((snapPost) {
         snapPost.docs.forEach((element) {
@@ -238,7 +238,7 @@ class DetailPostController extends GetxController {
             .get()
             .then((snapshotReport) {
           snapshotReport.docs.forEach((element) {
-            notification.doc(element['idReport']).delete();
+            report.doc(element['idReport']).delete();
           });
         });
         // detailCommunityController.onGetData();

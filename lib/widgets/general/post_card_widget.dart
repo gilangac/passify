@@ -179,7 +179,8 @@ Widget postCard(
                       : Container(
                           alignment: Alignment.topRight,
                           child: GestureDetector(
-                              onTap: () => _bottomSheetContent(idUser, idPost!),
+                              onTap: () =>
+                                  _bottomSheetContent(idUser, idPost!, title!),
                               child: Icon(Feather.more_horizontal)))
                 ],
               ),
@@ -448,7 +449,7 @@ Widget postCard(
       ));
 }
 
-void _bottomSheetContent(var idUser, String idPost) {
+void _bottomSheetContent(var idUser, String idPost, String title) {
   String myId = controller.myAccountId.value;
   Get.bottomSheet(
       SafeArea(
@@ -467,7 +468,8 @@ void _bottomSheetContent(var idUser, String idPost) {
                   child: Column(
                     children: [
                       _listAction(
-                          title: "Laporkan",
+                          titleAction: "Laporkan",
+                          title: title,
                           idPost: idPost,
                           type: "report",
                           path: AppPages.EDIT_PROFILE),
@@ -479,7 +481,8 @@ void _bottomSheetContent(var idUser, String idPost) {
                                   color: Colors.grey.shade300,
                                 ),
                                 _listAction(
-                                    title: "Edit Postingan",
+                                    titleAction: "Edit Postingan",
+                                    title: title,
                                     idPost: idPost,
                                     path: AppPages.HOME,
                                     type: "edit"),
@@ -514,7 +517,8 @@ void _bottomSheetContent(var idUser, String idPost) {
 }
 
 Widget _listAction(
-    {required String title,
+    {required String titleAction,
+    required String title,
     required String path,
     required String idPost,
     String? type}) {
@@ -541,7 +545,7 @@ Widget _listAction(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
           child: Text(
-            title,
+            titleAction,
             style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,

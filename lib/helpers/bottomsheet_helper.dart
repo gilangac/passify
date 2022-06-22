@@ -8,10 +8,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:passify/constant/color_constant.dart';
 
-
 class BottomSheetHelper {
-  static successReport(){
-     Get.bottomSheet(
+  static successReport() {
+    Get.bottomSheet(
       SafeArea(
         child: Padding(
           padding: EdgeInsets.all(10),
@@ -80,7 +79,83 @@ class BottomSheetHelper {
       isScrollControlled: true,
     );
   }
+
+  static successDissable() {
+    Get.bottomSheet(
+      SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(10),
+          child: Container(
+            height: 300,
+            child: Column(
+              children: [
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        "Pemberitahuan",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                            color: AppColors.tittleColor,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        "Maaf, akun anda dinonaktifkan sementara karena terjadi penyalahgunaan dalam aplikasi.",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                            color: Colors.grey.shade400,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      SizedBox(
+                        height: 100,
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            primary: AppColors.primaryColor, elevation: 0.5),
+                        onPressed: () {
+                          Get.back();
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 70),
+                          child: Text(
+                            "Kembali",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+      isDismissible: true,
+      enableDrag: true,
+      isScrollControlled: true,
+    );
+  }
 }
+
 class BottomsheetEvent extends StatelessWidget {
   const BottomsheetEvent({Key? key}) : super(key: key);
 

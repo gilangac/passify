@@ -317,6 +317,9 @@ class DetailCommunityController extends GetxController with ServiceController {
                       sort: int.parse(sort)));
                   // dataFjb.assignAll(fjbData);
                   dataFjb.sort((a, b) => b.sort!.compareTo(a.sort!));
+                  if (i == snapshot.size) {
+                    isLoadingPost.value = false;
+                  }
                 }
               });
             });
@@ -835,13 +838,14 @@ class DetailCommunityController extends GetxController with ServiceController {
           .get()
           .then((QuerySnapshot snapshotPost) {
         snapshotPost.docs.forEach((element) async {
-          var fileUrl =
-              Uri.decodeFull(Path.basename(element['photo'].toString()))
-                  .replaceAll(new RegExp(r'(\?alt).*'), '');
-
-          final firebase_storage.Reference firebaseStorageRef =
-              firebase_storage.FirebaseStorage.instance.ref().child(fileUrl);
-          await firebaseStorageRef.delete();
+          if (element['photo'] != "") {
+            var fileUrl =
+                Uri.decodeFull(Path.basename(element['photo'].toString()))
+                    .replaceAll(new RegExp(r'(\?alt).*'), '');
+            final firebase_storage.Reference firebaseStorageRef =
+                firebase_storage.FirebaseStorage.instance.ref().child(fileUrl);
+            await firebaseStorageRef.delete();
+          }
           post.doc(element['idPost']).delete();
         });
       });
@@ -863,7 +867,7 @@ class DetailCommunityController extends GetxController with ServiceController {
       });
       report.where("code", isEqualTo: idCommunity).get().then((snapshotReport) {
         snapshotReport.docs.forEach((element) {
-          notification.doc(element['idReport']).delete();
+          report.doc(element['idReport']).delete();
         });
       });
       CommunityController communityController = Get.put(CommunityController());
@@ -909,7 +913,7 @@ class DetailCommunityController extends GetxController with ServiceController {
         });
         report.where("code", isEqualTo: idPost).get().then((snapshotReport) {
           snapshotReport.docs.forEach((element) {
-            notification.doc(element['idReport']).delete();
+            report.doc(element['idReport']).delete();
           });
         });
         Get.back();

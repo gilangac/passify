@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/auth/firebase_auth_controller.dart';
+import 'package:passify/helpers/bottomsheet_helper.dart';
 import 'package:passify/routes/pages.dart';
 import 'package:passify/services/service_preference.dart';
 
@@ -165,10 +166,9 @@ class LoginPage extends StatelessWidget {
                   firebaseAuthController.signInWithGoogle().then((_) {
                     Get.back();
                     firebaseAuthController.onGetUser();
-                  }).onError((error, stackTrace) {
-                    if (error.toString() ==
-                        '[firebase_auth/user-disabled] The user account has been disabled by an administrator.') {
-                      print("Disabled");
+                  }).catchError((error) {
+                    if (error.code == 'user-disabled') {
+                      BottomSheetHelper.successDissable();
                     }
                   });
                 },

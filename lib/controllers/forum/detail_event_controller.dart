@@ -391,7 +391,7 @@ class DetailEventController extends GetxController {
           .get()
           .then((QuerySnapshot snapshotComment) {
         snapshotComment.docs.forEach((element) {
-          eventMember.doc(element['idComment']).delete();
+          eventComment.doc(element['idComment']).delete();
         });
       });
       notification
@@ -404,7 +404,7 @@ class DetailEventController extends GetxController {
       });
       report.where("code", isEqualTo: idEvent).get().then((snapshotReport) {
         snapshotReport.docs.forEach((element) {
-          notification.doc(element['idReport']).delete();
+          report.doc(element['idReport']).delete();
         });
       });
       EventController eventController = Get.put(EventController());
