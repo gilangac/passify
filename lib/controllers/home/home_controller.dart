@@ -10,6 +10,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:passify/controllers/auth/firebase_auth_controller.dart';
 import 'package:passify/models/community.dart';
 import 'package:passify/models/community_member.dart';
 import 'package:passify/models/event.dart';
@@ -117,6 +118,7 @@ class HomeController extends GetxController {
             date: d["date"],
             idUser: d["idUser"],
             email: d["email"],
+            status: d["status"],
             photo: d["photoUser"],
             twitter: d["twitter"],
             hobby: d["hobby"],
@@ -125,6 +127,11 @@ class HomeController extends GetxController {
         listMyHobby.value = d['hobby'];
         myCity.value = d['city'];
         myProvince.value = d['province'];
+        if (d["status"] == 0) {
+          FirebaseAuthController firebaseAuthController =
+              Get.put(FirebaseAuthController());
+          firebaseAuthController.logout();
+        }
       });
       readJson();
       onGetCommunity();

@@ -22,6 +22,7 @@ import 'package:passify/views/home/all_categories_page.dart';
 import 'package:passify/views/home/categories_page.dart';
 import 'package:passify/views/home/home_page.dart';
 import 'package:passify/views/login/login_page.dart';
+import 'package:passify/views/login/onboarding_page.dart';
 import 'package:passify/views/profile/edit_profile_page.dart';
 import 'package:passify/views/profile/profile_person_page.dart';
 import 'package:passify/views/register/register_page.dart';

@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/profile/profile_person_controller.dart';
+import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:passify/widgets/general/community_widget.dart';
 import 'package:passify/widgets/general/event_widget.dart';
@@ -24,7 +25,18 @@ class ProfilePersonPage extends StatelessWidget {
   }
 
   List<Widget> _action() {
-    return [ProfileActionMenuWidget()];
+    return [
+      profileC.dataUser[0].idUser != profileC.myProfile[0].idUser
+          ? GestureDetector(
+              child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 20),
+                  child: Icon(Feather.more_horizontal, size: 24)),
+              onTap: () {
+                _bottomSheetContent();
+              },
+            )
+          : SizedBox()
+    ];
   }
 
   Widget _body() {
@@ -45,6 +57,7 @@ class ProfilePersonPage extends StatelessWidget {
                               color: AppColors.black,
                               fontSize: 16,
                               fontWeight: FontWeight.w600)),
+                      actions: _action(),
                       centerTitle: true,
                       backgroundColor: Colors.white,
                       pinned: true,
@@ -327,6 +340,107 @@ class ProfilePersonPage extends StatelessWidget {
                     photo: data.photo,
                     membere: data.member);
               }),
+    );
+  }
+
+  void _bottomSheetContent() {
+    Get.bottomSheet(
+        SafeArea(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(20, 10, 20, 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(color: AppColors.lightGrey, width: 35, height: 4),
+                SizedBox(height: 30),
+                Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey.shade100),
+                    child: Column(
+                      children: [
+                        _listAction(title: "Laporkan Pengguna", type: "report"),
+                      ],
+                    )),
+                SizedBox(height: 13),
+                _cancelAction()
+              ],
+            ),
+          ),
+        ),
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+        isDismissible: true,
+        enableDrag: true,
+        isScrollControlled: true);
+  }
+
+  Widget _listAction({
+    required String title,
+    String? type,
+  }) {
+    return Container(
+      width: Get.width,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: () {
+            if (type == 'report') {
+              Get.back();
+              DialogHelper.showConfirm(
+                  title: "Laporkan Pengguna",
+                  description:
+                      "Apakah anda yakin akan melaporkan pengguna ini?",
+                  action: () {
+                    Get.back();
+                    profileC.onReportUser();
+                  },
+                  titlePrimary: "Laporkan",
+                  titleSecondary: "Batal");
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+            child: Text(
+              title,
+              style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textColor),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _cancelAction() {
+    return Container(
+      width: Get.width,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10), color: Colors.grey.shade100),
+      child: Material(
+        child: InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: () => Get.back(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+              child: Text(
+                'Batal',
+                style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.textColor),
+                textAlign: TextAlign.center,
+              ),
+            )),
+        color: Colors.transparent,
+      ),
     );
   }
 }

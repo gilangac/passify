@@ -7,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:passify/controllers/auth/firebase_auth_controller.dart';
+import 'package:passify/controllers/notification/notification_controller.dart';
 import 'package:passify/helpers/bottomsheet_helper.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/models/post.dart';
@@ -81,6 +83,11 @@ class DetailPostController extends GetxController {
           hobby: value["hobby"],
           city: value["city"],
           instagram: value["instagram"]));
+      if (value["status"] == 0) {
+        FirebaseAuthController firebaseAuthController =
+            Get.put(FirebaseAuthController());
+        firebaseAuthController.logout();
+      }
     });
   }
 
@@ -219,32 +226,35 @@ class DetailPostController extends GetxController {
 
     await post.doc(detailPost[0].idPost).delete().then((value) {
       postComment
-          .where("idPost", isEqualTo: detailPost[0].idPost) 
+          .where("idPost", isEqualTo: detailPost[0].idPost)
           .get()
           .then((snapPost) {
         snapPost.docs.forEach((element) {
           postComment.doc(element["idComment"]).delete();
         });
-        notification
-            .where("code", isEqualTo: detailPost[0].idPost)
-            .get()
-            .then((snapshotNotif) {
-          snapshotNotif.docs.forEach((element) {
-            notification.doc(element['idNotification']).delete();
-          });
-        });
-        report
-            .where("code", isEqualTo: detailPost[0].idPost)
-            .get()
-            .then((snapshotReport) {
-          snapshotReport.docs.forEach((element) {
-            report.doc(element['idReport']).delete();
-          });
-        });
-        // detailCommunityController.onGetData();
-        Get.back();
-        Get.back();
       });
+      notification
+          .where("code", isEqualTo: detailPost[0].idPost)
+          .get()
+          .then((snapshotNotif) {
+        snapshotNotif.docs.forEach((element) {
+          notification.doc(element['idNotification']).delete();
+        });
+      });
+      report
+          .where("code", isEqualTo: detailPost[0].idPost)
+          .get()
+          .then((snapshotReport) {
+        snapshotReport.docs.forEach((element) {
+          report.doc(element['idReport']).delete();
+        });
+      });
+      // detailCommunityController.onGetData();
+      Get.back();
+      Get.back();
+
+      NotificationController notifC = Get.find();
+      notifC.onGetData();
     });
   }
 
@@ -416,7 +426,13 @@ class DetailPostController extends GetxController {
         headers: <String, String>{'header_key': 'header_value'},
       );
     } else {
-      throw 'Could not launch $url';
+      await launch(
+        url,
+        forceSafariVC: false,
+        forceWebView: false,
+        headers: <String, String>{'header_key': 'header_value'},
+      );
+      print('Could not launch $url');
     }
   }
 

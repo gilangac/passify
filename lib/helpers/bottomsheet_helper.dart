@@ -86,7 +86,7 @@ class BottomSheetHelper {
         child: Padding(
           padding: EdgeInsets.all(10),
           child: Container(
-            height: 300,
+            height: 280,
             child: Column(
               children: [
                 Expanded(
@@ -106,18 +106,18 @@ class BottomSheetHelper {
                             fontWeight: FontWeight.w600),
                       ),
                       SizedBox(
-                        height: 20,
+                        height: 25,
                       ),
                       Text(
                         "Maaf, akun anda dinonaktifkan sementara karena terjadi penyalahgunaan dalam aplikasi.",
                         textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
                             color: Colors.grey.shade400,
-                            fontSize: 12,
+                            fontSize: 14,
                             fontWeight: FontWeight.w500),
                       ),
                       SizedBox(
-                        height: 100,
+                        height: 80,
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(

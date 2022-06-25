@@ -30,9 +30,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Passify',
       theme: lightTheme(context),
-      initialRoute: PreferenceService.getStatus() != "logged"
-          ? AppRoutes.INITIAL
-          : AppPages.NAVIGATOR,
+      initialRoute: PreferenceService.getBoard() == "notfirst"
+          ? PreferenceService.getStatus() != "logged"
+              ? AppPages.LOGIN
+              : AppPages.NAVIGATOR
+          : AppPages.ONBOARDING,
       getPages: AppRoutes.pages,
       defaultTransition: Transition.cupertino,
     );

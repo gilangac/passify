@@ -639,7 +639,7 @@ class DetailPostPage extends StatelessWidget {
                     child: Column(
                       children: [
                         _listAction(
-                            title: "Laporkan",
+                            title: "Laporkan Postingan",
                             path: AppPages.EDIT_PROFILE,
                             type: "report"),
                         myId == idUser

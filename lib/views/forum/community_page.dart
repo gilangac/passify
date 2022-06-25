@@ -105,7 +105,8 @@ class CommunityPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12)),
                   onSelected: (item) => handleClick(item),
                   itemBuilder: (context) => [
-                    PopupMenuItem<int>(value: 1, child: Text('Laporkan')),
+                    PopupMenuItem<int>(
+                        value: 1, child: Text('Laporkan Komunitas')),
                     PopupMenuItem<int>(
                         value: 0,
                         child: Row(
@@ -180,7 +181,8 @@ class CommunityPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12)),
                 onSelected: (item) => handleClick(item),
                 itemBuilder: (context) => [
-                  PopupMenuItem<int>(value: 1, child: Text('Laporkan')),
+                  PopupMenuItem<int>(
+                      value: 1, child: Text('Laporkan Komunitas')),
                   PopupMenuItem<int>(value: 2, child: Text('Keluar Komunitas'))
                 ],
               )
@@ -202,7 +204,8 @@ class CommunityPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12)),
                 onSelected: (item) => handleClick(item),
                 itemBuilder: (context) => [
-                      PopupMenuItem<int>(value: 1, child: Text('Laporkan')),
+                      PopupMenuItem<int>(
+                          value: 1, child: Text('Laporkan Komunitas')),
                     ]);
   }
 

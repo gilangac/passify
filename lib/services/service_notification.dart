@@ -103,6 +103,7 @@ class NotificationService extends GetxService {
       "melaporkan event $object",
       "melaporkan komunitas $object",
       "melaporkan postingan $object",
+      "melaporkan akun $object",
     ];
 
     String messageBody = messageNotif[type].toString();

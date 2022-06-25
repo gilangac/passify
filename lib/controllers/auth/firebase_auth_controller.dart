@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:passify/helpers/bottomsheet_helper.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/routes/pages.dart';
 import 'package:passify/services/service_notification.dart';
@@ -78,8 +79,11 @@ class FirebaseAuthController extends GetxController {
         .then((QuerySnapshot snapshot) async {
       print("jumlah : " + snapshot.size.toString());
       if (snapshot.size == 1) {
-        user.doc(snapshot.docs[0]['idUser']).get().then((value) {
-          if (value['username'] != '') {
+        user.doc(snapshot.docs[0]['idUser']).get().then((value) async {
+          if (value['status'] == 0) {
+            await _googleSignIn.signOut();
+            BottomSheetHelper.successDissable();
+          } else if (value['username'] != '') {
             snapshot.docs.forEach((element) {
               listFcmToken.assignAll(element['fcmToken']);
             });
@@ -137,6 +141,7 @@ class FirebaseAuthController extends GetxController {
         await auth.signOut();
         PreferenceService.clear();
         PreferenceService.setStatus("unlog");
+        PreferenceService.setBoard("notfirst");
         await _googleSignIn.signOut().then((value) {
           Get.offAllNamed(AppPages.LOGIN);
           // super.dispose();

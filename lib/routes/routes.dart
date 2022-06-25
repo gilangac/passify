@@ -3,13 +3,14 @@
 part of 'pages.dart';
 
 class AppRoutes {
-  static const INITIAL = AppPages.LOGIN;
+  static const INITIAL = AppPages.ONBOARDING;
 
   static final pages = [
     GetPage(
         name: _Paths.LOGIN,
         page: () => LoginPage(),
         binding: FirebaseBinding()),
+    GetPage(name: _Paths.ONBOARDING, page: () => OnboardingPage()),
     GetPage(name: _Paths.REGISTER, page: () => RegisterPage()),
     GetPage(name: _Paths.HOME, page: () => HomePage()),
     GetPage(name: _Paths.ALL_CATEGORIES, page: () => AllCategoriesPage()),

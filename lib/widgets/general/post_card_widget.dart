@@ -468,7 +468,7 @@ void _bottomSheetContent(var idUser, String idPost, String title) {
                   child: Column(
                     children: [
                       _listAction(
-                          titleAction: "Laporkan",
+                          titleAction: "Laporkan Postingan",
                           title: title,
                           idPost: idPost,
                           type: "report",

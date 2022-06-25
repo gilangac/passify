@@ -131,48 +131,48 @@ class SearchController extends GetxController {
     dataPost.isNotEmpty ? dataPost.clear() : null;
     try {
       int j = 0;
+      int k = 0;
       for (int i = 0; i < listMyIdCommunity.length; i++) {
         await post
             .where('idCommunity', isEqualTo: listMyIdCommunity[i])
             .get()
             .then((QuerySnapshot snapshot) {
+          k++;
           j += snapshot.size;
+          // if (snapshot.size == 0 && i + 1 == listMyIdCommunity.length) {
+          //   onFilterHashtag();
+          // }
           snapshot.docs.forEach((post) {
-            user
-                .where("idUser", isEqualTo: post["idUser"])
-                .get()
-                .then((QuerySnapshot userSnapshot) {
-              userSnapshot.docs.forEach((user) {
-                postComment
-                    .where("idPost", isEqualTo: post["idPost"])
-                    .get()
-                    .then((QuerySnapshot snapshotComment) {
-                  DateTime a = post['date'].toDate();
-                  String sort = DateFormat("yyyyMMddHHmmss").format(a);
-                  dataPost.add(PostModel(
-                      caption: post["caption"],
-                      category: post["category"],
-                      date: post["date"],
-                      idUser: post["idUser"],
-                      idCommunity: post["idCommunity"],
-                      photo: post["photo"],
-                      idPost: post["idPost"],
-                      title: post["title"],
-                      noHp: post["noHp"],
-                      price: post["price"],
-                      status: post["status"],
-                      name: user["name"],
-                      username: user["username"],
-                      photoUser: user["photoUser"],
-                      comment: snapshotComment.size,
-                      sort: int.parse(sort)));
-                  if (j == dataPost.length &&
-                      i + 1 == listMyIdCommunity.length) {
-                    onFilterHashtag();
-                  }
-                  // dataDisccusion = (disccusionData);
-                  dataPost.sort((a, b) => b.sort!.compareTo(a.sort!));
-                });
+            user.doc(post["idUser"]).get().then((user) {
+              postComment
+                  .where("idPost", isEqualTo: post["idPost"])
+                  .get()
+                  .then((QuerySnapshot snapshotComment) {
+                DateTime a = post['date'].toDate();
+                String sort = DateFormat("yyyyMMddHHmmss").format(a);
+                dataPost.add(PostModel(
+                    caption: post["caption"],
+                    category: post["category"],
+                    date: post["date"],
+                    idUser: post["idUser"],
+                    idCommunity: post["idCommunity"],
+                    photo: post["photo"],
+                    idPost: post["idPost"],
+                    title: post["title"],
+                    noHp: post["noHp"],
+                    price: post["price"],
+                    status: post["status"],
+                    name: user["name"],
+                    username: user["username"],
+                    photoUser: user["photoUser"],
+                    comment: snapshotComment.size,
+                    sort: int.parse(sort)));
+                if (j == dataPost.length && k == listMyIdCommunity.length) {
+                  print(dataPost);
+                  onFilterHashtag();
+                }
+                // dataDisccusion = (disccusionData);
+                dataPost.sort((a, b) => b.sort!.compareTo(a.sort!));
               });
             });
           });

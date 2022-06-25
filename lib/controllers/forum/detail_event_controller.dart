@@ -9,8 +9,10 @@ import 'dart:math';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:passify/constant/color_constant.dart';
+import 'package:passify/controllers/auth/firebase_auth_controller.dart';
 import 'package:passify/controllers/forum/event_controller.dart';
 import 'package:passify/controllers/home/home_controller.dart';
+import 'package:passify/controllers/notification/notification_controller.dart';
 import 'package:passify/controllers/profile/profile_controller.dart';
 import 'package:passify/helpers/bottomsheet_helper.dart';
 import 'package:passify/helpers/dialog_helper.dart';
@@ -84,6 +86,11 @@ class DetailEventController extends GetxController {
           hobby: value["hobby"],
           city: value["city"],
           instagram: value["instagram"]));
+      if (value["status"] == 0) {
+        FirebaseAuthController firebaseAuthController =
+            Get.put(FirebaseAuthController());
+        firebaseAuthController.logout();
+      }
     });
   }
 
@@ -407,6 +414,8 @@ class DetailEventController extends GetxController {
           report.doc(element['idReport']).delete();
         });
       });
+      NotificationController notifC = Get.find();
+      notifC.onGetData();
       EventController eventController = Get.put(EventController());
       eventController.onGetDataEvent();
       homeController.onRefreshData();

@@ -4,6 +4,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:passify/controllers/auth/firebase_auth_controller.dart';
 import 'package:passify/helpers/snackbar_helper.dart';
 import 'package:passify/models/community.dart';
 import 'package:passify/models/community_member.dart';
@@ -63,7 +64,14 @@ class ProfileController extends GetxController {
         headers: <String, String>{'header_key': 'header_value'},
       );
     } else {
-      SnackBarHelper.showError(description: "Tidak dapat menghubungkan");
+      // SnackBarHelper.showError(description: "Tidak dapat menghubungkan");
+      await launch(
+        url,
+        forceSafariVC: false,
+        forceWebView: false,
+        headers: <String, String>{'header_key': 'header_value'},
+      );
+      print('Could not launch $url');
     }
   }
 
@@ -87,6 +95,11 @@ class ProfileController extends GetxController {
             hobby: d["hobby"],
             city: d["city"],
             instagram: d["instagram"]));
+        if (d["status"] == 0) {
+          FirebaseAuthController firebaseAuthController =
+              Get.put(FirebaseAuthController());
+          firebaseAuthController.logout();
+        }
 
         name.value = dataUser[0].name.toString();
         for (int i = 0; i < d['hobby'].length; i++) {

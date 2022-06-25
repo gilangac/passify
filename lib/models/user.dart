@@ -9,6 +9,7 @@ class UserModel {
   String? provinsi;
   String? city;
   String? idUser;
+  int? status;
   Timestamp? date;
   List? hobby;
   String? instagram;
@@ -23,6 +24,7 @@ class UserModel {
     this.provinsi,
     this.city,
     this.idUser,
+    this.status,
     this.date,
     this.hobby,
     this.instagram,

@@ -719,7 +719,7 @@ class EventPage extends StatelessWidget {
                     child: Column(
                       children: [
                         _listAction(
-                            title: "Laporkan",
+                            title: "Laporkan Event",
                             path: AppPages.EDIT_PROFILE,
                             type: "report"),
                         myId == idUser

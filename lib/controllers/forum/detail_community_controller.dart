@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:images_picker/images_picker.dart';
+import 'package:passify/controllers/auth/firebase_auth_controller.dart';
 import 'package:passify/controllers/base/service_controller.dart';
 import 'package:passify/controllers/forum/community_controller.dart';
 import 'package:passify/controllers/home/home_controller.dart';
@@ -131,6 +132,11 @@ class DetailCommunityController extends GetxController with ServiceController {
           hobby: value["hobby"],
           city: value["city"],
           instagram: value["instagram"]));
+      if (value["status"] == 0) {
+        FirebaseAuthController firebaseAuthController =
+            Get.put(FirebaseAuthController());
+        firebaseAuthController.logout();
+      }
     });
   }
 
@@ -920,6 +926,8 @@ class DetailCommunityController extends GetxController with ServiceController {
         dataDisccusion.refresh();
         dataFjb.refresh();
       });
+      NotificationController notifC = Get.find();
+      notifC.onGetData();
     }).onError((error, stackTrace) {
       Get.back();
     });
@@ -967,7 +975,6 @@ class DetailCommunityController extends GetxController with ServiceController {
           username: myProfile[0].name,
           object: titlePost);
       Get.back();
-      Get.back();
       BottomSheetHelper.successReport();
     });
   }
@@ -993,7 +1000,14 @@ class DetailCommunityController extends GetxController with ServiceController {
         headers: <String, String>{'header_key': 'header_value'},
       );
     } else {
-      SnackBarHelper.showError(description: "Tidak dapat menghubungkan");
+      // SnackBarHelper.showError(description: "Tidak dapat menghubungkan");
+      await launch(
+        url,
+        forceSafariVC: false,
+        forceWebView: false,
+        headers: <String, String>{'header_key': 'header_value'},
+      );
+      print('Could not launch $url');
     }
   }
 

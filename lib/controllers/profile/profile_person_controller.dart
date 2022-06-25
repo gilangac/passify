@@ -1,15 +1,21 @@
 // ignore: unused_import
 // ignore_for_file: avoid_function_literals_in_foreach_calls, unnecessary_this
 
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:passify/controllers/auth/firebase_auth_controller.dart';
+import 'package:passify/helpers/bottomsheet_helper.dart';
+import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/helpers/snackbar_helper.dart';
 import 'package:passify/models/community.dart';
 import 'package:passify/models/community_member.dart';
 import 'package:passify/models/event.dart';
 import 'package:passify/models/user.dart';
 import 'package:intl/intl.dart';
+import 'package:passify/services/service_notification.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProfilePersonController extends GetxController {
@@ -29,10 +35,12 @@ class ProfilePersonController extends GetxController {
       FirebaseFirestore.instance.collection('communityMembers');
   CollectionReference eventComment =
       FirebaseFirestore.instance.collection('eventComments');
+  CollectionReference report = FirebaseFirestore.instance.collection('reports');
   final _isLoading = true.obs;
   var listMyIdEvent = [].obs;
   var listMyIdCommunity = [].obs;
   var dataEvent = <EventModel>[].obs;
+  var myProfile = <UserModel>[].obs;
   var dataCommunity = <CommunityModel>[].obs;
   var communityData = <CommunityModel>[].obs;
   var dataMember = <CommunityMemberModel>[].obs;
@@ -47,6 +55,29 @@ class ProfilePersonController extends GetxController {
     await onGetDataUser();
     await onGetEventMember();
     await onGetCommunityMember();
+    await onGetMyProfile();
+  }
+
+  Future<void> onGetMyProfile() async {
+    await user.doc(auth.currentUser!.uid).get().then((value) {
+      myProfile.assign(UserModel(
+          name: value["name"],
+          username: value["username"],
+          date: value["date"],
+          idUser: value["idUser"],
+          email: value["email"],
+          photo: value["photoUser"],
+          twitter: value["twitter"],
+          hobby: value["hobby"],
+          city: value["city"],
+          instagram: value["instagram"]));
+      if (value["status"] == 0) {
+        FirebaseAuthController firebaseAuthController =
+            Get.put(FirebaseAuthController());
+        firebaseAuthController.logout();
+      }
+      _isLoading.value = false;
+    });
   }
 
   Future<void> onLaunchUrl(String type, String username) async {
@@ -64,7 +95,14 @@ class ProfilePersonController extends GetxController {
         headers: <String, String>{'header_key': 'header_value'},
       );
     } else {
-      SnackBarHelper.showError(description: "Tidak dapat menghubungkan");
+      // SnackBarHelper.showError(description: "Tidak dapat menghubungkan");
+      await launch(
+        url,
+        forceSafariVC: false,
+        forceWebView: false,
+        headers: <String, String>{'header_key': 'header_value'},
+      );
+      print('Could not launch $url');
     }
   }
 
@@ -92,7 +130,7 @@ class ProfilePersonController extends GetxController {
           hobby.value = d['hobby'][i];
         }
       });
-      _isLoading.value = false;
+      onGetMyProfile();
     });
   }
 
@@ -206,5 +244,33 @@ class ProfilePersonController extends GetxController {
     }
   }
 
+  onReportUser() async {
+    Get.back();
+    DialogHelper.showLoading();
+    String idReport = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+        getRandomString(8).toString();
+    await report.doc(idReport).set({
+      "idReport": idReport,
+      "idFromUser": auth.currentUser?.uid,
+      "category": 3,
+      "code": dataUser[0].idUser,
+      "readAt": null,
+      "date": DateTime.now(),
+    }).then((_) {
+      NotificationService.pushNotifAdmin(
+          code: dataUser[0].idUser.toString(),
+          type: 3,
+          username: myProfile[0].name,
+          object: dataUser[0].username.toString());
+      Get.back();
+      BottomSheetHelper.successReport();
+    });
+  }
+
+  final _chars =
+      'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+  final Random _rnd = Random();
+  String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
+      length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
   get isLoading => this._isLoading.value;
 }
