@@ -62,6 +62,8 @@ class NotificationController extends GetxController {
       });
     }).then((_) {
       _isLoading.value = false;
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 

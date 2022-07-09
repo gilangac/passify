@@ -38,6 +38,7 @@ class DetailEventController extends GetxController {
   CollectionReference report = FirebaseFirestore.instance.collection('reports');
 
   String dateee = DateFormat("yyyy").format(DateTime.now());
+  final ScrollController scrollController = ScrollController();
   late final commentText = ''.obs;
   var isFollow = false.obs;
   final _isLoadingDetail = true.obs;
@@ -50,6 +51,7 @@ class DetailEventController extends GetxController {
   final commentFC = TextEditingController();
   var idEvent = Get.arguments;
   var myAccountId = ''.obs;
+  var valueRadio = 10.obs;
   var selectedDropdown = 'WIB'.obs;
   var selectedTime = '00.00 '.obs;
   final formKeyEditEvent = GlobalKey<FormState>();
@@ -426,7 +428,7 @@ class DetailEventController extends GetxController {
     });
   }
 
-  onReportEvent() async {
+  onReportEvent(int problem) async {
     Get.back();
     DialogHelper.showLoading();
     String idReport = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
@@ -435,6 +437,7 @@ class DetailEventController extends GetxController {
       "idReport": idReport,
       "idFromUser": auth.currentUser?.uid,
       "category": 0,
+      "problem": problem,
       "code": idEvent,
       "readAt": null,
       "date": DateTime.now(),
@@ -446,7 +449,7 @@ class DetailEventController extends GetxController {
           object: detailEvent[0].name);
       Get.back();
       BottomSheetHelper.successReport();
-    });
+    }).then((value) {valueRadio.value = 10;});
   }
 
   onPostComment() {
@@ -454,6 +457,7 @@ class DetailEventController extends GetxController {
     String idComment = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
         getRandomString(8).toString();
 
+    scrollController.jumpTo(scrollController.position.maxScrollExtent);
     if (commentText.isNotEmpty || commentText.value != '') {
       commentEvent.add(EventCommentModel(
           date: Timestamp.fromDate(DateTime.now()),

@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/auth/firebase_auth_controller.dart';
-import 'package:passify/controllers/profile/profile_controller.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/routes/pages.dart';
 

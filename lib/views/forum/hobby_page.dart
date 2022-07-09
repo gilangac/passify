@@ -291,9 +291,9 @@ class HobbyPage extends StatelessWidget {
                         children: [
                           SizedBox(height: 20),
                           _formEventName(),
-                          _formEventLocation(),
                           _formEventDate(),
                           _formEventTime(),
+                          _formEventLocation(),
                           _formEventDesc(),
                           SizedBox(height: 50),
                         ],
@@ -342,9 +342,11 @@ class HobbyPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: TextFormField(
           onChanged: (text) => {},
-          keyboardType: TextInputType.text,
-          textInputAction: TextInputAction.next,
+          keyboardType: TextInputType.name,
+          textInputAction: TextInputAction.newline,
           enabled: true,
+          maxLines: 4,
+          minLines: 2,
           decoration: InputDecoration(hintText: "Lokasi"),
           autovalidateMode: AutovalidateMode.onUserInteraction,
           validator: (value) {
@@ -392,10 +394,10 @@ class HobbyPage extends StatelessWidget {
                         height: 200,
                         child: CupertinoDatePicker(
                           mode: CupertinoDatePickerMode.date,
-                          initialDateTime: DateTime.now(),
+                          // initialDateTime: DateTime.now(),
                           use24hFormat: true,
                           dateOrder: DatePickerDateOrder.dmy,
-                          minimumDate: DateTime(2022),
+                          minimumDate: DateTime.now(),
                           onDateTimeChanged: (DateTime newDateTime) {
                             eventC.dateEvent = newDateTime;
                             eventC.dateFC.text =
@@ -566,10 +568,10 @@ class HobbyPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: TextFormField(
           onChanged: (text) => {},
-          keyboardType: TextInputType.text,
+          keyboardType: TextInputType.name,
           maxLines: 6,
           minLines: 5,
-          textInputAction: TextInputAction.done,
+          textInputAction: TextInputAction.newline,
           enabled: true,
           decoration: InputDecoration(hintText: "Deskripsi"),
           autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -914,10 +916,10 @@ class HobbyPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: TextFormField(
           onChanged: (text) => {},
-          keyboardType: TextInputType.text,
+          keyboardType: TextInputType.name,
           maxLines: 6,
           minLines: 5,
-          textInputAction: TextInputAction.done,
+          textInputAction: TextInputAction.newline,
           enabled: true,
           decoration: InputDecoration(
               hintText: "Deskripsi", fillColor: Colors.grey.shade100),

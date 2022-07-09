@@ -30,8 +30,8 @@
         },
         {
             "id": "4",
-            "name": "Coding",
-            "path": "coding",
+            "name": "Teknologi",
+            "path": "teknologi",
             "icon": "coding_icon.png",
             "value": false
         },
@@ -86,8 +86,8 @@
         },
         {
             "id": "12",
-            "name": "Gaming",
-            "path": "gaming",
+            "name": "E-Sport",
+            "path": "e-sport",
             "icon": "gaming_icon.png",
             "value": false
         },

@@ -47,12 +47,9 @@ class CommunityPage extends StatelessWidget {
             detailCommunityC.memberWaiting, "Permintaan Bergabung");
         break;
       case 1:
-        DialogHelper.showConfirm(
-            title: "Laporkan Komunitas",
-            description: "Apakah anda yakin akan melaporkan komunitas ini?",
-            action: () => detailCommunityC.onReportCommunity(),
-            titlePrimary: "Laporkan",
-            titleSecondary: "Batal");
+        detailCommunityC.valueRadio.value = 10;
+        _bottomSheetReport();
+
         break;
       case 2:
         detailCommunityC.onLeaveCommunity("leave");
@@ -1200,6 +1197,196 @@ class CommunityPage extends StatelessWidget {
         ));
   }
 
+  void _bottomSheetReport() {
+    Get.bottomSheet(
+        SafeArea(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(color: Colors.grey.shade300, width: 35, height: 4),
+                SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ),
+                  child: Text(
+                    "Mengapa anda melaporkan komunitas ini?",
+                    style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textColor),
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+                SizedBox(height: 20),
+                _listReport(0),
+                _listReport(1),
+                _listReport(2),
+                _listReport(3),
+                Divider(height: 1.5, color: Colors.grey.shade400),
+                SizedBox(height: 10),
+                SizedBox(height: 13),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ),
+                  child: _submitReport(),
+                )
+              ],
+            ),
+          ),
+        ),
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+        isDismissible: true,
+        enableDrag: true,
+        isScrollControlled: true);
+  }
+
+  Widget _listReport(
+    int index,
+  ) {
+    var report = [
+      "Kekerasan, pelecehan, ancaman, pembakaran atau intimidasi terhadap orang atau organisasi",
+      "Terlibat dalam atau berkontribusi pada aktivitas ilegal apa pun yang melanggar hak orang lain",
+      "Penggunaan bahasa yang menghina, diskriminatif, atau terlalu vulgar",
+      "Memberikan informasi yang salah, menyesatkan atau tidak akurat"
+    ];
+    return InkWell(
+      onTap: () {
+        detailCommunityC.valueRadio.value = index;
+        print(detailCommunityC.valueRadio.value);
+        // Get.back();
+        // DialogHelper.showConfirm(
+        //     title: "Laporkan Komunitas",
+        //     description: "Apakah anda yakin akan melaporkan komunitas ini?",
+        //     action: () => detailCommunityC.onReportCommunity(index),
+        //     titlePrimary: "Laporkan",
+        //     titleSecondary: "Batal");
+      },
+      child: Obx(() => Container(
+            width: Get.width,
+            child: Column(
+              children: [
+                Divider(height: 1.5, color: Colors.grey.shade400),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          report[index].toString(),
+                          style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.textColor),
+                          textAlign: TextAlign.left,
+                        ),
+                      ),
+                      // Container(
+                      //   width: 18,
+                      //   child: Icon(Feather.chevron_right,
+                      //       color: Colors.grey.shade400),
+                      // )
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 0, 0, 0),
+                        child: Container(
+                          height: 18,
+                          width: 18,
+                          decoration: BoxDecoration(
+                              color: detailCommunityC.valueRadio.value == index
+                                  ? AppColors.primaryColor
+                                  : Colors.transparent,
+                              border: Border.all(
+                                  color:
+                                      detailCommunityC.valueRadio.value == index
+                                          ? AppColors.accentColor
+                                          : Colors.grey.shade600,
+                                  width: 2),
+                              borderRadius: BorderRadius.circular(15)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          )),
+    );
+  }
+
+  Widget _submitReport() {
+    return Obx(() => Container(
+          width: Get.width,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: detailCommunityC.valueRadio.value == 10
+                  ? Colors.grey.shade300
+                  : AppColors.primaryColor),
+          child: Material(
+            child: InkWell(
+                borderRadius: BorderRadius.circular(10),
+                onTap: detailCommunityC.valueRadio.value == 10
+                    ? null
+                    : () {
+                        // DialogHelper.showConfirm(
+                        //     title: "Laporkan Event",
+                        //     description:
+                        //         "Apakah anda yakin akan melaporkan event ini?",
+                        //     action: () =>
+                        detailCommunityC.onReportCommunity(
+                            detailCommunityC.valueRadio.value);
+                        // titlePrimary: "Laporkan",
+                        // titleSecondary: "Batal");
+                      },
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                  child: Text(
+                    'Laporkan',
+                    style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                )),
+            color: Colors.transparent,
+          ),
+        ));
+  }
+
+  Widget _cancelAction() {
+    return Container(
+      width: Get.width,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10), color: Colors.grey.shade100),
+      child: Material(
+        child: InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: () => Get.back(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+              child: Text(
+                'Batal',
+                style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.textColor),
+                textAlign: TextAlign.center,
+              ),
+            )),
+        color: Colors.transparent,
+      ),
+    );
+  }
+
   Widget _formTitle() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -1256,6 +1443,9 @@ class CommunityPage extends StatelessWidget {
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
                 enabled: true,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ], // Only numbers can be entered
                 decoration: InputDecoration(
                     hintText: "Harga", fillColor: Colors.grey.shade100),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -1279,6 +1469,9 @@ class CommunityPage extends StatelessWidget {
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.next,
                 enabled: true,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ], // Only numbers can be entered
                 decoration: InputDecoration(
                     hintText: "Nomor Whatsapp (Opsional)",
                     fillColor: Colors.grey.shade100),

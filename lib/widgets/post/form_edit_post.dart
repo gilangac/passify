@@ -32,9 +32,9 @@ void formCreateEvent() {
                       children: [
                         SizedBox(height: 20),
                         _formEventName(),
-                        _formEventLocation(),
                         _formEventDate(),
                         _formEventTime(),
+                        _formEventLocation(),
                         _formEventDesc(),
                         SizedBox(height: 50),
                       ],
@@ -84,9 +84,11 @@ Widget _formEventLocation() {
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
     child: TextFormField(
         onChanged: (text) => {},
-        keyboardType: TextInputType.text,
-        textInputAction: TextInputAction.next,
+        keyboardType: TextInputType.name,
+        textInputAction: TextInputAction.newline,
         enabled: true,
+        maxLines: 4,
+        minLines: 2,
         decoration: InputDecoration(hintText: "Lokasi"),
         autovalidateMode: AutovalidateMode.onUserInteraction,
         validator: (value) {
@@ -135,10 +137,9 @@ Widget _formEventDate() {
                       height: 200,
                       child: CupertinoDatePicker(
                         mode: CupertinoDatePickerMode.date,
-                        initialDateTime: DateTime.now(),
                         use24hFormat: true,
                         dateOrder: DatePickerDateOrder.dmy,
-                        minimumDate: DateTime(2022),
+                        minimumDate: DateTime.now(),
                         onDateTimeChanged: (DateTime newDateTime) {
                           controller.dateEvent = newDateTime;
                           controller.dateFC.text =

@@ -167,6 +167,7 @@ class LoginPage extends StatelessWidget {
                     Get.back();
                     firebaseAuthController.onGetUser();
                   }).catchError((error) {
+                    print(error.code);
                     if (error.code == 'user-disabled') {
                       BottomSheetHelper.successDissable();
                     }

@@ -77,6 +77,8 @@ class ProfilePersonController extends GetxController {
         firebaseAuthController.logout();
       }
       _isLoading.value = false;
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 
@@ -131,6 +133,8 @@ class ProfilePersonController extends GetxController {
         }
       });
       onGetMyProfile();
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 
@@ -144,6 +148,8 @@ class ProfilePersonController extends GetxController {
         listMyIdEvent.add(element['idEvent']);
       });
       onGetEvent();
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 
@@ -158,6 +164,8 @@ class ProfilePersonController extends GetxController {
         listMyIdCommunity.add(element['idCommunity']);
       });
       onGetCommunity();
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 
@@ -192,6 +200,8 @@ class ProfilePersonController extends GetxController {
             });
           });
         });
+      }).onError((error, stackTrace) {
+        Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
       });
     }
   }
@@ -240,11 +250,13 @@ class ProfilePersonController extends GetxController {
             dataCommunity.sort((a, b) => b.sort!.compareTo(a.sort!));
           });
         });
+      }).onError((error, stackTrace) {
+        Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
       });
     }
   }
 
-  onReportUser() async {
+  onReportUser(int problem) async {
     Get.back();
     DialogHelper.showLoading();
     String idReport = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
@@ -253,6 +265,7 @@ class ProfilePersonController extends GetxController {
       "idReport": idReport,
       "idFromUser": auth.currentUser?.uid,
       "category": 3,
+      "problem": problem,
       "code": dataUser[0].idUser,
       "readAt": null,
       "date": DateTime.now(),
@@ -264,6 +277,9 @@ class ProfilePersonController extends GetxController {
           object: dataUser[0].username.toString());
       Get.back();
       BottomSheetHelper.successReport();
+    }).onError((error, stackTrace) {
+      Get.back();
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 

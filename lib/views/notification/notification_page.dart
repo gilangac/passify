@@ -26,7 +26,7 @@ class NotificationPage extends StatelessWidget {
     "menyetujui permintaan anda bergabung dengan komunitas ",
     "mengomentari postingan anda",
     "juga mengomentari postingan ",
-    "membuat postingan baru di komunitas ",
+    "membuat postingan baru ",
     "mengomentari event ",
     "juga mengikuti event "
   ];

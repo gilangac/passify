@@ -343,6 +343,112 @@ class ProfilePersonPage extends StatelessWidget {
     );
   }
 
+  void _bottomSheetReport() {
+    Get.bottomSheet(
+        SafeArea(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(color: Colors.grey.shade300, width: 35, height: 4),
+                SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ),
+                  child: Text(
+                    "Mengapa anda melaporkan pengguna ini?",
+                    style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textColor),
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+                SizedBox(height: 20),
+                _listReport(0),
+                _listReport(1),
+                _listReport(2),
+                _listReport(3),
+                Divider(height: 1.5, color: Colors.grey.shade400),
+                SizedBox(height: 10),
+                SizedBox(height: 13),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ),
+                  child: _cancelAction(),
+                )
+              ],
+            ),
+          ),
+        ),
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+        isDismissible: true,
+        enableDrag: true,
+        isScrollControlled: true);
+  }
+
+  Widget _listReport(
+    int index,
+  ) {
+    var report = [
+      "Kekerasan, pelecehan, ancaman, pembakaran atau intimidasi terhadap orang atau organisasi",
+      "Terlibat dalam atau berkontribusi pada aktivitas ilegal apa pun yang melanggar hak orang lain",
+      "Penggunaan bahasa yang menghina, diskriminatif, atau terlalu vulgar",
+      "Memberikan informasi yang salah, menyesatkan atau tidak akurat"
+    ];
+    return InkWell(
+      onTap: () {
+        Get.back();
+        DialogHelper.showConfirm(
+            title: "Laporkan Pengguna",
+            description: "Apakah anda yakin akan melaporkan pengguna ini?",
+            action: () {
+              Get.back();
+              profileC.onReportUser(index);
+            },
+            titlePrimary: "Laporkan",
+            titleSecondary: "Batal");
+      },
+      child: Container(
+        width: Get.width,
+        child: Column(
+          children: [
+            Divider(height: 1.5, color: Colors.grey.shade400),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      report[index].toString(),
+                      style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.textColor),
+                      textAlign: TextAlign.left,
+                    ),
+                  ),
+                  Container(
+                    width: 18,
+                    child: Icon(Feather.chevron_right,
+                        color: Colors.grey.shade400),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _bottomSheetContent() {
     Get.bottomSheet(
         SafeArea(
@@ -391,16 +497,17 @@ class ProfilePersonPage extends StatelessWidget {
           onTap: () {
             if (type == 'report') {
               Get.back();
-              DialogHelper.showConfirm(
-                  title: "Laporkan Pengguna",
-                  description:
-                      "Apakah anda yakin akan melaporkan pengguna ini?",
-                  action: () {
-                    Get.back();
-                    profileC.onReportUser();
-                  },
-                  titlePrimary: "Laporkan",
-                  titleSecondary: "Batal");
+              _bottomSheetReport();
+              // DialogHelper.showConfirm(
+              //     title: "Laporkan Pengguna",
+              //     description:
+              //         "Apakah anda yakin akan melaporkan pengguna ini?",
+              //     action: () {
+              //       Get.back();
+              //       profileC.onReportUser();
+              //     },
+              //     titlePrimary: "Laporkan",
+              //     titleSecondary: "Batal");
             }
           },
           child: Padding(

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
@@ -57,17 +59,36 @@ class NavigatorController extends GetxController {
     RemoteMessage? initialMessage =
         await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage?.data != null) {
-      final jsonPayload = initialMessage!.data["code"];
-      final type = initialMessage.data["path"];
-      if (type == "post") {
-        Get.toNamed(AppPages.DETAIL_POST + jsonPayload, arguments: jsonPayload);
-      } else if (type == "community") {
-        Get.toNamed(AppPages.COMMUNITY + jsonPayload, arguments: jsonPayload);
-      } else if (type == "event") {
-        Get.toNamed(AppPages.DETAIL_EVENT + jsonPayload,
-            arguments: jsonPayload);
-      }
+      final jsonPayload = initialMessage!.data;
+      // final jsonPayload = json.decode(initialMessage.data);
+      if (jsonPayload['type'].toString() == "0" ||
+          jsonPayload['type'].toString() == "1") {
+        print(jsonPayload['type']);
+        Get.toNamed(AppPages.COMMUNITY + jsonPayload['code'].toString(),
+            arguments: jsonPayload['code']);
+      } else if (jsonPayload['type'].toString() == "2" ||
+          jsonPayload['type'].toString() == "3" ||
+          jsonPayload['type'].toString() == "4") {
+        print(jsonPayload['type']);
+        Get.toNamed(AppPages.DETAIL_POST + jsonPayload['code'].toString(),
+            arguments: jsonPayload['code']);
+      } else if (jsonPayload['type'].toString() == "5" ||
+          jsonPayload['type'].toString() == "6") {
+        print(jsonPayload['type']);
+        Get.toNamed(AppPages.DETAIL_EVENT + jsonPayload['code'].toString(),
+            arguments: jsonPayload['code']);
+      
     }
+  }
+      // if (type == "post") {
+      //   Get.toNamed(AppPages.DETAIL_POST + jsonPayload, arguments: jsonPayload);
+      // } else if (type == "community") {
+      //   Get.toNamed(AppPages.COMMUNITY + jsonPayload, arguments: jsonPayload);
+      // } else if (type == "event") {
+      //   Get.toNamed(AppPages.DETAIL_EVENT + jsonPayload,
+      //       arguments: jsonPayload);
+      // }
+    // }
     super.onInit();
   }
 }

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -71,21 +72,31 @@ class DetailTrend extends StatelessWidget {
               itemCount: dataTrend.length,
               itemBuilder: (context, index) {
                 var data = dataTrend[index];
-                return postCard(
-                    idPost: data.idPost,
-                    idUser: data.idUser,
-                    title: data.title,
-                    price: data.price,
-                    status: data.status,
-                    name: data.name,
-                    username: data.username,
-                    photoUser: data.photoUser,
-                    caption: data.caption,
-                    photo: data.photo,
-                    idCommunity: data.idCommunity.toString(),
-                    category: data.category,
-                    date: data.date!.toDate(),
-                    comment: data.comment);
+                return StreamBuilder<DocumentSnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('communities')
+                        .doc(data.idCommunity)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      return postCard(
+                          idPost: data.idPost,
+                          idUser: data.idUser,
+                          title: data.title,
+                          price: data.price,
+                          status: data.status,
+                          name: data.name,
+                          username: data.username,
+                          photoUser: data.photoUser,
+                          caption: data.caption,
+                          photo: data.photo,
+                          idCommunity: snapshot.hasData
+                              ? snapshot.data!.get("name")
+                              : "",
+                          category: data.category,
+                          isFromForum: true,
+                          date: data.date!.toDate(),
+                          comment: data.comment);
+                    });
               }),
     );
   }

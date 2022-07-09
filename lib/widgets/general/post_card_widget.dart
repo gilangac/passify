@@ -2,6 +2,7 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -18,6 +19,7 @@ import 'package:intl/intl.dart';
 import 'package:hashtagable/hashtagable.dart';
 
 DetailCommunityController controller = Get.find();
+FirebaseAuth auth = FirebaseAuth.instance;
 
 Widget postCard(
     {String? idPost,
@@ -223,7 +225,9 @@ Widget postCard(
                               Text(
                                 status == "available" ? "Tersedia" : "Terjual",
                                 style: GoogleFonts.poppins(
-                                    color: Colors.grey.shade600,
+                                    color: status == "available"
+                                        ? Colors.grey.shade600
+                                        : Colors.red.shade300,
                                     height: 1.5,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w400),
@@ -449,8 +453,169 @@ Widget postCard(
       ));
 }
 
+void _bottomSheetReport(var idPost, var title) {
+  Get.bottomSheet(
+      SafeArea(
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(color: Colors.grey.shade300, width: 35, height: 4),
+              SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                ),
+                child: Text(
+                  "Mengapa anda melaporkan postingan ini?",
+                  style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textColor),
+                  textAlign: TextAlign.left,
+                ),
+              ),
+              SizedBox(height: 20),
+              _listReport(0, idPost, title),
+              _listReport(1, idPost, title),
+              _listReport(2, idPost, title),
+              _listReport(3, idPost, title),
+              Divider(height: 1.5, color: Colors.grey.shade400),
+              SizedBox(height: 10),
+              SizedBox(height: 13),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                ),
+                child: _submitReport(idPost, title),
+              )
+            ],
+          ),
+        ),
+      ),
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+      isDismissible: true,
+      enableDrag: true,
+      isScrollControlled: true);
+}
+
+Widget _listReport(int index, var idPost, var title) {
+  var report = [
+    "Kekerasan, pelecehan, ancaman, pembakaran atau intimidasi terhadap orang atau organisasi",
+    "Terlibat dalam atau berkontribusi pada aktivitas ilegal apa pun yang melanggar hak orang lain",
+    "Penggunaan bahasa yang menghina, diskriminatif, atau terlalu vulgar",
+    "Memberikan informasi yang salah, menyesatkan atau tidak akurat"
+  ];
+  return InkWell(
+    onTap: () {
+      controller.valueRadio.value = index;
+      // Get.back();
+      // DialogHelper.showConfirm(
+      //     title: "Laporkan Postingan",
+      //     description: "Apakah anda yakin akan melaporkan postingan ini?",
+      //     action: () => controller.onReportPost(idPost, title, index),
+      //     titlePrimary: "Laporkan",
+      //     titleSecondary: "Batal");
+    },
+    child: Obx(() => Container(
+          width: Get.width,
+          child: Column(
+            children: [
+              Divider(height: 1.5, color: Colors.grey.shade400),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        report[index].toString(),
+                        style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.textColor),
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    // Container(
+                    //   width: 18,
+                    //   child: Icon(Feather.chevron_right,
+                    //       color: Colors.grey.shade400),
+                    // )
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 0, 0, 0),
+                      child: Container(
+                        height: 18,
+                        width: 18,
+                        decoration: BoxDecoration(
+                            color: controller.valueRadio.value == index
+                                ? AppColors.primaryColor
+                                : Colors.transparent,
+                            border: Border.all(
+                                color: controller.valueRadio.value == index
+                                    ? AppColors.accentColor
+                                    : Colors.grey.shade600,
+                                width: 2),
+                            borderRadius: BorderRadius.circular(15)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        )),
+  );
+}
+
+Widget _submitReport(var idPost, var title) {
+  return Obx(() => Container(
+        width: Get.width,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: controller.valueRadio.value == 10
+                ? Colors.grey.shade300
+                : AppColors.primaryColor),
+        child: Material(
+          child: InkWell(
+              borderRadius: BorderRadius.circular(10),
+              onTap: controller.valueRadio.value == 10
+                  ? null
+                  : () {
+                      // DialogHelper.showConfirm(
+                      //     title: "Laporkan Event",
+                      //     description:
+                      //         "Apakah anda yakin akan melaporkan event ini?",
+                      //     action: () =>
+                      controller.onReportPost(
+                          idPost, title, controller.valueRadio.value);
+                      // titlePrimary: "Laporkan",
+                      // titleSecondary: "Batal");
+                    },
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                child: Text(
+                  'Laporkan',
+                  style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
+              )),
+          color: Colors.transparent,
+        ),
+      ));
+}
+
 void _bottomSheetContent(var idUser, String idPost, String title) {
-  String myId = controller.myAccountId.value;
+  String myId = auth.currentUser!.uid.toString();
   Get.bottomSheet(
       SafeArea(
         child: Padding(
@@ -534,12 +699,14 @@ Widget _listAction(
             Get.toNamed(AppPages.EDIT_POST + Get.arguments.toString(),
                 arguments: [idPost, "community"]);
           } else if (type == 'report') {
-            DialogHelper.showConfirm(
-                title: "Laporkan Postingan",
-                description: "Apakah anda yakin akan melaporkan postingan ini?",
-                action: () => controller.onReportPost(idPost, title),
-                titlePrimary: "Laporkan",
-                titleSecondary: "Batal");
+            controller.valueRadio.value = 10;
+            _bottomSheetReport(idPost, title);
+            // DialogHelper.showConfirm(
+            //     title: "Laporkan Postingan",
+            //     description: "Apakah anda yakin akan melaporkan postingan ini?",
+            //     action: () => controller.onReportPost(idPost, title),
+            //     titlePrimary: "Laporkan",
+            //     titleSecondary: "Batal");
           }
         },
         child: Padding(

@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:passify/controllers/notification/notification_controller.dart';
 import 'package:passify/routes/pages.dart';
@@ -57,7 +58,7 @@ class NotificationService extends GetxService {
       "menyetujui permintaan anda bergabung dengan komunitas $object",
       "mengomentari postingan anda",
       "juga mengomentari postingan $object",
-      "membuat postingan baru di komunitas $object",
+      "membuat postingan baru $object",
       "mengomentari event $object",
       "juga mengikuti event $object"
     ];
@@ -156,6 +157,9 @@ class NotificationService extends GetxService {
         final androidDetails = AndroidNotificationDetails('1', 'Specific',
             channelDescription: 'Notification for specific user',
             fullScreenIntent: true,
+            timeoutAfter: 4000,
+            color: Colors.white.withOpacity(0.8),
+            colorized: true,
             importance: Importance.max,
             priority: Priority.high);
         final iosDetails = IOSNotificationDetails();

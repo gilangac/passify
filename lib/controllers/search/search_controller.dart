@@ -78,6 +78,10 @@ class SearchController extends GetxController {
     eventDataSearch.isNotEmpty ? eventDataSearch.clear() : null;
     communityDataSearch.isNotEmpty ? communityDataSearch.clear() : null;
     if (searchText.value != '') {
+      personData.removeWhere((element) => element.name == "");
+      personData.sort(
+        (a, b) => a.name!.compareTo(b.name!),
+      );
       personDataSearch.value = personData
           .where((data) =>
               data.name!
@@ -124,6 +128,8 @@ class SearchController extends GetxController {
         listMyIdCommunity.add(element['idCommunity']);
       });
       onGetPost();
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 
@@ -139,6 +145,9 @@ class SearchController extends GetxController {
             .then((QuerySnapshot snapshot) {
           k++;
           j += snapshot.size;
+          if (snapshot.size == 0 && k == listMyIdCommunity.length) {
+            onFilterHashtag();
+          }
           // if (snapshot.size == 0 && i + 1 == listMyIdCommunity.length) {
           //   onFilterHashtag();
           // }
@@ -168,7 +177,6 @@ class SearchController extends GetxController {
                     comment: snapshotComment.size,
                     sort: int.parse(sort)));
                 if (j == dataPost.length && k == listMyIdCommunity.length) {
-                  print(dataPost);
                   onFilterHashtag();
                 }
                 // dataDisccusion = (disccusionData);
@@ -240,6 +248,7 @@ class SearchController extends GetxController {
     print(searchText.value.toTitleCase());
     // if (searchText.value != '') {
     await user
+        .where("username", isNotEqualTo: "")
         // .where("name".toLowerCase(),
         //     isGreaterThanOrEqualTo: searchText.value.toTitleCase())
         // .orderBy("date", descending: true)
@@ -257,8 +266,11 @@ class SearchController extends GetxController {
             hobby: d["hobby"],
             city: d["city"],
             instagram: d["instagram"]));
+        personData.removeWhere((element) => element.name == "");
       });
       _isLoadingPerson.value = false;
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
     // }
   }
@@ -298,6 +310,8 @@ class SearchController extends GetxController {
         });
       });
       _isLoadingEvent.value = false;
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
     // }
   }
@@ -344,6 +358,8 @@ class SearchController extends GetxController {
         });
       });
       _isLoadingCommunity.value = false;
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
     // }
   }

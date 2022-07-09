@@ -107,6 +107,8 @@ class ProfileController extends GetxController {
         }
       });
       _isLoading.value = false;
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 
@@ -120,6 +122,8 @@ class ProfileController extends GetxController {
         listMyIdEvent.add(element['idEvent']);
       });
       onGetEvent();
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 
@@ -134,6 +138,8 @@ class ProfileController extends GetxController {
         listMyIdCommunity.add(element['idCommunity']);
       });
       onGetCommunity();
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 
@@ -168,6 +174,8 @@ class ProfileController extends GetxController {
             });
           });
         });
+      }).onError((error, stackTrace) {
+        Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
       });
     }
   }
@@ -216,6 +224,8 @@ class ProfileController extends GetxController {
             dataCommunity.sort((a, b) => b.sort!.compareTo(a.sort!));
           });
         });
+      }).onError((error, stackTrace) {
+        Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
       });
     }
   }

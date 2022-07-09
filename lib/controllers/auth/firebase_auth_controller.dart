@@ -116,6 +116,7 @@ class FirebaseAuthController extends GetxController {
           "username": '',
           "city": '',
           "province": '',
+          "status": 1,
           "hobby": initHobby,
           "instagram": '',
           "twitter": '',

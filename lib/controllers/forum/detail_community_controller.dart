@@ -59,6 +59,7 @@ class DetailCommunityController extends GetxController with ServiceController {
   var selectedImagePath = ''.obs;
   var selectedImagePathEdit = ''.obs;
   var progress = 0.0.obs;
+  var valueRadio = 10.obs;
   var urlImage = ''.obs;
   var urlImageEdit = ''.obs;
   var myAccountId = ''.obs;
@@ -95,6 +96,8 @@ class DetailCommunityController extends GetxController with ServiceController {
 
   @override
   void onInit() {
+    myAccountId.value = auth.currentUser!.uid;
+    print(myAccountId);
     onGetData();
     onGetMyProfile();
     onScrollControlled();
@@ -137,6 +140,8 @@ class DetailCommunityController extends GetxController with ServiceController {
             Get.put(FirebaseAuthController());
         firebaseAuthController.logout();
       }
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 
@@ -144,7 +149,7 @@ class DetailCommunityController extends GetxController with ServiceController {
     if (auth.currentUser == null) Get.offAndToNamed(AppPages.NOT_FOUND);
     final User? users = auth.currentUser;
     final String? myId = users!.uid;
-    myAccountId.value = myId.toString();
+    myAccountId.value = auth.currentUser!.uid;
     try {
       await community
           .where("idCommunity", isEqualTo: idCommunity)
@@ -244,6 +249,8 @@ class DetailCommunityController extends GetxController with ServiceController {
             onGetPost();
           });
         });
+      }).onError((error, stackTrace) {
+        Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
       });
     } catch (e) {
       print(e);
@@ -331,6 +338,8 @@ class DetailCommunityController extends GetxController with ServiceController {
             });
           });
         });
+      }).onError((error, stackTrace) {
+        Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
       });
     } catch (e) {
       print(e);
@@ -391,6 +400,10 @@ class DetailCommunityController extends GetxController with ServiceController {
                 "noHp": noHpFC.text,
                 "status": "available",
                 "date": DateTime.now(),
+              }).onError((error, stackTrace) {
+                Get.back();
+                Get.snackbar(
+                    "Terjadi Kesalahan", "Periksa koneksi internet anda!");
               })
             : await post.doc(idPost).set({
                 "idPost": idPost,
@@ -404,6 +417,10 @@ class DetailCommunityController extends GetxController with ServiceController {
                 "noHp": noHpFC.text,
                 "status": "available",
                 "date": DateTime.now(),
+              }).onError((error, stackTrace) {
+                Get.back();
+                Get.snackbar(
+                    "Terjadi Kesalahan", "Periksa koneksi internet anda!");
               });
 
         pushNotifNewPost(idPost);
@@ -614,6 +631,9 @@ class DetailCommunityController extends GetxController with ServiceController {
               onClearFC();
               onGetData();
               // comunityC.onGetDataCommunity();
+            }).onError((error, stackTrace) {
+              Get.snackbar(
+                  "Terjadi Kesalahan", "Periksa koneksi internet anda!");
             });
     } catch (e) {}
   }
@@ -701,6 +721,8 @@ class DetailCommunityController extends GetxController with ServiceController {
         "readAt": null,
         "date": DateTime.now(),
       });
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 
@@ -727,7 +749,9 @@ class DetailCommunityController extends GetxController with ServiceController {
               // comunityC.onGetDataCommunity();
             });
           });
-        });
+        }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
+    });
   }
 
   onRemoveMember(String? idMemberRemove) {
@@ -750,6 +774,8 @@ class DetailCommunityController extends GetxController with ServiceController {
               description: "Berhasil mengeluarkan partisipan");
         });
       });
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 
@@ -786,6 +812,8 @@ class DetailCommunityController extends GetxController with ServiceController {
           "date": DateTime.now(),
         });
       });
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
     onGetData();
   }
@@ -800,6 +828,8 @@ class DetailCommunityController extends GetxController with ServiceController {
       value.docs.forEach((element) {
         communityMember.doc(element["idMember"]).delete();
       });
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
     onGetData();
   }
@@ -884,6 +914,9 @@ class DetailCommunityController extends GetxController with ServiceController {
       notificationController.onGetData();
       Get.back();
       Get.back();
+    }).onError((error, stackTrace) {
+      Get.back();
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 
@@ -930,10 +963,13 @@ class DetailCommunityController extends GetxController with ServiceController {
       notifC.onGetData();
     }).onError((error, stackTrace) {
       Get.back();
+    }).onError((error, stackTrace) {
+      Get.back();
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 
-  onReportCommunity() async {
+  onReportCommunity(int problem) async {
     Get.back();
     DialogHelper.showLoading();
     String idReport = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
@@ -942,6 +978,7 @@ class DetailCommunityController extends GetxController with ServiceController {
       "idReport": idReport,
       "idFromUser": auth.currentUser?.uid,
       "category": 1,
+      "problem": problem,
       "code": idCommunity,
       "readAt": null,
       "date": DateTime.now(),
@@ -953,10 +990,13 @@ class DetailCommunityController extends GetxController with ServiceController {
           object: detailCommunity[0].name);
       Get.back();
       BottomSheetHelper.successReport();
+    }).onError((error, stackTrace) {
+      Get.back();
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 
-  onReportPost(var idPost, var titlePost) async {
+  onReportPost(var idPost, var titlePost, int problem) async {
     Get.back();
     DialogHelper.showLoading();
     String idReport = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
@@ -965,6 +1005,7 @@ class DetailCommunityController extends GetxController with ServiceController {
       "idReport": idReport,
       "idFromUser": auth.currentUser?.uid,
       "category": 2,
+      "problem": problem,
       "code": idPost,
       "readAt": null,
       "date": DateTime.now(),
@@ -976,6 +1017,9 @@ class DetailCommunityController extends GetxController with ServiceController {
           object: titlePost);
       Get.back();
       BottomSheetHelper.successReport();
+    }).onError((error, stackTrace) {
+      Get.back();
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 

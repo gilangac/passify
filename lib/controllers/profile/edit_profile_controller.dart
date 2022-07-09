@@ -84,6 +84,8 @@ class EditProfileController extends GetxController with ServiceController {
         selectedHoby.value = d['hobby'];
       });
       dataUser.isNotEmpty ? _isLoading.value = false : _isLoading.value = true;
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 

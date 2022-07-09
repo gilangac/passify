@@ -39,6 +39,7 @@ class DetailPostController extends GetxController {
   CollectionReference report = FirebaseFirestore.instance.collection('reports');
 
   String dateee = DateFormat("yyyy").format(DateTime.now());
+  final ScrollController scrollController = ScrollController();
   late final commentText = ''.obs;
   final _isLoadingDetail = true.obs;
   final _isAvailable = true.obs;
@@ -49,6 +50,7 @@ class DetailPostController extends GetxController {
   var dataComment = <PostCommentModel>[].obs;
   final commentFC = TextEditingController();
   var idPost = Get.arguments;
+  var valueRadio = 10.obs;
   var idCommunity = ''.obs;
   var communityName = ''.obs;
   var isMemberCommunity = false.obs;
@@ -266,6 +268,7 @@ class DetailPostController extends GetxController {
     List idUserComment = [];
     List idUserCommentFilter = [];
     List listAllTokenComment = [];
+    scrollController.jumpTo(scrollController.position.maxScrollExtent);
     commentPost.add(PostCommentModel(
         date: Timestamp.fromDate(DateTime.now()),
         idUser: auth.currentUser?.uid,
@@ -393,7 +396,7 @@ class DetailPostController extends GetxController {
     }
   }
 
-  onReportPost() async {
+  onReportPost(int problem) async {
     Get.back();
     DialogHelper.showLoading();
     String idReport = DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
@@ -402,6 +405,7 @@ class DetailPostController extends GetxController {
       "idReport": idReport,
       "idFromUser": auth.currentUser?.uid,
       "category": 2,
+      "problem": problem,
       "code": idPost,
       "readAt": null,
       "date": DateTime.now(),

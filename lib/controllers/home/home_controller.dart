@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:passify/controllers/auth/firebase_auth_controller.dart';
+import 'package:passify/helpers/snackbar_helper.dart';
 import 'package:passify/models/community.dart';
 import 'package:passify/models/community_member.dart';
 import 'package:passify/models/event.dart';
@@ -135,6 +136,8 @@ class HomeController extends GetxController {
       });
       readJson();
       onGetCommunity();
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 
@@ -211,6 +214,8 @@ class HomeController extends GetxController {
         listMyIdEvent.add(element['idEvent']);
       });
       onGetEvent();
+    }).onError((error, stackTrace) {
+      Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
   }
 
@@ -250,6 +255,8 @@ class HomeController extends GetxController {
             });
           });
         });
+      }).onError((error, stackTrace) {
+        Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
       });
     }
   }

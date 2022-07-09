@@ -95,6 +95,9 @@ class CommunityController extends GetxController with ServiceController {
           "idUser": auth.currentUser?.uid,
           "status": "verified",
           "date": dateNow,
+        }).onError((error, stackTrace) {
+          Get.back();
+          Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
         });
         homeController.onRefreshData();
         profileController.onRefresh();
@@ -159,6 +162,8 @@ class CommunityController extends GetxController with ServiceController {
             dataCommunity.sort((a, b) => b.sort!.compareTo(a.sort!));
           });
         });
+      }).onError((error, stackTrace) {
+        Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
       });
     } catch (e) {
       print(e);

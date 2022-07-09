@@ -24,7 +24,7 @@ Widget commentWidget(
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(5),
       color: sort == 0
-          ? Colors.grey.shade400.withOpacity(0.5)
+          ? Colors.grey.shade300.withOpacity(0.5)
           : Colors.transparent,
     ),
     child: Column(
