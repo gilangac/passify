@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:passify/controllers/forum/detail_community_controller.dart';
+import 'package:passify/controllers/forum/forum_controller.dart';
 import 'package:path/path.dart' as Path;
 import 'package:passify/controllers/forum/detail_post_controller.dart';
 import 'package:passify/helpers/dialog_helper.dart';
@@ -180,12 +182,15 @@ class EditPostController extends GetxController {
   void _afterAction() {
     if (isFrom == "detail") {
       DetailPostController detailPostC = Get.find();
+      ForumController forumController = Get.find();
       // DetailCommunityController detailCommunityC = Get.find();
       // detailCommunityC.onGetData();
+      detailPostC.OnRefresh();
+      forumController.onGetPost();
       detailPostC.onGetDataDetail();
     } else if (isFrom == "community") {
-      // DetailCommunityController detailCommunityC = Get.find();
-      // detailCommunityC.onGetData();
+      DetailCommunityController detailCommunityC = Get.find();
+      detailCommunityC.onGetData();
     }
     Get.back();
     Get.back();

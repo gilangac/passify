@@ -781,6 +781,8 @@ class DetailCommunityController extends GetxController with ServiceController {
 
   onAccMember(String idUser) async {
     Get.back();
+    Get.back();
+    DialogHelper.showLoading();
     await communityMember
         .where("idUser", isEqualTo: idUser)
         .where("idCommunity", isEqualTo: idCommunity)
@@ -812,7 +814,9 @@ class DetailCommunityController extends GetxController with ServiceController {
           "date": DateTime.now(),
         });
       });
+      Get.back();
     }).onError((error, stackTrace) {
+      Get.back();
       Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
     onGetData();
@@ -820,6 +824,8 @@ class DetailCommunityController extends GetxController with ServiceController {
 
   onRejectMember(String idUser) async {
     Get.back();
+    Get.back();
+    DialogHelper.showLoading();
     await communityMember
         .where("idUser", isEqualTo: idUser)
         .where("idCommunity", isEqualTo: idCommunity)
@@ -828,7 +834,9 @@ class DetailCommunityController extends GetxController with ServiceController {
       value.docs.forEach((element) {
         communityMember.doc(element["idMember"]).delete();
       });
+      Get.back();
     }).onError((error, stackTrace) {
+      Get.back();
       Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
     });
     onGetData();
@@ -984,7 +992,7 @@ class DetailCommunityController extends GetxController with ServiceController {
       "date": DateTime.now(),
     }).then((_) {
       NotificationService.pushNotifAdmin(
-          code: idCommunity,
+          code: idReport,
           type: 1,
           username: myProfile[0].name,
           object: detailCommunity[0].name);
@@ -1011,7 +1019,7 @@ class DetailCommunityController extends GetxController with ServiceController {
       "date": DateTime.now(),
     }).then((_) {
       NotificationService.pushNotifAdmin(
-          code: idPost,
+          code: idReport,
           type: 2,
           username: myProfile[0].name,
           object: titlePost);

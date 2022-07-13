@@ -256,16 +256,91 @@ class DetailEventController extends GetxController {
     List listFcmToken = [];
     List listFcmTokenComment = [];
     int i = 0;
+    int l = 0;
 
     var member = <UserModel>[];
     member = memberEvent
         .where((data) => data.idUser != auth.currentUser!.uid)
         .toList();
+
+    if (member.isEmpty) {
+      int j = 0;
+      int k = 0;
+      List tokenUser = [];
+      List listAllTokenComment = [];
+      List idUserComment = [];
+      List idUserCommentFilter = [];
+      eventComment
+          .where("idEvent", isEqualTo: Get.arguments)
+          .get()
+          .then((QuerySnapshot snapshot) {
+        print("Snapshot : ${snapshot.size}");
+        int sad = 0;
+        snapshot.docs.forEach((userComment) async {
+          sad++;
+          k++;
+          idUserComment.add(userComment['idUser']);
+          if (snapshot.size == k) {
+            print(idUserComment.toSet().toList());
+            idUserCommentFilter = idUserComment.toSet().toList();
+            idUserCommentFilter.removeWhere(
+                (idUserFilter) => idUserFilter == auth.currentUser!.uid);
+            // print(idUserCommentFilter);
+            if (idUserCommentFilter.isEmpty) {
+              NotificationService.pushNotif(
+                  code: Get.arguments,
+                  registrationId: listFcmToken,
+                  type: 5,
+                  username: myProfile[0].name,
+                  object: detailEvent[0].name);
+            }
+            await Future.forEach(idUserCommentFilter, (idUser) async {
+              if (action == "comment") {
+                String idNotif =
+                    DateFormat("yyyyMMddHHmmss").format(DateTime.now()) +
+                        getRandomString(8).toString();
+                await notification.doc(idNotif).set({
+                  "idNotification": idNotif,
+                  "idUser": idUser,
+                  "code": Get.arguments,
+                  "idFromUser": auth.currentUser?.uid,
+                  "category": 5,
+                  "readAt": null,
+                  "date": DateTime.now(),
+                });
+              }
+
+              await user.doc(idUser.toString()).get().then((datauser) async {
+                tokenUser.addAll(datauser['fcmToken']);
+                l++;
+                if (idUserCommentFilter.length == l) {
+                  await Future.forEach(tokenUser, (token) async {
+                    j++;
+                    listAllTokenComment.add(token);
+                    print(tokenUser.length);
+                    if (tokenUser.length == j) {
+                      listFcmToken.addAll(listAllTokenComment);
+                      listFcmTokenComment = listFcmToken.toSet().toList();
+                      NotificationService.pushNotif(
+                          code: Get.arguments,
+                          registrationId: listFcmTokenComment,
+                          type: 5,
+                          username: myProfile[0].name,
+                          object: detailEvent[0].name);
+                    }
+                  });
+                }
+              });
+            });
+          }
+        });
+      });
+    }
     member.forEach((element) async {
       i++;
       listFcmToken.addAll(element.fcmToken!.toList());
+
       if (i == member.length) {
-        print(listFcmToken);
         if (action == "follow") {
           NotificationService.pushNotif(
               code: Get.arguments,
@@ -284,31 +359,63 @@ class DetailEventController extends GetxController {
               .where("idEvent", isEqualTo: Get.arguments)
               .get()
               .then((QuerySnapshot snapshot) {
+            print("Snapshot : ${snapshot.size}");
+            int sad = 0;
             snapshot.docs.forEach((userComment) async {
+              sad++;
               k++;
               idUserComment.add(userComment['idUser']);
               if (snapshot.size == k) {
+                print(idUserComment.toSet().toList());
                 idUserCommentFilter = idUserComment.toSet().toList();
                 idUserCommentFilter.removeWhere(
                     (idUserFilter) => idUserFilter == auth.currentUser!.uid);
                 // print(idUserCommentFilter);
+                if (idUserCommentFilter.isEmpty) {
+                  NotificationService.pushNotif(
+                      code: Get.arguments,
+                      registrationId: listFcmToken,
+                      type: 5,
+                      username: myProfile[0].name,
+                      object: detailEvent[0].name);
+                }
                 await Future.forEach(idUserCommentFilter, (idUser) async {
+                  member.forEach((memberEvents) async {
+                    if (idUser != memberEvents.idUser) {
+                      if (action == "comment") {
+                        String idNotif = DateFormat("yyyyMMddHHmmss")
+                                .format(DateTime.now()) +
+                            getRandomString(8).toString();
+                        await notification.doc(idNotif).set({
+                          "idNotification": idNotif,
+                          "idUser": idUser,
+                          "code": Get.arguments,
+                          "idFromUser": auth.currentUser?.uid,
+                          "category": 5,
+                          "readAt": null,
+                          "date": DateTime.now(),
+                        });
+                      }
+                    }
+                  });
+
                   await user
                       .doc(idUser.toString())
                       .get()
                       .then((datauser) async {
                     tokenUser.addAll(datauser['fcmToken']);
-                    if (idUserCommentFilter.length == tokenUser.length) {
+                    l++;
+                    if (idUserCommentFilter.length == l) {
                       await Future.forEach(tokenUser, (token) async {
                         j++;
                         listAllTokenComment.add(token);
+                        print(tokenUser.length);
                         if (tokenUser.length == j) {
                           listFcmToken.addAll(listAllTokenComment);
                           listFcmTokenComment = listFcmToken.toSet().toList();
-                          print(listFcmTokenComment);
                           NotificationService.pushNotif(
                               code: Get.arguments,
-                              registrationId: listFcmToken,
+                              registrationId: listFcmTokenComment,
                               type: 5,
                               username: myProfile[0].name,
                               object: detailEvent[0].name);
@@ -443,13 +550,15 @@ class DetailEventController extends GetxController {
       "date": DateTime.now(),
     }).then((_) {
       NotificationService.pushNotifAdmin(
-          code: idEvent,
+          code: idReport,
           type: 0,
           username: myProfile[0].name,
           object: detailEvent[0].name);
       Get.back();
       BottomSheetHelper.successReport();
-    }).then((value) {valueRadio.value = 10;});
+    }).then((value) {
+      valueRadio.value = 10;
+    });
   }
 
   onPostComment() {

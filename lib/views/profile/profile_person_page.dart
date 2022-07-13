@@ -14,6 +14,7 @@ import 'package:passify/widgets/general/community_widget.dart';
 import 'package:passify/widgets/general/event_widget.dart';
 import 'package:passify/widgets/profile/Profile_action_widget.dart';
 import 'package:intl/intl.dart';
+import 'package:passify/widgets/shimmer/profile_shimmer.dart';
 
 class ProfilePersonPage extends StatelessWidget {
   ProfilePersonPage({Key? key}) : super(key: key);
@@ -41,9 +42,7 @@ class ProfilePersonPage extends StatelessWidget {
 
   Widget _body() {
     return profileC.isLoading
-        ? Center(
-            child: CircularProgressIndicator(),
-          )
+        ? ProfileShimmer()
         : DefaultTabController(
             length: 2,
             child: NestedScrollView(
@@ -344,6 +343,7 @@ class ProfilePersonPage extends StatelessWidget {
   }
 
   void _bottomSheetReport() {
+    profileC.valueRadio.value = 10;
     Get.bottomSheet(
         SafeArea(
           child: Padding(
@@ -379,7 +379,7 @@ class ProfilePersonPage extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
                   ),
-                  child: _cancelAction(),
+                  child: _submitReport(),
                 )
               ],
             ),
@@ -405,48 +405,102 @@ class ProfilePersonPage extends StatelessWidget {
     ];
     return InkWell(
       onTap: () {
-        Get.back();
-        DialogHelper.showConfirm(
-            title: "Laporkan Pengguna",
-            description: "Apakah anda yakin akan melaporkan pengguna ini?",
-            action: () {
-              Get.back();
-              profileC.onReportUser(index);
-            },
-            titlePrimary: "Laporkan",
-            titleSecondary: "Batal");
+        profileC.valueRadio.value = index;
+        // Get.back();
+        // DialogHelper.showConfirm(
+        //     title: "Laporkan Pengguna",
+        //     description: "Apakah anda yakin akan melaporkan pengguna ini?",
+        //     action: () {
+        //       Get.back();
+        //       profileC.onReportUser(index);
+        //     },
+        //     titlePrimary: "Laporkan",
+        //     titleSecondary: "Batal");
       },
-      child: Container(
-        width: Get.width,
-        child: Column(
-          children: [
-            Divider(height: 1.5, color: Colors.grey.shade400),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      report[index].toString(),
-                      style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: AppColors.textColor),
-                      textAlign: TextAlign.left,
-                    ),
+      child: Obx(() => Container(
+            width: Get.width,
+            child: Column(
+              children: [
+                Divider(height: 1.5, color: Colors.grey.shade400),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          report[index].toString(),
+                          style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.textColor),
+                          textAlign: TextAlign.left,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 0, 0, 0),
+                        child: Container(
+                          height: 18,
+                          width: 18,
+                          decoration: BoxDecoration(
+                              color: profileC.valueRadio.value == index
+                                  ? AppColors.primaryColor
+                                  : Colors.transparent,
+                              border: Border.all(
+                                  color: profileC.valueRadio.value == index
+                                      ? AppColors.accentColor
+                                      : Colors.grey.shade600,
+                                  width: 2),
+                              borderRadius: BorderRadius.circular(15)),
+                        ),
+                      ),
+                    ],
                   ),
-                  Container(
-                    width: 18,
-                    child: Icon(Feather.chevron_right,
-                        color: Colors.grey.shade400),
-                  )
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          )),
     );
+  }
+
+  Widget _submitReport() {
+    return Obx(() => Container(
+          width: Get.width,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: profileC.valueRadio.value == 10
+                  ? Colors.grey.shade300
+                  : AppColors.primaryColor),
+          child: Material(
+            child: InkWell(
+                borderRadius: BorderRadius.circular(10),
+                onTap: profileC.valueRadio.value == 10
+                    ? null
+                    : () {
+                        // DialogHelper.showConfirm(
+                        //     title: "Laporkan Event",
+                        //     description:
+                        //         "Apakah anda yakin akan melaporkan event ini?",
+                        //     action: () =>
+                        profileC.onReportUser(profileC.valueRadio.value);
+                        // titlePrimary: "Laporkan",
+                        // titleSecondary: "Batal");
+                      },
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                  child: Text(
+                    'Laporkan',
+                    style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                )),
+            color: Colors.transparent,
+          ),
+        ));
   }
 
   void _bottomSheetContent() {

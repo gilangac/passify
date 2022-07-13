@@ -17,6 +17,7 @@ import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:passify/widgets/general/comment_widget.dart';
 import 'package:passify/widgets/general/dotted_separator.dart';
 import 'package:passify/widgets/post/form_edit_post.dart';
+import 'package:passify/widgets/shimmer/detail_event_shimmer.dart';
 import 'package:share_plus/share_plus.dart';
 
 class EventPage extends StatelessWidget {
@@ -51,7 +52,7 @@ class EventPage extends StatelessWidget {
 
   Widget _body() {
     return Obx(() => detailEventController.isLoadingDetail
-        ? Center(child: CircularProgressIndicator())
+        ? Center(child: DetailEventShimmer())
         : Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -702,6 +703,7 @@ class EventPage extends StatelessWidget {
   }
 
   void _bottomSheetReport() {
+    detailEventController.valueRadio.value = 10;
     Get.bottomSheet(
         SafeArea(
           child: Padding(

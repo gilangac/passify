@@ -454,6 +454,7 @@ Widget postCard(
 }
 
 void _bottomSheetReport(var idPost, var title) {
+  controller.valueRadio.value = 10;
   Get.bottomSheet(
       SafeArea(
         child: Padding(

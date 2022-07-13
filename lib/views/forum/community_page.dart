@@ -20,6 +20,8 @@ import 'package:passify/widgets/general/bottomsheet_widget.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:passify/widgets/general/dotted_separator.dart';
 import 'package:passify/widgets/general/post_card_widget.dart';
+import 'package:passify/widgets/shimmer/detail_community_shimmer.dart';
+import 'package:passify/widgets/shimmer/post_shimmer.dart';
 import 'package:share_plus/share_plus.dart';
 
 class CommunityPage extends StatelessWidget {
@@ -343,7 +345,7 @@ class CommunityPage extends StatelessWidget {
                   ),
                 )),
           )
-        : Center(child: CircularProgressIndicator()));
+        : Center(child: DetailCommunityShimmer()));
   }
 
   Widget _infoCommunity() {
@@ -723,7 +725,7 @@ class CommunityPage extends StatelessWidget {
                     SizedBox(
                       height: 20,
                     ),
-                    CircularProgressIndicator(),
+                    PostShimmer(),
                   ],
                 ),
               )
@@ -817,8 +819,18 @@ class CommunityPage extends StatelessWidget {
               ),
             ),
           ),
-        ),
-        detailCommunityC.dataFjb.isEmpty
+        ),        detailCommunityC.isLoadingPost.value
+            ? Center(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 20,
+                    ),
+                    PostShimmer(),
+                  ],
+                ),
+              )
+        : detailCommunityC.dataFjb.isEmpty
             ? Center(
                 child: Column(
                   children: [
@@ -999,24 +1011,52 @@ class CommunityPage extends StatelessWidget {
                                             child: Row(
                                               children: [
                                                 InkWell(
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                  child: Icon(Feather.check),
-                                                  onTap: () => detailCommunityC
-                                                      .onAccMember(
-                                                          member[index].idUser),
-                                                ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20),
+                                                    child: Icon(Feather.check,
+                                                        color: Colors
+                                                            .green.shade300),
+                                                    onTap: () {
+                                                      DialogHelper.showConfirm(
+                                                          title:
+                                                              "Terima Permintaan",
+                                                          description:
+                                                              "Apakah anda yakin akan menerima permintaan bergabung ke dalam komunitas?",
+                                                          action: () =>
+                                                              detailCommunityC
+                                                                  .onAccMember(
+                                                                      member[index]
+                                                                          .idUser),
+                                                          titlePrimary:
+                                                              "Terima",
+                                                          titleSecondary:
+                                                              "Batal");
+                                                    }),
                                                 SizedBox(
                                                   width: 10,
                                                 ),
                                                 InkWell(
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                  child: Icon(Feather.x),
-                                                  onTap: () => detailCommunityC
-                                                      .onRejectMember(
-                                                          member[index].idUser),
-                                                )
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20),
+                                                    child: Icon(Feather.x,
+                                                        color: Colors
+                                                            .red.shade300),
+                                                    onTap: () {
+                                                      DialogHelper.showConfirm(
+                                                          title:
+                                                              "Tolak Permintaan",
+                                                          description:
+                                                              "Apakah anda yakin akan menolak permintaan bergabung ke dalam komunitas?",
+                                                          action: () => detailCommunityC
+                                                              .onRejectMember(
+                                                                  member[index]
+                                                                      .idUser),
+                                                          titlePrimary: "Tolak",
+                                                          titleSecondary:
+                                                              "Batal");
+                                                    })
                                               ],
                                             ),
                                           )

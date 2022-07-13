@@ -17,6 +17,7 @@ import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:passify/widgets/general/comment_widget.dart';
 import 'package:passify/widgets/general/dotted_separator.dart';
 import 'package:intl/intl.dart';
+import 'package:passify/widgets/shimmer/detail_post_shimmer.dart';
 import 'package:share_plus/share_plus.dart';
 
 class DetailPostPage extends StatelessWidget {
@@ -31,93 +32,121 @@ class DetailPostPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
-      appBar: _appBar(),
-      body: _body(),
-      backgroundColor: Colors.white,
-    ));
+    return Obx(() => SafeArea(
+            child: Scaffold(
+          appBar: _appBar(),
+          body: _body(),
+          backgroundColor: Colors.white,
+        )));
   }
 
   PreferredSizeWidget _appBar() {
     return appBar(title: "Detail Postingan", actions: [
-      Padding(
-        padding: const EdgeInsets.fromLTRB(0, 0, 14, 0),
-        child: Container(
-            alignment: Alignment.center,
-            child: GestureDetector(
-                onTap: () =>
-                    _bottomSheetContent(detailPostC.detailPost[0].idUser),
-                child: Icon(Feather.more_horizontal))),
-      )
+      detailPostC.isMemberCommunity.value
+          ? Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 14, 0),
+              child: Container(
+                  alignment: Alignment.center,
+                  child: GestureDetector(
+                      onTap: () =>
+                          _bottomSheetContent(detailPostC.detailPost[0].idUser),
+                      child: Icon(Feather.more_horizontal))),
+            )
+          : SizedBox()
     ]);
   }
 
   Widget _body() {
     return Obx(
       () => detailPostC.isLoadingDetail
-          ? Center(child: CircularProgressIndicator())
+          ? DetailPostShimmer()
           : detailPostC.isMemberCommunity.value
-              ? Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              ? _content()
+              : Stack(
                   children: [
-                    Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: () => detailPostC.OnRefresh(),
-                        child: SingleChildScrollView(
-                          controller: detailPostC.scrollController,
-                          physics: BouncingScrollPhysics(
-                              parent: AlwaysScrollableScrollPhysics()),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _profile(),
-                              Divider(
-                                height: 5,
-                                thickness: 5,
-                                color: Colors.grey.shade200,
+                    _content(),
+                    Container(
+                      width: Get.width,
+                      height: Get.height,
+                      color: Colors.black.withOpacity(0.7),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 100,
+                            ),
+                            Icon(Feather.lock, color: Colors.white, size: 60),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              child: Text(
+                                "Anda bukan anggota komunitas ${detailPostC.communityName}",
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w700),
                               ),
-                              _comment(),
-                            ],
-                          ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              child: Text(
+                                "Gabung komunitas untuk dapat mengakses postingan ini",
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.poppins(
+                                    color: Colors.grey.shade400,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                            Container(height: 400)
+                          ],
                         ),
                       ),
                     ),
-                    Container(
-                      width: Get.width,
-                      color: Colors.white,
-                      child: _commentInput(),
-                    )
                   ],
-                )
-              : Center(
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 100,
-                      ),
-                      Text(
-                        "Anda bukan anggota komunitas ${detailPostC.communityName}",
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                            color: AppColors.tittleColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600),
-                      ),
-                      Text(
-                        "Gabung komunitas untuk dapat melihat postingan ini",
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                            color: Colors.grey.shade400,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      Container(height: 400)
-                    ],
-                  ),
                 ),
+    );
+  }
+
+  Widget _content() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: () => detailPostC.OnRefresh(),
+            child: SingleChildScrollView(
+              controller: detailPostC.scrollController,
+              physics: BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics()),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _profile(),
+                  Divider(
+                    height: 5,
+                    thickness: 5,
+                    color: Colors.grey.shade200,
+                  ),
+                  _comment(),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Container(
+          width: Get.width,
+          color: Colors.white,
+          child: _commentInput(),
+        )
+      ],
     );
   }
 
@@ -627,6 +656,7 @@ class DetailPostPage extends StatelessWidget {
   }
 
   void _bottomSheetReport(var idUser) {
+    detailPostC.valueRadio.value = 10;
     Get.bottomSheet(
         SafeArea(
           child: Padding(

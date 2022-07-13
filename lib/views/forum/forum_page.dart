@@ -10,6 +10,7 @@ import 'package:passify/controllers/forum/forum_controller.dart';
 import 'package:passify/widgets/general/app_bar.dart';
 import 'package:passify/widgets/general/post_card_widget.dart';
 import 'package:get/get.dart';
+import 'package:passify/widgets/shimmer/post_shimmer.dart';
 
 List post = [
   {'foto': "", 'name': 'Taesei Marukawa'},
@@ -40,7 +41,10 @@ class ForumPage extends StatelessWidget {
   Widget _body() {
     return forumController.isLoading
         ? Center(
-            child: CircularProgressIndicator(),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: PostShimmer(),
+            ),
           )
         : RefreshIndicator(
             onRefresh: () {

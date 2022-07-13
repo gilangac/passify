@@ -35,6 +35,7 @@ class ForumController extends GetxController {
   }
 
   onGetCommunityMember() async {
+    _isLoading.value = true;
     listMyIdCommunity.isNotEmpty ? listMyIdCommunity.clear() : null;
     await communityMember
         .where("idUser", isEqualTo: auth.currentUser!.uid)

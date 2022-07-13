@@ -163,6 +163,7 @@ Widget eventCard(
                                 width: Get.width * 0.5,
                                 child: Text(
                                   location ?? "GOR Wilis Madiun",
+                                  maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: GoogleFonts.poppins(
                                       fontSize: 12,

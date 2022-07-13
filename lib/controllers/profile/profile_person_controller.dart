@@ -23,6 +23,7 @@ class ProfilePersonController extends GetxController {
   final name = "".obs;
   final hobby = "".obs;
   final idUser = Get.arguments;
+  var valueRadio = 10.obs;
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionReference user = FirebaseFirestore.instance.collection('users');
@@ -40,7 +41,7 @@ class ProfilePersonController extends GetxController {
   var listMyIdEvent = [].obs;
   var listMyIdCommunity = [].obs;
   var dataEvent = <EventModel>[].obs;
-  var myProfile = <UserModel>[].obs;
+  var myProfile = <UserModel>[].obs; 
   var dataCommunity = <CommunityModel>[].obs;
   var communityData = <CommunityModel>[].obs;
   var dataMember = <CommunityMemberModel>[].obs;
@@ -271,7 +272,7 @@ class ProfilePersonController extends GetxController {
       "date": DateTime.now(),
     }).then((_) {
       NotificationService.pushNotifAdmin(
-          code: dataUser[0].idUser.toString(),
+          code: idReport,
           type: 3,
           username: myProfile[0].name,
           object: dataUser[0].username.toString());

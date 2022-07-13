@@ -294,6 +294,7 @@ class DetailPostController extends GetxController {
           commentText.value = '';
           int i = 0;
           int j = 0;
+          int k = 0;
           if (auth.currentUser!.uid != userPost[0].idUser &&
               memberCommunity.contains(userPost[0].idUser)) {
             String idNotif =
@@ -328,7 +329,6 @@ class DetailPostController extends GetxController {
               }
               if (snapshot.size == i) {
                 idUserCommentFilter = idUserComment.toSet().toList();
-                print(idUserCommentFilter);
                 idUserCommentFilter.removeWhere(
                     (idUserFilter) => idUserFilter == auth.currentUser!.uid);
                 idUserCommentFilter.removeWhere(
@@ -339,13 +339,13 @@ class DetailPostController extends GetxController {
                       .doc(idUser.toString())
                       .get()
                       .then((datauser) async {
+                    k++;
                     tokenUser.addAll(datauser['fcmToken']);
-                    if (idUserCommentFilter.length == tokenUser.length) {
+                    if (idUserCommentFilter.length == k) {
                       await Future.forEach(tokenUser, (token) async {
                         j++;
                         listAllTokenComment.add(token);
                         if (tokenUser.length == j) {
-                          print(listAllTokenComment);
                           NotificationService.pushNotif(
                               code: Get.arguments,
                               registrationId: listAllTokenComment,
@@ -411,7 +411,7 @@ class DetailPostController extends GetxController {
       "date": DateTime.now(),
     }).then((_) {
       NotificationService.pushNotifAdmin(
-          code: idPost,
+          code: idReport,
           type: 2,
           username: myProfile[0].name,
           object: detailPost[0].title);
