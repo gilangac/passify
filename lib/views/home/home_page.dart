@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/home/home_controller.dart';
 import 'package:passify/routes/pages.dart';
+import 'package:passify/services/service_preference.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:lottie/lottie.dart';
 import 'package:passify/widgets/general/event_widget.dart';
@@ -49,12 +50,24 @@ class HomePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(dataUser.name.toString(),
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    height: 1,
-                    fontWeight: FontWeight.w600,
-                  )),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(dataUser.name.toString(),
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        height: 1,
+                        fontWeight: FontWeight.w600,
+                      )),
+                  if (PreferenceService.getStatusUser() == "verified")
+                    Icon(
+                      Icons.check_circle,
+                      size: 17,
+                      color: Colors.blue.shade400,
+                    )
+                ],
+              ),
               Text(dataUser.username.toString(),
                   style: GoogleFonts.poppins(
                     fontSize: 14,

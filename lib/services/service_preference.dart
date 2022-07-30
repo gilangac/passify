@@ -11,6 +11,7 @@ class PreferenceService extends GetxService {
   static final _keyBoard = 'first';
   static final _keyStatus = 'unlogged';
   static final _keyUserId = 'userId';
+  static final _keyStatusUser = 'unverif';
   static final _keyFcmToken = 'fcmToken';
   static final _keyC1 = '0';
   static final _keyC2 = '1';
@@ -37,7 +38,7 @@ class PreferenceService extends GetxService {
     return null;
   }
 
-    static Future setIsLogged(bool isLogged) async {
+  static Future setIsLogged(bool isLogged) async {
     await _preferences.setBool(_keyIsLogged, isLogged);
   }
 
@@ -131,6 +132,17 @@ class PreferenceService extends GetxService {
 
   static int? getC4() {
     final data = _preferences.getInt(_keyC4);
+
+    if (data != null) return data;
+    return null;
+  }
+
+  static Future setStatusUser(String statusUser) async {
+    await _preferences.setString(_keyStatusUser, statusUser);
+  }
+
+  static String? getStatusUser() {
+    final data = _preferences.getString(_keyStatusUser);
 
     if (data != null) return data;
     return null;

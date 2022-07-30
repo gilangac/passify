@@ -5,12 +5,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:passify/controllers/auth/firebase_auth_controller.dart';
+import 'package:passify/controllers/home/home_controller.dart';
+import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/helpers/snackbar_helper.dart';
 import 'package:passify/models/community.dart';
 import 'package:passify/models/community_member.dart';
 import 'package:passify/models/event.dart';
 import 'package:passify/models/user.dart';
 import 'package:intl/intl.dart';
+import 'package:passify/services/service_notification.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProfileController extends GetxController {
@@ -227,6 +230,30 @@ class ProfileController extends GetxController {
       }).onError((error, stackTrace) {
         Get.snackbar("Terjadi Kesalahan", "Periksa koneksi internet anda!");
       });
+    }
+  }
+
+  onRequestVerifAccount() async {
+    Get.back();
+    DialogHelper.showLoading();
+    final User? users = auth.currentUser;
+    final String? idUser = users!.uid;
+    DocumentReference dataUserr = firestore.collection("users").doc(idUser);
+    try {
+      await dataUserr.update({
+        "status": 3,
+      });
+      Get.back();
+      Get.back();
+      NotificationService.pushNotifAdmin(
+          code: "", type: 4, username: dataUser[0].name, object: "");
+      SnackBarHelper.showSucces(description: "Berhasil mengajukan permintaan");
+      HomeController homeC = Get.find();
+      homeC.onRefreshData();
+      onRefresh();
+    } catch (e) {
+      Get.back();
+      SnackBarHelper.showError(description: "Gagal mengajukan permintaan");
     }
   }
 

@@ -6,8 +6,10 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/auth/firebase_auth_controller.dart';
+import 'package:passify/controllers/profile/profile_controller.dart';
 import 'package:passify/helpers/dialog_helper.dart';
 import 'package:passify/routes/pages.dart';
+import 'package:passify/services/service_preference.dart';
 
 FirebaseAuthController firebaseAuthController =
     Get.put(FirebaseAuthController());
@@ -54,6 +56,19 @@ void _bottomSheetContentProfile() {
                         height: 1,
                         color: Colors.grey.shade300,
                       ),
+                      if (PreferenceService.getStatusUser() != "verified" &&
+                          PreferenceService.getStatusUser() != "waiting")
+                        _listAction2(
+                            icon: Feather.check_circle,
+                            title: "Verifikasi Akun",
+                            path: AppPages.EDIT_PROFILE,
+                            type: "verif"),
+                      if (PreferenceService.getStatusUser() != "verified" &&
+                          PreferenceService.getStatusUser() != "waiting")
+                        Divider(
+                          height: 1,
+                          color: Colors.grey.shade300,
+                        ),
                       _listAction2(
                           icon: Feather.info,
                           title: "Tentang Aplikasi",
@@ -90,7 +105,20 @@ Widget _listAction2({
         borderRadius: BorderRadius.circular(10),
         onTap: () {
           Get.back();
-          type == "about" ? DialogHelper.showInfo() : Get.toNamed(path);
+          type == "about"
+              ? DialogHelper.showInfo()
+              : type == "verif"
+                  ? DialogHelper.showConfirm(
+                      title: "Ajukan Verifikasi Akun",
+                      description:
+                          "Akun yang telah terverifikasi dapat memiliki hak untuk mengelola komunitas dan event. \n\nApa anda yakin akan mengajukan permintaan verifikasi akun?",
+                      titleSecondary: "Batal",
+                      titlePrimary: "Ajukan",
+                      action: () {
+                        ProfileController profileC = Get.find();
+                        profileC.onRequestVerifAccount();
+                      })
+                  : Get.toNamed(path);
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/profile/profile_controller.dart';
+import 'package:passify/services/service_preference.dart';
 import 'package:passify/widgets/general/circle_avatar.dart';
 import 'package:passify/widgets/general/community_widget.dart';
 import 'package:passify/widgets/general/event_widget.dart';
@@ -121,12 +122,26 @@ class ProfilePage extends StatelessWidget {
         SizedBox(
           height: 10,
         ),
-        Text(
-          profileC.name.toString(),
-          style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: AppColors.tittleColor),
+        Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                profileC.name.toString(),
+                style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.tittleColor),
+              ),
+              if (PreferenceService.getStatusUser() == "verified")
+                Icon(
+                  Icons.check_circle,
+                  size: 17,
+                  color: Colors.blue.shade400,
+                )
+            ],
+          ),
         ),
         Text(
           dataUser.hobby!.length == 1

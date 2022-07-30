@@ -29,6 +29,8 @@ class EventController extends GetxController {
   final _isLoading = true.obs;
   var selectedDropdown = 'WIB'.obs;
   var selectedTime = '00.00 '.obs;
+  var latitude = ''.obs;
+  var longitude = ''.obs;
   DateTime dateEvent = DateTime.now();
   var category = Get.arguments;
 
@@ -37,6 +39,7 @@ class EventController extends GetxController {
   final locationFC = TextEditingController();
   final dateFC = TextEditingController();
   final timeFC = TextEditingController();
+  final addressFC = TextEditingController();
 
   @override
   void onInit() async {
@@ -59,7 +62,10 @@ class EventController extends GetxController {
           "name": nameFC.text,
           "category": category,
           "description": descriptionFC.text,
-          "location": locationFC.text,
+          "latitude": latitude.value,
+          "longitude": longitude.value,
+          "location": addressFC.text,
+          "locationDesc": locationFC.text,
           "date": dateNow,
           "dateEvent": dateEvent,
           "time": timeFC.text,
@@ -116,6 +122,9 @@ class EventController extends GetxController {
                 idEvent: d["idEvent"],
                 description: d["description"],
                 location: d["location"],
+                locationDesc: d["locationDesc"],
+                latitude: d["latitude"],
+                longitude: d["longitude"],
                 time: d["time"],
                 dateEvent: d["dateEvent"],
                 sort: int.parse(sort),

@@ -8,6 +8,9 @@ class EventModel {
   String? idUser;
   Timestamp? date;
   String? location;
+  String? locationDesc;
+  String? latitude;
+  String? longitude;
   String? time;
   Timestamp? dateEvent;
   int? member;
@@ -22,6 +25,9 @@ class EventModel {
       this.idUser,
       this.date,
       this.location,
+      this.locationDesc,
+      this.latitude,
+      this.longitude,
       this.time,
       this.dateEvent,
       this.member,

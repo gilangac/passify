@@ -51,6 +51,7 @@ class NotificationService extends GetxService {
       "Postingan Baru",
       "Komentar Baru",
       "Partisipan Event Baru"
+          "Permintaan Verifikasi Akun"
     ];
 
     List messageNotif = [
@@ -100,13 +101,21 @@ class NotificationService extends GetxService {
       String? username,
       required int type,
       String? object}) async {
+    List titleNotif = [
+      "Laporan Masuk",
+      "Laporan Masuk",
+      "Laporan Masuk",
+      "Laporan Masuk",
+      "Permintaan Verifikasi Akun"
+    ];
     List messageNotif = [
       "melaporkan event $object",
       "melaporkan komunitas $object",
       "melaporkan postingan $object",
       "melaporkan akun $object",
+      "Mengajukan permintaan verifikasi akun"
     ];
-
+    String titleBody = titleNotif[type].toString();
     String messageBody = messageNotif[type].toString();
     final uri = Uri.parse('https://fcm.googleapis.com/fcm/send');
     final headers = {
@@ -116,7 +125,7 @@ class NotificationService extends GetxService {
     };
     Map<String, dynamic> body = {
       "notification": {
-        "title": "Laporan Masuk",
+        "title": titleBody,
         "body": "$username $messageBody",
       },
       "data": {

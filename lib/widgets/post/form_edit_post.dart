@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:passify/constant/color_constant.dart';
 import 'package:passify/controllers/forum/detail_event_controller.dart';
 import 'package:intl/intl.dart';
+import 'package:passify/views/forum/maps_new_event_page.dart';
 
 DetailEventController controller = Get.find();
 
@@ -34,6 +35,7 @@ void formCreateEvent() {
                         _formEventName(),
                         _formEventDate(),
                         _formEventTime(),
+                        _formEventPickLocation(),
                         _formEventLocation(),
                         _formEventDesc(),
                         SizedBox(height: 50),
@@ -79,6 +81,41 @@ Widget _formEventName() {
   );
 }
 
+Widget _formEventPickLocation() {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+    child: GestureDetector(
+      onTap: () {
+        Get.to(() => MapsPageNewEvent(), arguments: "edit");
+      },
+      child: TextFormField(
+        onChanged: (text) => {},
+        keyboardType: TextInputType.name,
+        textInputAction: TextInputAction.next,
+        enabled: false,
+        onTap: () {
+          Get.to(() => MapsPageNewEvent(), arguments: "edit");
+        },
+        decoration: InputDecoration(
+            hintText: "Lokasi",
+            suffixIcon: Icon(
+              Feather.map_pin,
+              color: Colors.grey.shade300,
+            )),
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Masukkan Nama Event terlebih dahulu';
+          }
+          return null;
+        },
+        controller: controller.addressFC
+          ..text = controller.detailEvent[0].location.toString(),
+      ),
+    ),
+  );
+}
+
 Widget _formEventLocation() {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -89,7 +126,7 @@ Widget _formEventLocation() {
         enabled: true,
         maxLines: 4,
         minLines: 2,
-        decoration: InputDecoration(hintText: "Lokasi"),
+        decoration: InputDecoration(hintText: "Deskripsi Lokasi"),
         autovalidateMode: AutovalidateMode.onUserInteraction,
         validator: (value) {
           if (value == null || value.isEmpty) {
@@ -98,7 +135,7 @@ Widget _formEventLocation() {
           return null;
         },
         controller: controller.locationFC
-          ..text = controller.detailEvent[0].location.toString()),
+          ..text = controller.detailEvent[0].locationDesc.toString()),
   );
 }
 

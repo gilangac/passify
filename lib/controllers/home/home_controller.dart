@@ -60,6 +60,7 @@ class HomeController extends GetxController {
 
   @override
   void onInit() async {
+    print("c2 : ${PreferenceService.getC2()}");
     onRefreshData();
     super.onInit();
   }
@@ -128,6 +129,18 @@ class HomeController extends GetxController {
         listMyHobby.value = d['hobby'];
         myCity.value = d['city'];
         myProvince.value = d['province'];
+        if (d["status"].toString() == "1") {
+          PreferenceService.setStatusUser("unverif");
+        }
+
+        if (d["status"].toString() == "2") {
+          PreferenceService.setStatusUser("verified");
+        }
+
+        if (d["status"].toString() == "3") {
+          PreferenceService.setStatusUser("waiting");
+        }
+
         if (d["status"] == 0) {
           FirebaseAuthController firebaseAuthController =
               Get.put(FirebaseAuthController());

@@ -14,6 +14,8 @@ import 'package:passify/controllers/forum/event_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:passify/models/community.dart';
 import 'package:passify/models/event.dart';
+import 'package:passify/services/service_preference.dart';
+import 'package:passify/views/forum/maps_new_event_page.dart';
 import 'package:passify/widgets/general/app_bar.dart';
 import 'package:passify/widgets/general/bottomsheet_widget.dart';
 import 'package:passify/widgets/general/community_widget.dart';
@@ -30,13 +32,12 @@ class HobbyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: _appBar(),
-        body: _body(),
-        backgroundColor: Colors.white,
-      ),
-    );
+        length: 2,
+        child: Scaffold(
+          appBar: _appBar(),
+          body: _body(),
+          backgroundColor: Colors.white,
+        ));
   }
 
   PreferredSizeWidget _appBar() {
@@ -171,21 +172,22 @@ class HobbyPage extends StatelessWidget {
                         ),
                       ),
                     ),
-              Positioned(
-                right: 20,
-                bottom: 20,
-                child: FloatingActionButton(
-                  onPressed: () => _formCreateEvent(),
-                  child: Icon(
-                    Icons.add,
-                    color: AppColors.primaryColor,
-                    size: 29,
+              if (PreferenceService.getStatusUser() == "verified")
+                Positioned(
+                  right: 20,
+                  bottom: 20,
+                  child: FloatingActionButton(
+                    onPressed: () => _formCreateEvent(),
+                    child: Icon(
+                      Icons.add,
+                      color: AppColors.primaryColor,
+                      size: 29,
+                    ),
+                    backgroundColor: Colors.white,
+                    elevation: 2,
+                    splashColor: Colors.grey,
                   ),
-                  backgroundColor: Colors.white,
-                  elevation: 2,
-                  splashColor: Colors.grey,
-                ),
-              )
+                )
             ],
           );
   }
@@ -251,21 +253,22 @@ class HobbyPage extends StatelessWidget {
                         ),
                       ),
                     ),
-              Positioned(
-                right: 20,
-                bottom: 20,
-                child: FloatingActionButton(
-                  onPressed: () => _formCreateCommunity(),
-                  child: Icon(
-                    Icons.add,
-                    color: AppColors.primaryColor,
-                    size: 29,
+              if (PreferenceService.getStatusUser() == "verified")
+                Positioned(
+                  right: 20,
+                  bottom: 20,
+                  child: FloatingActionButton(
+                    onPressed: () => _formCreateCommunity(),
+                    child: Icon(
+                      Icons.add,
+                      color: AppColors.primaryColor,
+                      size: 29,
+                    ),
+                    backgroundColor: Colors.white,
+                    elevation: 2,
+                    splashColor: Colors.grey,
                   ),
-                  backgroundColor: Colors.white,
-                  elevation: 2,
-                  splashColor: Colors.grey,
-                ),
-              )
+                )
             ],
           );
   }
@@ -293,6 +296,7 @@ class HobbyPage extends StatelessWidget {
                           _formEventName(),
                           _formEventDate(),
                           _formEventTime(),
+                          _formEventPickLocation(),
                           _formEventLocation(),
                           _formEventDesc(),
                           SizedBox(height: 50),
@@ -337,6 +341,40 @@ class HobbyPage extends StatelessWidget {
     );
   }
 
+  Widget _formEventPickLocation() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      child: GestureDetector(
+        onTap: () {
+          Get.to(() => MapsPageNewEvent(), arguments: "create");
+        },
+        child: TextFormField(
+          onChanged: (text) => {},
+          keyboardType: TextInputType.name,
+          textInputAction: TextInputAction.next,
+          enabled: false,
+          onTap: () {
+            Get.to(() => MapsPageNewEvent(), arguments: "create");
+          },
+          decoration: InputDecoration(
+              hintText: "Lokasi",
+              suffixIcon: Icon(
+                Feather.map_pin,
+                color: Colors.grey.shade300,
+              )),
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Masukkan Nama Event terlebih dahulu';
+            }
+            return null;
+          },
+          controller: eventC.addressFC,
+        ),
+      ),
+    );
+  }
+
   Widget _formEventLocation() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -347,7 +385,7 @@ class HobbyPage extends StatelessWidget {
           enabled: true,
           maxLines: 4,
           minLines: 2,
-          decoration: InputDecoration(hintText: "Lokasi"),
+          decoration: InputDecoration(hintText: "Keterangan Lokasi"),
           autovalidateMode: AutovalidateMode.onUserInteraction,
           validator: (value) {
             if (value == null || value.isEmpty) {

@@ -52,6 +52,8 @@ class DetailEventController extends GetxController {
   var idEvent = Get.arguments;
   var myAccountId = ''.obs;
   var valueRadio = 10.obs;
+  var latitude = ''.obs;
+  var longitude = ''.obs;
   var selectedDropdown = 'WIB'.obs;
   var selectedTime = '00.00 '.obs;
   final formKeyEditEvent = GlobalKey<FormState>();
@@ -62,6 +64,7 @@ class DetailEventController extends GetxController {
   final locationFC = TextEditingController();
   final dateFC = TextEditingController();
   final timeFC = TextEditingController();
+  final addressFC = TextEditingController();
 
   @override
   void onInit() async {
@@ -121,9 +124,15 @@ class DetailEventController extends GetxController {
                 idEvent: d["idEvent"],
                 description: d["description"],
                 location: d["location"],
+                locationDesc: d["locationDesc"],
+                latitude: d["latitude"],
+                longitude: d["longitude"],
                 time: d["time"],
                 dateEvent: d["dateEvent"],
                 member: snapshotMember.size));
+
+            latitude.value = d["latitude"];
+            longitude.value = d["longitude"];
 
             user
                 .where("idUser", isEqualTo: member["idUser"])
@@ -214,7 +223,10 @@ class DetailEventController extends GetxController {
         await event.doc(idEvent).update({
           "name": nameFC.text,
           "description": descriptionFC.text,
-          "location": locationFC.text,
+          "location": addressFC.text,
+          "locationDesc": locationFC.text,
+          "latitude": latitude.value,
+          "longitude": longitude.value,
           "dateEvent": dateEvent,
           "time": timeFC.text,
         });
